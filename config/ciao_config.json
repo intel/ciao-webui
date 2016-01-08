@@ -1,0 +1,24 @@
+{
+    "development": {
+        "controller": {
+            "host": "hostname",
+            "port": "port number",
+            "protocol": "http or https"
+        },
+        "keystone": {
+            "host": "hostname",
+            "port": "port number",
+            "protocol": "http or https",
+            "uri": "/v3/auth/tokens"
+        },
+        "ui": {
+            "protocol": "http or https",
+            "certificates": {
+                "key": "path to key pem",
+                "cert": "path to cert pem",
+                "passphrase": "",
+                "trusted": []
+            }
+        }
+    }
+}

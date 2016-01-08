@@ -1,0 +1,57 @@
+<div class="tenant-page">
+    <!-- starts top navigation bar -->
+    <div id="main-top-navbar" attr-user="<%= username %>"></div>
+    <!-- header -->
+    <div class="row add-margin-bottom add-margin-top">
+        <div class="col-md-8">
+            <h6 class="frm-bold-text">
+                <%= section %>
+            </h6>
+        </div>
+        <div class="col-md-4">
+            <!-- Insert 'add Instance' Button dynamically -->
+            <div id="add-instances">
+            </div>
+        </div>
+    </div>
+    <!-- ends header -->
+
+    <!-- Usage summary -->
+    <div class="usage-summary">
+        <div class="container">
+            <h2 class="frm-bold-text add-margin-bottom">
+                Usage Summary
+            </h2>
+            <!-- Insert summary elements dynamically -->
+            <div id="usage-summary" >
+            </div>
+        </div>
+    </div>
+    <!-- ends Usage summary -->
+
+    <!-- grouped instances -->
+    <div class="grouped-instances add-margin-bottom">
+        <h2 class="frm-bold-text add-margin-bottom">
+            Grouped Instances
+        </h2>
+        <!-- Insert Workloads components dynamically -->
+        <div id="workloads-container" class="intances">
+        </div>
+    </div>
+    <!-- end grouped instances -->
+
+    <!-- instances on this host -->
+    <div class="instances">
+        <div class="row">
+            <div class="col-md-12">
+                <h2 class="frm-bold-text add-margin-bottom">
+                    Instances on this host
+                </h2>
+            </div>
+        </div>
+        <div id="instances-host" ></div>
+
+    </div>
+    <!-- end instances on this host -->
+</div>
+

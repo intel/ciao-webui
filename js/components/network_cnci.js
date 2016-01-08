@@ -1,0 +1,103 @@
+// React js component
+var React = require('react');
+var CustomeCatalogue = require('./catalogue/customeCatalogue.js');
+
+var $ = require('jquery')
+
+var networkCnci = React.createClass({
+
+    restart: function(item) {
+        console.log('Restaring instance: ', item);
+        //TODO: Change state in server. Changing locally just for testing
+    },
+    disabledRestartButton: function(item){
+
+        var disabled = true;
+        if(item.length > 0){
+            disabled =  false;
+        }
+        return disabled;
+    },
+    getActions: function(){
+
+        return [
+                {
+                    label:'Restart',
+                    name:'restart',
+                    onClick:this.restart,
+                    onDisabled:this.disabledRestartButton
+                }
+            ];
+    },
+    getSearchfields: function(){
+        return ['tenant', 'geography', 'rack_identifier'];
+    },
+
+    componentDidMount: function() {
+        var update = function () {
+            $.get({url: this.props.source})
+                .done(function (data) {
+                    if (data) {
+                        var fmtData = {
+                            source:this.props.source,
+                            data:data.cncis.map((cnci) => {
+                                var fmtCnci = {};
+                                for(key in cnci) {
+                                    switch (key) {
+
+                                        case 'id':
+                                        fmtCnci.cnci_uuid = cnci.id;
+                                        break;
+
+                                        case 'subnets':
+                                        var subnetString = "";
+                                        cnci.subnets.forEach((val) => {
+                                            subnetString += val.subnet_cidr+" ";
+                                        });
+                                        fmtCnci.subnets = subnetString;
+                                        break;
+
+                                        default:
+                                        fmtCnci[key] = cnci[key];
+                                        break;
+                                    }
+                                }
+                                return fmtCnci;
+                            })};
+
+                        datamanager.setDataSource('network-cnci',fmtData);
+                    }
+                }.bind(this));;
+        }.bind(this);
+
+        update();
+        window.setInterval(update,2000);
+    },
+
+    render: function() {
+
+        var columns = [];
+        if (this.props.data) {
+            columns= Object.keys(this.props.data[0]).map(function(text){
+                return text.replace('_', ' ');
+            });
+        }
+
+        var link = {
+            field:'cnci_uuid',
+            url:'/admin/network/'
+        };
+
+        return (
+        <CustomeCatalogue
+            data={this.props.data}
+            link={link}
+            columns={columns}
+            actions={this.getActions()}
+            searchFields={this.getSearchfields()}
+            />
+        );
+    }
+});
+
+module.exports = networkCnci;

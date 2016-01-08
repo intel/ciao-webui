@@ -1,0 +1,77 @@
+
+<div class="admin-page">
+  <!-- starts top navigation bar -->
+  <div id="main-top-navbar" attr-user="<%= username %>"></div>
+  <!-- header -->
+  <div class="row">
+    <div class="col-md-8">
+      <h6 class="frm-bold-text">
+        <%= title %>
+      </h6>
+    </div>
+    <div class="col-md-4">
+      <div id="active-tenants">
+      </div>
+    </div>
+  </div>
+  <!-- ends header -->
+
+  <!-- Node Summary -->
+  <div class="node-summary">
+    
+      <!-- Insert node summary dynamically -->
+      <div id="node-summary" >
+      </div>
+    
+  </div>
+  <!-- ends Usage summary -->
+
+  <!-- Usage summary -->
+  <div class="usage-summary">
+    <div class="container">
+      <h2 class="frm-bold-text add-margin-bottom">
+        Usage Summary
+      </h2>
+
+      <div class="row">
+        <div class="col-md-3">
+          <!-- Insert summary elements dynamically -->
+          <div id="instances-counter" >
+          </div>
+        </div>
+        <div class="col-md-9">
+          <!-- Insert summary elements dynamically -->
+          <div id="usage-summary" >
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- ends Usage summary -->
+
+  <!-- instances on this host -->
+  <div class="nodes">
+    <div class="row">
+      <div class="col-md-12">
+        <h2 class="frm-bold-text add-margin-bottom">
+          Nodes
+        </h2>
+      </div>
+    </div>
+    <div id="nodes" ></div>
+  </div>
+
+  <!-- instances on this host -->
+  <div class="network">
+    <div class="row">
+      <div class="col-md-12">
+        <h2 class="frm-bold-text add-margin-bottom">
+          Network CNCI
+        </h2>
+      </div>
+    </div>
+    <div id="network-cnci" ></div>
+  </div>
+  <!-- end instances on this host -->
+</div>
+

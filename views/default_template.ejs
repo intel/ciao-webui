@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title><%= title %></title>
+  </head>
+  <body>
+
+    <div class="main-container container">
+      <!-- default template accepts page path to include -->
+      <%- include(page,data) %>
+    </div>
+
+    <!-- this template loads JS files passed on the "scripts" array -->
+    <% scripts.forEach( (script) => { %>
+    <script type="text/javascript" src="<%= script %>"></script>
+    <%}); %>
+  </body>
+</html>

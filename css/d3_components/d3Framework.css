@@ -1,0 +1,33 @@
+/* lineChart component */
+.line {
+    fill: none;
+    stroke: steelblue;
+    stroke-width: 1.5px;
+}
+
+.line-chart-time-control {
+    text-align: center;
+    padding-top: 5px;
+    padding-left
+}
+
+.arc text {
+    text-anchor: middle;
+}
+.arc path {
+    stroke: #fff;
+}
+
+.domain {
+    fill: none;
+    stroke: #000;
+    stroke-width: 1.5px;
+}
+
+/* Bootstrap's grid system adds padding when using columns, use this class
+   to override if necessary
+*/
+.no-padding {
+    padding-right: 0px!important;
+    padding-left: 0px!important;
+}

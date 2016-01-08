@@ -1,0 +1,12 @@
+node_modules
+npm-debug.log
+public/javascripts/*
+build
+config/identity_config.json
+config/ciao_config.json
+public/stylesheets/*
+views/development_template.ejs
+views/development_template.ejs.bak
+views/default_template.ejs.bak
+views/production_template.ejs
+css/css_framework/bootstrap.min.css

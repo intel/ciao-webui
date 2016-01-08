@@ -1,0 +1,161 @@
+// CIAO adapter
+
+// ciaoAdapter constructor
+// If no configuration file is set for ciao, hostname, port and protocol
+// may be set in this function.
+var ciaoAdapter = function (hostname, port, protocol) {
+
+    if (!hostname || !port || !protocol) {
+        var config = getConfigFromFile();
+        this.host = config.host;
+        this.port = config.port;
+        this.protocol = config.protocol;
+    } else {
+        this.protocol = protocol;
+        this.host = hostname;
+        this.port = port;
+    }
+    console.log(this);
+    this.http = require((config.protocol)?config.protocol:"http");
+};
+
+ciaoAdapter.prototype.delete = function (path,token, next){
+
+    var options = getHttpOptions(this.host,
+                                 this.port,
+                                 path,
+                                 "DELETE",
+                                 this.protocol,
+                                 token);
+    var response = new httpResponse(next);
+    var req = this.http.request(options, response.callback);
+    req.end();
+    return response;
+};
+
+// Use Path as the endpoint we want to request in accordance to the API
+ciaoAdapter.prototype.get = function (path,token, next){
+
+    var options = getHttpOptions(this.host,
+                                 this.port,
+                                 path,
+                                 "GET",
+                                 this.protocol,
+                                 token);
+    var response = new httpResponse(next);
+    var req = this.http.request(options, response.callback);
+    req.end();
+    return response;
+};
+
+ciaoAdapter.prototype.post = function (path, data,token, next){
+
+    var options = getHttpOptions(this.host,
+                                 this.port,
+                                 path,
+                                 "POST",
+                                 this.protocol,
+                                 token);
+
+    var dataString = JSON.stringify(data);
+    // get content-length and add to header
+
+    options.headers["Content-Length"] = dataString.length;
+
+    var response = new httpResponse(next);
+    var req = this.http.request(options, response.callback);
+    req.write(dataString);
+    req.end();
+    return response;
+};
+
+// Declarative style methods for CIAO Adapter
+// Note: declarative methods are not "RESTful" use for  testing purposes only
+// DO NOT implement more methods than required, use .get, .post instead
+// by providing an URI to access the CIAO API
+
+ciaoAdapter.prototype.getFlavors = function (tenant_id,token, next){
+    var options = getHttpOptions(this.host,
+                                 this.port,
+                                 "/v2.1/" + tenant_id + "/flavors",
+                                 "GET",
+                                 this.protocol,
+                                 token);
+
+    var response = new httpResponse(next);
+    var req = this.http.request(options, response.callback);
+    req.end();
+
+    return response;
+};
+
+ciaoAdapter.prototype.getServersDetail = function (tenant_id,token, next){
+    var options = getHttpOptions(this.host,
+                                 this.port,
+                                 "/v2.1/" + tenant_id + "/servers/detail",
+                                 "GET",
+                                 this.protocol,
+                                 token);
+
+    var response = new httpResponse(next);
+    var req = this.http.request(options, response.callback);
+    req.end();
+    return response;
+};
+
+// Helper functions
+
+// Return json configuration from ciao_config.json file
+var getConfigFromFile = function () {
+    var file = __dirname +"/../config/ciao_config.json";
+    var fs = require('fs');
+    var config = JSON.parse(fs.readFileSync(file, 'utf8'));
+    return config[process.env.NODE_ENV].controller;
+};
+
+// Use this helper function to build an authenticated request, specify HTTP or
+// HTTPS protocol, HTTP method, host and port.
+var getHttpOptions = function (host, port, path, method, protocol, token) {
+
+    var options = {
+        host: host,
+        port: port,
+        method: method,
+        path: (protocol+ "://" + host + ":" + port + path),
+        headers: {
+            "Content-Type":"application/json",
+            "X-Auth-Token": token,
+            "X-Service-Token": token
+        }
+    };
+
+    // Accept Unauthorized Certificates
+    options.rejectUnauthorized = false;
+
+    return options;
+};
+
+// This httpResponse helper will handle and store response in JSON format
+// while accepting a callback function
+var httpResponse = function (next) {
+
+    this.callback = function (response) {
+        var chunk = '';
+        response.on('data', function(c){chunk += c;});
+        response.on('end', function() {
+            this.response = response;
+            this.raw = chunk;
+            if (response.statusCode == 200) {
+                try {
+                    this.json = JSON.parse(chunk);
+                }catch(e){
+                    this.json = {error:e};
+                }
+            }
+            if(next)
+                next(); // callback passed
+        }.bind(this));
+    }.bind(this);
+};
+
+module.exports = ciaoAdapter;

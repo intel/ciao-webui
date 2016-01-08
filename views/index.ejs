@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <h1><%= title %></h1>
+    <p>This application is under development. At this moment hese are the available pages.</p>
+    <ul>
+      <% for(var key in urls) { %> 
+      <li><a href="<%= urls[key] %>"/><%= urls[key] %></li>
+      <% } %>
+    </ul>
+  </body>
+</html>
