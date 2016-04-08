@@ -67,7 +67,7 @@ cp -r node_modules/bootstrap/dist/fonts/* public/stylesheets/fonts
 cp -r node_modules/bootstrap/dist/css/bootstrap.min.css public/stylesheets
 
 # Copy datamanager.js to public directory
-cp build/data/dataManager.js public/javascripts/dataManager.js
+cp build/data/dataManager.js public/javascripts/datamanager.js
 
 # Verify the environment to define the template
 if [ $env == "default" ]
