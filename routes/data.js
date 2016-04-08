@@ -137,7 +137,7 @@ router.get('/:tenant/flavors/:flavor', function(req, res, next) {
     var data = adapter.get(uri,req.session.token, () => res.send(data.json));
 });
 
-router.get('/:tenant/resources', function (req, res, next) {
+router.get('/:tenant/quotas', function (req, res, next) {
     validateTokenScope(req, res, {
         "success": (t) => {
             // validate Units for usage sumary components
@@ -151,7 +151,7 @@ router.get('/:tenant/resources', function (req, res, next) {
                     (value / 1000) + "TB";
             };
 
-            var uri = "/v2.1/" + req.params.tenant + "/resources";
+            var uri = "/v2.1/" + req.params.tenant + "/quotas";
             var data = adapter.get(uri,req.session.token, () => {
                 if (data.json) {
                     function validateQuota (value) {

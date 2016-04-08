@@ -34,7 +34,7 @@ $('document').ready(function () {
 
     //Usage summary
     datamanager.onDataSourceSet('usage-summary', function (sourceData) {
-        sourceData.source = "/resources";
+        sourceData.source = "/quotas";
         ReactDOM.render(
             <UsageSummary {...sourceData}/>,
             document.getElementById("usage-summary"));
