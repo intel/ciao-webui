@@ -312,6 +312,7 @@
                          oldToken = req.session.token;
                          req.session.token = finalToken;
                          req.session.user_uuid = result.json.token.user.id;
+                         req.session.roles = result.json.token.roles;
                          console.log("authenticate: keystone token retrieved: "+
                                      req.session.token);
                      }

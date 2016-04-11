@@ -31,10 +31,6 @@ if [ ! -f public/javascripts/library/jquery-ui.js ]; then
     mv jquery-ui.min.js public/javascripts/library/jquery-ui.js
 fi
 
-# Download bootstrap from CDN
-
-curl 'http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css' \n -o css/css_framework/bootstrap.min.css
-
 # Download required font
 mkdir tempDownloads
 cd tempDownloads
@@ -105,6 +101,11 @@ npm run babel-react &
 npm run build-login
 npm run build-tenant
 npm run build-admin
+npm run build-machine
+npm run build-network
+npm run build-subnet
+npm run build-group
+
 
 # Start the application
 npm start
