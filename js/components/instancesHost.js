@@ -15,7 +15,8 @@ var instancesHost = React.createClass({
     getDefaultProps: function () {
         // source defaults to server details url
         return {
-            data: []
+            data: [],
+            count : 0
 
         };
     },
@@ -116,6 +117,7 @@ var instancesHost = React.createClass({
             onDisabled: this.disabledStartButton
         }, {
             label: 'Stop',
+
             name: 'stop',
             onClick: this.stopInstance,
             onDisabled: this.disabledStopButton
@@ -147,26 +149,38 @@ var instancesHost = React.createClass({
 
         var callSource = function () {
 
-            //limit=5&marker=e0829f26-5ce2-481d-b8e1-ab671d0cda5a
-            console.log('callSource', this.props.source);
-            var query = '?limit=5&marker=' + this.state.pagination.instance_id;
+            var query = '?limit=5';
 
-            this.props.source = this.props.source + query;
-            console.log('this.props.source', this.props.source);
-            $.get({
-                url: this.props.source }).done(function (data) {
-                if (data) {
+            console.log('this.state.pagination', this.state);
+
+            if(this.state.pagination){
+                query = query + '&marker=' + this.state.pagination.instance_id;
+            }
+            console.log('query', query);
+            var url = this.props.source + query;
+
+            $.get({url: url })
+                .done(function (data) {
+                    if (data) {
+
+                        var url = this.props.source + '/count';
+                        $.get({url: url })
+                            .done(function (count) {
+
+                                datamanager.setDataSource(this.props.dataKey, {
+                                    dataKey: this.props.dataKey,
+                                    source: this.props.source,
+                                    data: data,
+                                    count: count.count
+                                });
+                            }.bind(this));
+                    }
+                }.bind(this))
+                .fail(function (err) {
                     datamanager.setDataSource(this.props.dataKey, {
                         dataKey: this.props.dataKey,
-                        source: this.props.source,
-                        data: data
-                    });
-                }
-            }.bind(this)).fail(function (err) {
-                datamanager.setDataSource(this.props.dataKey, {
-                    dataKey: this.props.dataKey,
-                    source: this.props.source });
-            }.bind(this));
+                        source: this.props.source });
+                }.bind(this));
         }.bind(this);
         callSource();
 
@@ -176,7 +190,7 @@ var instancesHost = React.createClass({
     },
 
     onChangePage: function (lastRecord) {
-
+        console.log('amen');
         this.setState({ pagination: lastRecord });
         //onStateChange
         //componentShouldUpdate
@@ -198,6 +212,7 @@ var instancesHost = React.createClass({
         }
         if (this.props.data) return React.createElement(CustomCatalogue, {
             data: this.props.data,
+            count: this.props.count,
             columns: columns,
             actions: this.getActions(),
             dropDownActions: this.getDropdownActions(),

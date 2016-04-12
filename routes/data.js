@@ -65,10 +65,53 @@ router.delete('/:tenant/servers/:server', function (req, res, next) {
         });
 });
 
+
+router.get('/:tenant/servers/detail/count',function(req, res, next) {
+
+    validateTokenScope(req, res, {
+            "success": (t) => {
+                var uri = "/v2.1/" + req.params.tenant + "/servers/detail";
+                var token = (t)? t: req.session.token;
+                var data = adapter.get(uri,token, () => {
+                    if (data.json) {
+                        res.send({count:data.json.servers.length});
+                    } else {
+                        res.send({count:0});
+                    }
+
+                });
+            },
+
+            "fail": (resp) => {
+                if(resp) {
+                    res.status(resp.error.code)
+                        .send({"count":0})
+                        .end();
+                } else {
+                    res.status(500)
+                        .send({"count":0});
+                }
+            }
+    });
+});
+
+
 router.get('/:tenant/servers/detail',function(req, res, next) {
+
+
+    //TODO: Implement ForEach
+    var query = '?';
+    if(req.query.limit){
+        query = '?limit='+req.query.limit;
+    }
+    if(req.query.marker){
+        query = '&marker='+req.query.marker;
+    }
+
+    console.log('query', query);
     validateTokenScope(req, res, {
         "success": (t) => {
-            var uri = "/v2.1/" + req.params.tenant + "/servers/detail";
+            var uri = "/v2.1/" + req.params.tenant + "/servers/detail"+query;
             var token = (t)? t: req.session.token;
             console.log("Request to "+uri+ " - token:" + token);
             var data = adapter.get(uri,token, () => {
