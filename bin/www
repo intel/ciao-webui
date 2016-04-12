@@ -26,7 +26,6 @@ process.argv.forEach((value) => {
  */
 
 var port = normalizePort(process.env.PORT || '3000');
-var https_port = normalizePort(process.env.HTTPS_PORT || '3001');
 app.set('port', port);
 
 
@@ -34,7 +33,7 @@ app.set('port', port);
  * Create HTTP and HTTPS servers.
  */
 
-var server = http.createServer(app);
+var server = null;
 
 // Gather information from configuration file
 var uiConfig = JSON.parse(
@@ -46,17 +45,19 @@ var protocol = (args.protocol)? args.protocol: uiConfig.protocol;
 var keyFile = uiConfig.certificates.key;
 var certFile = uiConfig.certificates.cert;
 
-var https_server = uiConfig.protocol;
-
-if(fs.existsSync(keyFile) && fs.existsSync(certFile)) {
+if (protocol == 'http')
+    server = require(uiConfig.protocol).createServer(credentials,app);
+else if (fs.existsSync(keyFile) && fs.existsSync(certFile)) {
     var pkey = fs.readFileSync(keyFile, 'utf8');
     var pcert = fs.readFileSync(certFile, 'utf8');
     app.key = pkey;
     app.cert = pcert;
-    var passphrase = uiConfig.ui.passphrase;
+    var passphrase = uiConfig.certificates.passphrase;
     var credentials = {key: pkey, cert: pcert,passphrase: passphrase};
 
-    https_server = https.createServer(credentials,app);
+    server = require(uiConfig.protocol).createServer(credentials,app);
+} else {
+    console.log("Error setting up https server, please check ciao_config.json");
 }
 
 /**
@@ -66,12 +67,6 @@ if(fs.existsSync(keyFile) && fs.existsSync(certFile)) {
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
-
-if (https_server) {
-    https_server.listen(https_port);
-    https_server.on('error', onError);
-    https_server.on('listening', onListening);
-}
 
 /**
  * Normalize a port into a number, string, or false.

@@ -72,7 +72,6 @@ global.API = {
     get_node_stats:'/getNodeStats'
 };
 
-
 app.use(urls_config.index, index);
 app.use(urls_config.components, components);
 app.use(urls_config.tenant, tenant);
@@ -86,8 +85,6 @@ app.use(function(req, res, next) {
   err.status = 404;
   next(err);
 });
-
-// error handlers
 
 // development error handler
 // will print stacktrace

@@ -15,7 +15,6 @@ var ciaoAdapter = function (hostname, port, protocol) {
         this.host = hostname;
         this.port = port;
     }
-    console.log(this);
     this.http = require((config.protocol)?config.protocol:"http");
 };
 
