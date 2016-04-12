@@ -1,6 +1,6 @@
 // React js component
 var React = require('react');
-var CustomeCatalogue = require('./catalogue/customeCatalogue.js');
+var CustomCatalogue = require('./catalogue/customCatalogue.js');
 var $ = require('jquery')
 var nodes = React.createClass({
     evacuateNode: function() { //this one
@@ -92,7 +92,7 @@ var nodes = React.createClass({
         };
 
         return (
-            <CustomeCatalogue
+            <CustomCatalogue
                 data={this.props.data}
                 link={link}
                 columns={columns}

@@ -5,7 +5,7 @@ var reactBootstrap = require('react-bootstrap');
 var Modal = reactBootstrap.Modal;
 var Button = reactBootstrap.Button;
 
-var customeModal = React.createClass({
+var customModal = React.createClass({
 
     getDefaultProps: function() {
         return {
@@ -39,4 +39,4 @@ var customeModal = React.createClass({
     }
 });
 
-module.exports = customeModal;
+module.exports = customModal;

@@ -3,7 +3,7 @@ var React = require('react');
 var reactBootstrap = require('react-bootstrap');
 var Pagination = reactBootstrap.Pagination;
 
-var customePagination = React.createClass({
+var customPagination = React.createClass({
 
     getInitialState: function() {
         return {
@@ -40,4 +40,4 @@ var customePagination = React.createClass({
 
 });
 
-module.exports = customePagination;
+module.exports = customPagination;

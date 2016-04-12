@@ -2,7 +2,7 @@
 // React js component
 var React = require('react');
 
-var customeAlert = React.createClass({
+var customAlert = React.createClass({
 
     getInitialState: function() {
         return {};
@@ -48,4 +48,4 @@ var customeAlert = React.createClass({
    }
 });
 
-module.exports = customeAlert;
+module.exports = customAlert;

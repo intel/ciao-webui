@@ -6,7 +6,7 @@ var Dropdown = reactBootstrap.Dropdown;
 var MenuItem = reactBootstrap.MenuItem;
 var Button = reactBootstrap.Button;
 
-var CustomeSearch = require('./customeSearch.js');
+var CustomSearch = require('./customSearch.js');
 
 var tableActionToolbar = React.createClass({
 
@@ -58,7 +58,7 @@ var tableActionToolbar = React.createClass({
                         </ButtonToolbar>
                     </div>
                     <div className="pull-rigth">
-                        <CustomeSearch title="Search Instances" />
+                        <CustomSearch title="Search Instances" />
                     </div>
                 </div>
             </div>

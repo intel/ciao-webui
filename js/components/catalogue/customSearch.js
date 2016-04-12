@@ -1,7 +1,7 @@
 // React js component
 var React = require('react');
 
-var customeSearch = React.createClass({
+var customSearch = React.createClass({
 
     getInitialState: function() {
         return {};
@@ -23,4 +23,4 @@ var customeSearch = React.createClass({
     }
 });
 
-module.exports = customeSearch;
+module.exports = customSearch;

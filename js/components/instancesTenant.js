@@ -1,6 +1,6 @@
 // React js component
 var React = require('react');
-var CustomeCatalogue = require('./catalogue/customeCatalogue.js');
+var CustomCatalogue = require('./catalogue/customCatalogue.js');
 var $=require('jquery')
 
 var instancesTenant = React.createClass({
@@ -152,7 +152,7 @@ var instancesTenant = React.createClass({
 
 
         return (
-            <CustomeCatalogue
+            <CustomCatalogue
                 data={this.props.data}
                 columns={columns}
                 actions={this.getActions()}
