@@ -19,6 +19,9 @@ mkdir public/javascripts
 # Create library working directory
 mkdir public/javascripts/library
 
+#Build react + jsx code and put in build directory
+npm run babel-react &
+
 # get vendor libraries
 # Copy all the js libraries to the public Path
 if [ ! -f public/javascripts/library/jquery.js ]; then
@@ -94,8 +97,6 @@ loadDatamanager="<script type='text/javascript'>window.datamanager.loadData((<%-
 # Replace \\ for \n (this is just for mac)
 sed -i.bak "s~$match~$match\\$bootstrap\\$framework\\$d3\\$jquery\\$jqueryui\\$datamanager\\$loadDatamanager~" views/$file
 
-#Build react + jsx code and put in build directory
-npm run babel-react &
 
 # Run build scripts
 npm run build-login
