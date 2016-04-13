@@ -13,7 +13,8 @@ var groupOverview = React.createClass({
     flavorsDesc: [],
 
     loadFlavors: function () {
-        if(this.flavorsDesc.length == 0)
+        window.setInterval(function () {
+                    if(this.flavorsDesc.length == 0)
             this.props.flavors.forEach(function (flavor) {
                 $.get({url:this.props.detailUrl + "/flavors/" + flavor.id})
                     .done(function (data) {
@@ -26,6 +27,7 @@ var groupOverview = React.createClass({
                         }
                     }.bind(this));
             }.bind(this));
+        }.bind(this), 5000);
     },
 
     shouldComponentUpdate: function(nextProps, nextState) {

@@ -78,10 +78,15 @@ router.get('/:tenant/servers/detail/count',function(req, res, next) {
                 var token = (t)? t: req.session.token;
                 var data = adapter.get(uri,token, () => {
                     if (data.json) {
-                        if (data.json.servers)
-                            res.send({count:data.json.servers.length});
-                        else
-                            res.send({count:0});
+                        var rcount;
+                        try {
+                             rcount = data.json.servers.length;
+                            ;
+                        } catch(e){
+                            rcount = 0;
+                        } finally {
+                            res.send({count: rcount});
+                        }
                     } else {
                         res.send({count:0});
                     }
