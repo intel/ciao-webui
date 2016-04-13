@@ -146,9 +146,12 @@ var instancesHost = React.createClass({
         return true;
     },
     componentDidMount: function () {
-
+        var executing = false;
         var callSource = function () {
-
+            if (executing == true)
+                return;
+            else
+                executing = true;
             var query = '?limit=5';
 
             console.log('this.state.pagination', this.state);
@@ -166,7 +169,7 @@ var instancesHost = React.createClass({
                         var url = this.props.source + '/count';
                         $.get({url: url })
                             .done(function (count) {
-
+                                executing = false;
                                 datamanager.setDataSource(this.props.dataKey, {
                                     dataKey: this.props.dataKey,
                                     source: this.props.source,
@@ -186,7 +189,7 @@ var instancesHost = React.createClass({
 
         window.setInterval(function () {
             callSource();
-        }.bind(this), 2000);
+        }.bind(this), 3500);
     },
 
     onChangePage: function (lastRecord) {

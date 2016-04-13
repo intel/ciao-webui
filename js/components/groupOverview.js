@@ -40,27 +40,16 @@ var groupOverview = React.createClass({
 
         var update = function () {
             $.get({
-                url: this.props.detailUrl + "/servers/detail"
+                url: this.props.detailUrl + "/flavors/detail"
+                ,timeout:5000
             }).done(function (data) {
-                var flavors = this.flavorsDesc;
-
-                var fmtData = this.props.flavors.map(function (val) {
-                    var disks = flavors.filter(
-                        (element) => val.id == element.id);
-                    var filteredData = data.filter(
-                        (server) => server.Image == disks[0].disk);
-                    val.totalInstances = filteredData.length;
-                    val.runningInstances =filteredData.filter(
-                        (x) => x.State == 'running').length;
-                    return val;
-                }.bind(this));
-                this.setState({
-                    updates:this.state.updates+1});
+                // this.setState({
+                //     updates:this.state.updates+1});
                 datamanager.setDataSource('group-overview',
                                           {
                                               dataKey: 'group-overview',
                                               detailUrl: this.props.detailUrl,
-                                              flavors:fmtData});
+                                              flavors:data.flavors});
             }.bind(this))
                 .fail(function (err) {
                     console.log("Group overview update failed: "+err);
@@ -68,12 +57,13 @@ var groupOverview = React.createClass({
         }.bind(this);
 
         update();
-        window.groupInterval = setInterval(update, 2000);
+        window.groupInterval = setInterval(update, 5000);
     },
 
     componentWillUnmount: function() {
         datamanager.clearEvent('add-instances');
     },
+
     render: function() {
         var groups = this.props.flavors
             .map((props, i) => (

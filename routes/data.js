@@ -74,7 +74,10 @@ router.get('/:tenant/servers/detail/count',function(req, res, next) {
                 var token = (t)? t: req.session.token;
                 var data = adapter.get(uri,token, () => {
                     if (data.json) {
-                        res.send({count:data.json.servers.length});
+                        if (data.json.servers)
+                            res.send({count:data.json.servers.length});
+                        else
+                            res.send({count:0});
                     } else {
                         res.send({count:0});
                     }
@@ -105,7 +108,7 @@ router.get('/:tenant/servers/detail',function(req, res, next) {
         query = '?limit='+req.query.limit;
     }
     if(req.query.marker){
-        query = '&marker='+req.query.marker;
+        query += '&marker='+req.query.marker;
     }
 
     console.log('query', query);
@@ -166,18 +169,123 @@ router.get('/:tenant/flavors', function(req, res, next) {
             var uri = "/v2.1/" + req.params.tenant + "/flavors";
             var data = adapter.get(
                 uri,req.session.token,
-                () => res.send(data.json));
+                () => {
+                    // Temporal optimization
+                    // Cache current workload information.
+                    // Workloads aren't likely to change while UI is
+                    // running. If workloads change, users must logout and
+                    // login again..
+                    // TODO: remove once a better optimization is implemented
+                    if (!req.session.workloads) {
+                        req.session.workloads = data.json.flavors;
+                    }
+                    res.send({flavors:req.session.workloads});
+                });
         },
         "fail": () => {
             res.status(500).end();
         }
     });
+});
 
+// Ciao-webui only:
+// This helper service optimize usage for current Grouped Instances
+// implementation.
+
+router.get('/:tenant/flavors/detail', function(req, res, next) {
+    validateTokenScope(req, res, {
+        "success": (t) => {
+            // Implement a processing flag to prevent overload
+            if (!req.session.wrefresh)
+                req.session.wrefresh = false;
+            if (req.session.wrefresh == false && req.session.workloads)  {
+                var uri = "/v2.1/" + req.params.tenant + "/servers/detail";
+                req.session.wrefresh = true;
+                var data = adapter.get(
+                    uri,req.session.token,
+                    function () {
+                        var workloads = req.session.workloads.map((w,index) => {
+                            var filteredData = data.json.servers.filter(
+                                (server) => {
+                                    return server.image.id == w.disk;
+                                });
+                            // total instances and running instances respectively
+                            var ti = filteredData.length;
+                            var tri = filteredData.filter((server) => {
+                                return server.status == 'running';
+                            }).length;
+
+                            w.totalInstances = ti;
+                            w.totalRunningInstances = tri;
+                            return w;
+                        });
+                        req.session.workloads = workloads;
+                        // Refresh has been completed
+                        req.session.wrefresh = false;
+                        res.send({flavors:req.session.workloads});
+                    });
+                } else {
+                    res.send({flavors:req.session.workloads});
+                }
+        },
+        "fail": () => {
+            res.send({flavors:[]});
+        }
+    });
 });
 
 router.get('/:tenant/flavors/:flavor', function(req, res, next) {
-    var uri = "/v2.1/" + req.params.tenant + "/flavors/" + req.params.flavor;
-    var data = adapter.get(uri,req.session.token, () => res.send(data.json));
+    validateTokenScope(req, res, {
+        "success": (t) => {
+            var uri = "/v2.1/" + req.params.tenant + "/flavors/" +
+                req.params.flavor;
+            var data = adapter.get(
+                uri,req.session.token,
+                () => {
+                    //Add detailes to cached workloads
+                    if (req.session.workloads)
+                        var workloads = req.session.workloads
+                        .map((w) => {
+                            if (w.id == req.params.flavor) {
+                                w.disk = data.json.flavor.disk;
+                            }
+                            return w;
+                        });
+                    req.session.workloads = workloads;
+                    res.send(data.json);
+                });
+        },
+        "fail": () => {
+            res.send({});
+        }
+    });
+});
+
+// TODO: this services only works for users with admin role.
+// enable for common users
+router.get('/flavors/:flavor/servers/detail', function(req, res, next) {
+    var uri = "/v2.1/flavors/" +
+        req.params.flavor + "/servers/detail";
+    var data = adapter.get(
+        uri,req.session.token,
+        () => res.send(data.json));
+});
+
+router.get('/:tenant/resources', function(req, res, next) {
+    validateTokenScope(req, res, {
+        "success": (t) => {
+            var start = req.query.start;
+            var end = req.query.end;
+            var query = "?start="+start+"&end="+end;
+            var uri = "/v2.1/" + req.params.tenant + "/resources" + query;
+            var data = adapter.get(
+                uri,req.session.token,
+                () => res.send(data.json));
+        },
+        "fail": () => {
+            res.send({});
+        }
+    });
 });
 
 router.get('/:tenant/quotas', function (req, res, next) {
@@ -197,13 +305,13 @@ router.get('/:tenant/quotas', function (req, res, next) {
             var uri = "/v2.1/" + req.params.tenant + "/quotas";
             var data = adapter.get(uri,req.session.token, () => {
                 if (data.json) {
-                    function validateQuota (value) {
+                    var validateQuota = (value) => {
                         if (value !== -1){
                             return value;
                         } else {
-                            return;
+                            return null;
                         }
-                    }
+                    };
 
                     var usageSummaryData = [
                         {

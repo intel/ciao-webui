@@ -69,7 +69,8 @@ $('document').ready(function () {
             .done(function (data) {
                 if (data) {
                     data.dataKey = 'group-overview';
-                    data.detailUrl = '/data/' + datamanager.data.activeTenant.id;
+                    data.detailUrl = '/data/' +
+                        datamanager.data.activeTenant.id;
                     datamanager.setDataSource('group-overview', data);
                     datamanager.setDataSource('add-instances', {activeTenant, data});
                 }
