@@ -14,26 +14,33 @@ process.on('message', function(m) {
             uri,
             token,
             function () {
-                var workloads = sessionWorkloads.map((w,index) => {
-                    if (data.json.servers){
-                        var filteredData = data.json.servers.filter(
-                            function (server) {
-                                return server.image.id == w.disk;
-                            });
-                        // total instances and running instances
-                        var ti = filteredData.length;
-                        var tri = filteredData.filter((server) => {
-                            return server.status == 'running';
-                        }).length;
-                        w.totalInstances = ti;
-                        w.totalRunningInstances = tri;
-                    }
-                    return w;
-                });
-                // send workloads back to parent
-                process.send(
-                    JSON.stringify({workloads:workloads}));
-                //res.send({flavors:req.session.workloads});
+                var workloads;
+                try {
+                    workloads = sessionWorkloads.map((w,index) => {
+                        if (data.json.servers){
+                            var filteredData = data.json.servers.filter(
+                                function (server) {
+                                    return server.flavor.id == w.id;
+                                });
+                            // total instances and running instances
+                            var ti = filteredData.length;
+                            var tri = filteredData.filter((server) => {
+                                return server.status == 'running';
+                            }).length;
+                            w.totalInstances = ti;
+                            w.totalRunningInstances = tri;
+                        }
+                        return w;
+                    });
+                } catch(err) {
+                    workloads = sessionWorkloads;
+                }
+                finally {
+                    // send workloads back to parent
+                    process.send(
+                        JSON.stringify({workloads:workloads}));
+                    //res.send({flavors:req.session.workloads});
+                }
             });
 });
 
