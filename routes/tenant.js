@@ -19,15 +19,13 @@ var config = {
 
 function validatePermissions (req, res, next){
     if(req.session.isAdmin){ //if is admin, redirect to /admin
-        res.redirect('/admin')
+        res.redirect('/admin');
     }
 
     next();
 };
 
 var getTenants = function (req, res, next) {
-    console.log('session', req.session);
-
     if (!req.session.tenants) {
         //tenants are not set for this user's session
         var result;
@@ -41,14 +39,19 @@ var getTenants = function (req, res, next) {
         }).then(function () {
 
             req.session.tenants = result.json.projects;
-            req.session.activeTenant = result.json.projects?result.json.projects[0]:[];
-            console.log("Succesfully retrieved tenants:");
-            console.log(req.session.tenants);
+            req.session.activeTenant = result.json.projects ?
+                result.json.projects[0]:[];
+            if (process.env.NODE_ENV != 'production') {
+                console.log("Succesfully retrieved tenants:");
+                console.log(req.session.tenants);
+            }
             next();
         }).catch(function () {
             req.session.tenants = [];
             req.session.activeTenant = getActiveTenant();
-            console.log("ERROR: didn't retrieved tenants");
+            if (process.env.NODE_ENV != 'production') {
+                console.log("ERROR: didn't retrieved tenants");
+            }
             next();
         });
     } else {
@@ -65,7 +68,6 @@ router.get('/', validatePermissions, function(req, res, next) {
     config.data.tenants = req.session.tenants;
     config.data.activeTenant = req.session.activeTenant;
 
-    console.log('config', config);
     res.render(process.env.NODE_ENV+'_template', config);
 });
 

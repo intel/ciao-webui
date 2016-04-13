@@ -58,7 +58,9 @@ router.post('/login', function(req, res, next) {
 
         },
         fail: function (resp) {
-            console.log(resp);
+            if (process.env.NODE_ENV != 'production') {
+                console.log(resp);
+            }
             if(resp) {
                 res.status(resp.error.code)
                     .send(resp.error)

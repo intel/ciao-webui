@@ -18,14 +18,13 @@ var config = {
 
 function validatePermissions (req, res, next){
     if(!req.session.isAdmin){ //if is admin, redirect to /admin
-        res.redirect('/forbidden')
+        res.redirect('/forbidden');
     }
 
     next();
 };
 
 var getTenants = function (req, res, next) {
-    console.log(req.session);
 
     if (!req.session.tenants) {
         req.session.tenants = [];
@@ -41,12 +40,17 @@ var getTenants = function (req, res, next) {
                 });
         }).then(function () {
             req.session.tenants = result.json.projects;
-            req.session.activeTenant = result.json.projects?result.json.projects[0]:[];
-            console.log("Succesfully retrieved tenants:");
-            console.log(req.session.tenants);
+            req.session.activeTenant = result.json.projects ?
+                result.json.projects[0]:[];
+            if (process.env.NODE_ENV != 'production') {
+                console.log("Succesfully retrieved tenants:");
+                console.log(req.session.tenants);
+            }
             next();
         }).catch(function () {
-            console.log("ERROR: didn't retrieved tenants");
+            if (process.env.NODE_ENV != 'production') {
+                console.log("ERROR: didn't retrieved tenants");
+            }
             next();
         });
     } else {

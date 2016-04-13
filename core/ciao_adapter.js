@@ -106,7 +106,7 @@ ciaoAdapter.prototype.getServersDetail = function (tenant_id,token, next){
 
 // Return json configuration from ciao_config.json file
 var getConfigFromFile = function () {
-    var file = __dirname +"/../config/ciao_config.json";
+    var file = "./config/ciao_config.json";
     var fs = require('fs');
     var config = JSON.parse(fs.readFileSync(file, 'utf8'));
     return config[process.env.NODE_ENV].controller;

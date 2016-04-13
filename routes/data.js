@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var sessionHandler = require('../core/session');
 var ciaoAdapter = require('../core/ciao_adapter');
-
+var spawn = require('child_process').fork;
 
 var adapter = new ciaoAdapter();
 
@@ -18,15 +18,19 @@ var validateTokenScope = function (req, res, next) {
         else
             next.success();
     };
-    console.log("validating scope");
-    console.log("req.tenant:" +req.params.tenant);
+    if (process.env.NODE_ENV != 'production') {
+        console.log("validating scope");
+        console.log("req.tenant:" +req.params.tenant);
+    }
     if (req.params.tenant) {
         var id = req.params.tenant;
         if (req.session.token_scope == null ||
             req.session.token_scope != id) {
             // get scoped token
-            console.log("Current token: "+req.session.token);
-            console.log("Get scoped token with tenant-id:"+id);
+            if (process.env.NODE_ENV != 'production') {
+                console.log("Current token: "+req.session.token);
+                console.log("Get scoped token with tenant-id:"+id);
+            }
 
             // At this point user must have a token, therefore use token method
             var bundle = {
@@ -111,12 +115,13 @@ router.get('/:tenant/servers/detail',function(req, res, next) {
         query += '&marker='+req.query.marker;
     }
 
-    console.log('query', query);
+    if (process.env.NODE_ENV != 'production') {
+        console.log('query', query);
+    }
     validateTokenScope(req, res, {
         "success": (t) => {
             var uri = "/v2.1/" + req.params.tenant + "/servers/detail"+query;
             var token = (t)? t: req.session.token;
-            console.log("Request to "+uri+ " - token:" + token);
             var data = adapter.get(uri,token, () => {
                 if (data.json) {
                     var servers = data.json.servers;
@@ -169,7 +174,7 @@ router.get('/:tenant/flavors', function(req, res, next) {
             var uri = "/v2.1/" + req.params.tenant + "/flavors";
             var data = adapter.get(
                 uri,req.session.token,
-                () => {
+                function() {
                     // Temporal optimization
                     // Cache current workload information.
                     // Workloads aren't likely to change while UI is
@@ -180,7 +185,7 @@ router.get('/:tenant/flavors', function(req, res, next) {
                         req.session.workloads = data.json.flavors;
                     }
                     res.send({flavors:req.session.workloads});
-                });
+                }.bind(req));
         },
         "fail": () => {
             res.status(500).end();
@@ -195,38 +200,38 @@ router.get('/:tenant/flavors', function(req, res, next) {
 router.get('/:tenant/flavors/detail', function(req, res, next) {
     validateTokenScope(req, res, {
         "success": (t) => {
+
             // Implement a processing flag to prevent overload
             if (!req.session.wrefresh)
                 req.session.wrefresh = false;
             if (req.session.wrefresh == false && req.session.workloads)  {
                 var uri = "/v2.1/" + req.params.tenant + "/servers/detail";
                 req.session.wrefresh = true;
-                var data = adapter.get(
-                    uri,req.session.token,
-                    function () {
-                        var workloads = req.session.workloads.map((w,index) => {
-                            var filteredData = data.json.servers.filter(
-                                (server) => {
-                                    return server.image.id == w.disk;
-                                });
-                            // total instances and running instances respectively
-                            var ti = filteredData.length;
-                            var tri = filteredData.filter((server) => {
-                                return server.status == 'running';
-                            }).length;
 
-                            w.totalInstances = ti;
-                            w.totalRunningInstances = tri;
-                            return w;
-                        });
-                        req.session.workloads = workloads;
-                        // Refresh has been completed
-                        req.session.wrefresh = false;
-                        res.send({flavors:req.session.workloads});
-                    });
-                } else {
-                    res.send({flavors:req.session.workloads});
-                }
+                // Spawn new process to handle
+                var child = spawn('./core/helpers/flavorDetails.js');
+                // send message to child
+                child.send(JSON.stringify({
+                    uri: uri,
+                    token: req.session.token,
+                    workloads: req.session.workloads
+                }));
+                //child.send("hello mundo");
+                child.on('message', function(m) {
+                    req.session.wrefresh = false;
+                    var resp = JSON.parse(m)
+                        .workloads;
+                    req.session.workloads = resp;
+                    // Non blocking code, send response first, then map and update.
+                    // update will be reflected on the next call.
+                    res.send({flavors: resp});
+                });
+            }
+            else {
+                res.send({
+                    flavors:req.session.workloads?
+                        req.session.workloads:[]});
+            }
         },
         "fail": () => {
             res.send({flavors:[]});
@@ -241,7 +246,7 @@ router.get('/:tenant/flavors/:flavor', function(req, res, next) {
                 req.params.flavor;
             var data = adapter.get(
                 uri,req.session.token,
-                () => {
+                function() {
                     //Add detailes to cached workloads
                     if (req.session.workloads)
                         var workloads = req.session.workloads
@@ -253,7 +258,7 @@ router.get('/:tenant/flavors/:flavor', function(req, res, next) {
                         });
                     req.session.workloads = workloads;
                     res.send(data.json);
-                });
+                }.bind(req));
         },
         "fail": () => {
             res.send({});
@@ -362,8 +367,6 @@ router.get('/nodes', function (req, res, next) {
 router.get('/nodes/summary', function (req, res, next) {
     var uri = "/v2.1/nodes/summary";
     var data = adapter.get(uri,req.session.token, () => {
-        console.log("Response");
-        console.log(data);
         res.set('Content-Type','application/json');
         res.send(data.json);
     });
