@@ -13,21 +13,23 @@ var groupOverview = React.createClass({
     flavorsDesc: [],
 
     loadFlavors: function () {
-        window.setInterval(function () {
-                    if(this.flavorsDesc.length == 0)
-            this.props.flavors.forEach(function (flavor) {
-                $.get({url:this.props.detailUrl + "/flavors/" + flavor.id})
-                    .done(function (data) {
-                        if (data) {
-                            this.flavorsDesc.push({
-                                id:data.flavor.id,
-                                disk:data.flavor.disk});
-                            console.log("Retrieved flavor information:");
-                            console.log(data);
-                        }
-                    }.bind(this));
-            }.bind(this));
-        }.bind(this), 5000);
+        var load = function () {
+            if(this.flavorsDesc.length == 0)
+                this.props.flavors.forEach(function (flavor) {
+                    $.get({url:this.props.detailUrl + "/flavors/" + flavor.id})
+                        .done(function (data) {
+                            if (data) {
+                                this.flavorsDesc.push({
+                                    id:data.flavor.id,
+                                    disk:data.flavor.disk});
+                                console.log("Retrieved flavor information:");
+                                console.log(data);
+                            }
+                        }.bind(this));
+                }.bind(this));
+        }.bind(this);
+        load();
+        window.setInterval(load, 5000);
     },
 
     shouldComponentUpdate: function(nextProps, nextState) {
