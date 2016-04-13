@@ -30,6 +30,14 @@ d3ElementSummary.update = function (svgEl, props, state) {
     var svg = d3.select(svgEl);
     var angle = (Math.PI * 2) * (props.value / props.quota);
     var angleFull = (Math.PI * 2);
+    var sizeX;
+
+    // getting size for quotas
+    if (((Math.round(props.value * 100 / props.quota)).toString()).length > 2) {
+        sizeX = 35;
+    } else {
+        sizeX = 25;
+    }
 
     // create arc for given data
     var radius = props.width / 2;
@@ -79,7 +87,7 @@ d3ElementSummary.update = function (svgEl, props, state) {
 
     g.append("text")
         .attr("y", -2)
-        .attr("x", 25)
+        .attr("x", sizeX)
         .attr("class","frm-bold-text")
         .style({"font-size":"smaller"})
         .text("%");
