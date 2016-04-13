@@ -3,7 +3,7 @@ var router = express.Router();
 var sessionHandler = require('../core/session');
 var ciaoAdapter = require('../core/ciao_adapter');
 var spawn = require('child_process').fork;
-
+var querystring = require('querystring');
 var adapter = new ciaoAdapter();
 
 // Scope token validation
@@ -80,7 +80,9 @@ router.get('/:tenant/servers/detail/count',function(req, res, next) {
                     if (data.json) {
                         var rcount;
                         try {
-                             rcount = data.json.servers.length;
+                             rcount = (data.json.total_servers)?
+                                data.json.total_servers
+                                :data.json.servers.length;
                             ;
                         } catch(e){
                             rcount = 0;
@@ -110,18 +112,10 @@ router.get('/:tenant/servers/detail/count',function(req, res, next) {
 
 router.get('/:tenant/servers/detail',function(req, res, next) {
 
-
-    //TODO: Implement ForEach
-    var query = '?';
-    if(req.query.limit){
-        query = '?limit='+req.query.limit;
-    }
-    if(req.query.marker){
-        query += '&marker='+req.query.marker;
-    }
+    var query = '?' + querystring.stringify(req.query);
 
     if (process.env.NODE_ENV != 'production') {
-        console.log('query', query);
+        console.log('servers/detail :query string:', query);
     }
     validateTokenScope(req, res, {
         "success": (t) => {
