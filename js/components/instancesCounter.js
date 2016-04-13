@@ -52,15 +52,19 @@ var instancesCounter = React.createClass({
         console.log("total Instances",this.props.data.total_instances);
 
         return (
-            <div className="element-summary-panel">
-                <div className="panel frm-panel frm-panel-default">
-                    <div className="panel-body">
-                        <h2 className="frm-bold-text pull-left">
+            <div className="element-summary-panel usageSummary">
+            <div className="frm-panel-heading frm-panel-empty">
+            </div>
+                <div className="panel frm-panel-default">
+                    <div className="panel-body frm-remake">
+                        <h3 className="frm-bold-text frm-remake frm-panel-pull-left">
                            Instances
-                        </h2>
-                        <h6 className="frm-bold-text pull-left">
-                            {this.props.data.total_instances}
-                        </h6>
+                        </h3>
+                        <div>
+                            <h6 className="frm-bold-text frm-body-h6">
+                                {this.props.data.total_instances}
+                            </h6>
+                        </div>
                     </div>
                 </div>
             </div>

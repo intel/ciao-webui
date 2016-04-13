@@ -68,9 +68,9 @@ var elementSummary = React.createClass({
             <div className="element-summary-panel">
                 <div className="frm-panel-heading frm-panel-standar">
                 </div>
-                <div className="panel frm-panel frm-panel-default">
+                <div className="panel frm-panel frm-panel-default frm-panel-remake">
                     <div className="panel-body">
-                        <h6 className="frm-bold-text">
+                        <h6 className="frm-bold-text frm-body-h6">
                             {body}
                         </h6>
                         <div className="frm-secondary-text frm-bold-text">

@@ -38,17 +38,21 @@ var nodeSummary = React.createClass({
 
     render: function() {
         console.log(this.props);
-        console.log("rendering");
+        var panelTitle;
 
         if(this.props.sections.length > 0){
-            console.log(this.props.sections.length);
             var section = function (data) {
+                if(data.name==="total_nodes"){
+                    panelTitle = (data.name).substring(6);
+                } else {
+                    panelTitle = (data.name).substring(12);
+                }
                 return (
                 <div className="element-summary-panel">
-                    <div className={"frm-panel-default frm-panel-title-"+data.name}>
-                        <div className="frm-bold-text">{data.name} </div>
+                    <div className={"frm-panel-default frm-panel-title-"+panelTitle}>
+                        <div className="frm-bold-text">{panelTitle}</div>
                     </div>
-                    <div className="panel frm-panel frm-panel-default">
+                    <div className="panel frm-panel frm-panel-default frm-panel-pull-left">
                         <h6 className="frm-bold-text">
                             {data.number}
                         </h6>
@@ -63,8 +67,6 @@ var nodeSummary = React.createClass({
                     </div>
                 );
             });
-            console.log(sections);
-            console.log(sections);
             return (
                     <div className="element-summary-panel">
                         <div className="frm-panel-heading frm-panel-regular">
@@ -73,7 +75,7 @@ var nodeSummary = React.createClass({
                             <div className="panel-body">
                                 <div className="row">
                                     <div className="col-xs-12">
-                                        <h4 className="frm-bold-text pull-left">
+                                        <h4 className="frm-bold-text frm-secondary-text pull-left">
                                             Node Summary
                                         </h4>
                                     </div>

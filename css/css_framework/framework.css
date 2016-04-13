@@ -80,6 +80,23 @@ h6{
 .frm-secondary-text{
     color: #969696;
 }
+.frm-terciary-text{
+    color: #323232;
+}
+
+.frm-remake{
+    padding: 0px;
+    margin-top: 0px;
+}
+.frm-panel-remake{
+    margin-bottom: 6px;
+}
+.frm-test{
+    padding-bottom: 0px;
+}
+.frm-body-h6{
+    margin-top: 20px;
+}
 /*
 * Headers
 */
@@ -201,6 +218,11 @@ h6{
     background-color: #e5d8ff;
     color: #4b327f;
 }
+.frm-panel-empty{
+    border-radius: 6px;
+    background-color: #fff;
+    border-bottom: 0px;
+}
 .frm-panel-title{
     font-family: 'ClearSans-Bold';
     font-size: 14px;
@@ -209,6 +231,10 @@ h6{
 
 .frm-panel-footer{
     border-top: 0px;
+}
+.frm-panel-pull-left{
+    padding-left: 20px;
+    text-align: left;
 }
 
 /*
@@ -505,7 +531,6 @@ ul> li> a{
 .frm-panel-title-ready{
     color:#fff;
     background-color: #2BD899;
-
 }
 .frm-panel-title-full{
     color:#fff;
@@ -519,7 +544,10 @@ ul> li> a{
     color:#fff;
     background-color: #F3D54E;
 }
-
+.frm-panel-title-nodes{
+    color:#fff;
+    background-color: #00aeef;
+}
 /*
 * Nodes, Instance Module
 */
