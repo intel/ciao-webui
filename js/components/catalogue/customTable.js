@@ -9,13 +9,13 @@ var CustomPagination = require('./customPagination.js');
 var customTable = React.createClass({
     displayName: 'customTable',
 
-
     getInitialState: function () {
         return {
             activePage: 1,
             actualItems: []
         };
     },
+
     select: function (row) {
         var selected = this.props.selectedRows;
         var newSelected = [];
@@ -30,34 +30,24 @@ var customTable = React.createClass({
         } else {
             newSelected.push(row);
         }
-
         this.props.onSelectRow(newSelected);
     },
+
     isChecked: function (row) {
 
         var entry = this.props.selectedRows.find(function (element) {
             return element.instance_id == row.instance_id;
         });
-
         return entry;
     },
+
     changePage: function (page) {
         this.setState({ activePage: page });
-        var lasItem = this.props.data[this.props.data.length - 1];
-        this.props.onChangePage(lasItem);
+        datamanager.data.offset = page;
+        //var lasItem = this.props.data[this.props.data.length - 1];
+        this.props.onChangePage(page);
     },
-    /*getActualData: function(){
-     var itemsPerPage = this.props.pagination.itemsPerPage;
-     var page = this.state.activePage;
-     var actualItems = []
-     for (var i = (page-1) * itemsPerPage; i < (page * itemsPerPage); i++) {
-     if(this.props.data[i]){
-     actualItems.push(this.props.data[i]);
-     }
-     }
-     this.props.onChangePage(actualItems);
-     return actualItems;
-     },*/
+
     render: function () {
 
         var actualData = this.props.data;
@@ -148,7 +138,7 @@ var customTable = React.createClass({
                 'div',
                 { className: 'frm-pagination' },
                 React.createElement(CustomPagination, _extends({ className: 'pagination',
-                    items: this.props.data
+                    items: this.props.pagination.items
                 }, this.props.pagination, {
                     onSelect: this.changePage }))
             )

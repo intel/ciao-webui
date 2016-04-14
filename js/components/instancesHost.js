@@ -8,7 +8,8 @@ var instancesHost = React.createClass({
 
     getInitialState: function () {
         return {
-            pagination: null
+            pagination: 0, // offset is 0,
+            items: 0
         };
     },
 
@@ -16,16 +17,17 @@ var instancesHost = React.createClass({
         // source defaults to server details url
         return {
             data: [],
-            count : 0
-
+            count : 0,
+            recordsPerPage:10
         };
     },
+
     startInstance: function (elements) {
         console.log('Starting instance: ', elements);
         elements.forEach(el => {
             var url = "/data/" + datamanager.data.activeTenant.id +
-                    //TODO: not having tenant_id may cause bugs for users with more than one tenant
-                    // el.tenant_id +
+                //TODO: not having tenant_id may cause bugs
+                // for users with more than one tenant
                 "/servers/" + el.instance_id + "/action";
         $.post({
             url: url,
@@ -152,13 +154,12 @@ var instancesHost = React.createClass({
                 return;
             else
                 executing = true;
-            var query = '?limit=5';
+            var query = '?limit=' + this.props.recordsPerPage;
 
-            console.log('this.state.pagination', this.state);
+            query = query +
+                '&offset=' + (datamanager.data.offset ?
+                              datamanager.data.offset:1);
 
-            if(this.state.pagination){
-                query = query + '&marker=' + this.state.pagination.instance_id;
-            }
             console.log('query', query);
             var url = this.props.source + query;
 
@@ -170,12 +171,20 @@ var instancesHost = React.createClass({
                         $.get({url: url })
                             .done(function (count) {
                                 executing = false;
-                                datamanager.setDataSource(this.props.dataKey, {
+                                // if service returns complete data not
+                                // not delimited by limit and offset querys
+                                var fmtData = {
                                     dataKey: this.props.dataKey,
                                     source: this.props.source,
-                                    data: data,
-                                    count: count.count
-                                });
+                                    data: data
+                                };
+                                if (data.length < this.props.recordsPerPage) {
+                                    fmtData.count = count.count;
+                                } else {
+                                    fmtData.count = 0;
+                                }
+                                datamanager.setDataSource(this.props.dataKey,
+                                                          fmtData);
                             }.bind(this));
                     }
                 }.bind(this))
@@ -193,7 +202,7 @@ var instancesHost = React.createClass({
     },
 
     onChangePage: function (lastRecord) {
-        console.log('amen');
+
         this.setState({ pagination: lastRecord });
         //onStateChange
         //componentShouldUpdate

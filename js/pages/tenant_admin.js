@@ -48,6 +48,8 @@ $('document').ready(function () {
         sourceData.source = "/data/"
             + datamanager.data.activeTenant.id
             + "/servers/detail";
+        // pagination shows 10 items per page
+        sourceData.recordsPerPage = 10;
         sourceData.dataKey = keyInstanceHost;
         ReactDOM.render(
             <InstancesHost {...sourceData}/>,

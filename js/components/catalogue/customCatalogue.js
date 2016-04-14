@@ -190,8 +190,11 @@ var catalogue = React.createClass({
     getTableConfiguration: function () {
 
         var config = this.props;
-
-        var pagination = config.pagination ? config.pagination : this.props.paginationDefault;
+        var pagination = {
+            items: this.props.count
+        };
+        // var pagination = config.pagination ?
+        //     config.pagination : this.props.paginationDefault;
 
         return {
             columns: config.columns ? config.columns : [],

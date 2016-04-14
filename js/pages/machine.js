@@ -65,7 +65,7 @@ $('document').ready(function () {
             + datamanager.data.idMachine
             + "/servers/detail";;
     datamanager.onDataSourceSet(key, function (sourceData) {
-
+        sourceData.recordsPerPage = 10;
         sourceData.source = ihSource;
         sourceData.dataKey = key;
         ReactDOM.render(

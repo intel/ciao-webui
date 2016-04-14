@@ -199,12 +199,16 @@ router.get('/:tenant/flavors', function(req, res, next) {
 router.get('/:tenant/flavors/detail', function(req, res, next) {
     validateTokenScope(req, res, {
         "success": (t) => {
-
+            var query = '?' + querystring.stringify(req.query);
+            if (process.env.NODE_ENV != 'production') {
+                console.log('servers/detail :query string:', query);
+            }
             // Implement a processing flag to prevent overload
             if (!req.session.wrefresh)
                 req.session.wrefresh = false;
             if (req.session.wrefresh == false && req.session.workloads)  {
-                var uri = "/v2.1/" + req.params.tenant + "/servers/detail";
+                var uri = "/v2.1/" + req.params.tenant + "/servers/detail" +
+                    query;
                 req.session.wrefresh = true;
 
                 // Spawn new process to handle
@@ -221,8 +225,6 @@ router.get('/:tenant/flavors/detail', function(req, res, next) {
                     var resp = JSON.parse(m)
                         .workloads;
                     req.session.workloads = resp;
-                    // Non blocking code, send response first, then map and update.
-                    // update will be reflected on the next call.
                     res.send({flavors: resp});
                 });
             }
@@ -391,24 +393,69 @@ router.get('/nodes/:node', function (req, res, next) {
 });
 
 router.get('/nodes/:node/servers/detail', function (req, res, next) {
-    var uri = "/v2.1/nodes/" + req.params.node + "/servers/detail";
+
+    var query = '?' + querystring.stringify(req.query);
+    if (process.env.NODE_ENV != 'production') {
+        console.log('servers/detail :query string:', query);
+    }
+
+    var uri = "/v2.1/nodes/" + req.params.node + "/servers/detail" +
+        query;
     var data = adapter.get(uri,req.session.token, () => {
         if (data.json) {
             var servers = data.json.servers;
             if (Array.prototype.isPrototypeOf(servers)) {
-
                 res.send(servers
                          .map((value) => {
                              for(key in value) {
                                  if(Array.prototype.isPrototypeOf(value[key]))
                                      value[key] = value[key].toString();
                              }
+                             delete value.cpus_usage;
                              return value;
                          }));
             } else {
                 res.send([]);
             }
         }
+    });
+});
+
+router.get('/nodes/:node/servers/detail/count',function(req, res, next) {
+
+    validateTokenScope(req, res, {
+            "success": (t) => {
+                var uri = "/v2.1/nodes/" + req.params.node + "/servers/detail";
+                var token = (t)? t: req.session.token;
+                var data = adapter.get(uri,token, () => {
+                    if (data.json) {
+                        var rcount;
+                        try {
+                             rcount = (data.json.total_servers)?
+                                data.json.total_servers
+                                :data.json.servers.length;
+                            ;
+                        } catch(e){
+                            rcount = 0;
+                        } finally {
+                            res.send({count: rcount});
+                        }
+                    } else {
+                        res.send({count:0});
+                    }
+                });
+            },
+
+            "fail": (resp) => {
+                if(resp) {
+                    res.status(resp.error.code)
+                        .send({"count":0})
+                        .end();
+                } else {
+                    res.status(500)
+                        .send({"count":0});
+                }
+            }
     });
 });
 
