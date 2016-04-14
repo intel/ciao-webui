@@ -566,7 +566,18 @@ ul> li> a{
 .instance_state-stopped{
     color: #FF5573;
 }
-
+ td.State-running {
+     color: #2BD899;
+ }
+ td.State-pending {
+     color: #f3d54e;;
+ }
+ td.State-stopped {
+     color: #ff5573;
+ }
+ td.State-exited {
+     color: #969696;;
+ }
 
 /*
 * Usage summary Module

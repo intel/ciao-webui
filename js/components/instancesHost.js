@@ -114,18 +114,18 @@ var instancesHost = React.createClass({
     getActions: function () {
         return [{
             label: 'Start',
-            name: 'start',
+            name: 'Start',
             onClick: this.startInstance,
             onDisabled: this.disabledStartButton
         }, {
             label: 'Stop',
 
-            name: 'stop',
+            name: 'Stop',
             onClick: this.stopInstance,
             onDisabled: this.disabledStopButton
         }, {
             label: 'Remove',
-            name: 'remove',
+            name: 'Remove',
             onClick: this.confirmDelete,
             onDisabled: this.disabledRemoveButton
         }];

@@ -66,7 +66,7 @@ var elementSummary = React.createClass({
         var secondaryTitle = (title == 'Processor')?'':'';
         return (
             <div className="element-summary-panel">
-                <div className="frm-panel-heading frm-panel-standar">
+                <div className="frm-panel-heading frm-panel-success-full">
                 </div>
                 <div className="panel frm-panel frm-panel-default frm-panel-remake">
                     <div className="panel-body">

@@ -16,22 +16,26 @@ var instancesGroup = React.createClass({
         var getBody = function () {
             return (<div className="panel-body">
                     <div className="frm-panel-title">
-                        {this.props.name}
+                        <h3 className="frm-bold-text frm-remake">
+                            {this.props.name}
+                        </h3>
                     </div>
                     <div className="row">
                         <div className="col-xs-6 text-center">
                             <h4>
                             </h4>
-                            <h3 className="frm-secondary-text">
-                                {this.props.totalInstances} Instances
-                            </h3>
+                            <h6 className="frm-bold-text">
+                                {this.props.totalInstances}
+                            </h6>
+                            <h3 className="frm-secondary-text">Instances</h3>
                         </div>
                         <div className="col-xs-6 text-center">
                             <h4>
                             </h4>
-                            <h3 className="frm-secondary-text">
-                                {this.props.totalRunningInstances} Running
-                            </h3>
+                            <h6 className="frm-bold-text">
+                                {this.props.totalRunningInstances}
+                            </h6>
+                            <h3 className="frm-secondary-text">Running</h3>
                         </div>
                     </div></div>
                    );
