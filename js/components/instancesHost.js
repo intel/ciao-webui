@@ -176,13 +176,14 @@ var instancesHost = React.createClass({
                                 var fmtData = {
                                     dataKey: this.props.dataKey,
                                     source: this.props.source,
-                                    data: data
+                                    data: data,
+                                    count: count.count
                                 };
-                                if (data.length < this.props.recordsPerPage) {
-                                    fmtData.count = count.count;
-                                } else {
-                                    fmtData.count = 0;
-                                }
+                                //if (data.length > this.props.recordsPerPage) {
+                                //    fmtData.count = count.count;
+                                //} else {
+                                //    fmtData.count = 0;
+                                //}
                                 datamanager.setDataSource(this.props.dataKey,
                                                           fmtData);
                             }.bind(this));

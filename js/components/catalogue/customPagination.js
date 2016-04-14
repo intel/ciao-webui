@@ -23,8 +23,8 @@ var customPagination = React.createClass({
         this.props.onSelect(selectedEvent.eventKey);
     },
     render: function() {
-        // var items = Math.ceil(this.props.items.length/this.props.itemsPerPage);
-        var items = Math.ceil(this.props.items);
+        var items = Math.ceil(this.props.items/this.props.itemsPerPage);
+        //var items = Math.ceil(this.props.items);
 
         return (<Pagination
                     prev
