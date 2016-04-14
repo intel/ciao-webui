@@ -79,11 +79,18 @@ var usageSummary = React.createClass({
     render: function() {
         var dynamicWidth = Math.round(12 / this.props.data.length);
         var elements = [];
+        var columnGrid;
+
+        if((this.props.data).length > 3) {
+            columnGrid = "col-xs-3 col-sm-3";
+        } else {
+            columnGrid = "col-xs-4 col-sm-4";
+        }
 
         if (this.props.data) this.props.data.forEach(
             (props) => {
                 elements.push(
-                    <div key={props.name} className={"col-xs-3 col-sm-3"}>
+                    <div key={props.name} className={columnGrid}>
                         <ElementSummary {...props}/>
                     </div>);
                 }
