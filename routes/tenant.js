@@ -67,6 +67,7 @@ router.get('/', validatePermissions, function(req, res, next) {
     config.data.username = req.session.username;
     config.data.tenants = req.session.tenants;
     config.data.activeTenant = req.session.activeTenant;
+    config.data.REFRESH = (Number(process.env.REFRESH) | 3500);
 
     res.render(process.env.NODE_ENV+'_template', config);
 });

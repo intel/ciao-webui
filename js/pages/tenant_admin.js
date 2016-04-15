@@ -35,6 +35,8 @@ $('document').ready(function () {
     //Usage summary
     datamanager.onDataSourceSet('usage-summary', function (sourceData) {
         sourceData.source = "/quotas";
+        var refresh = (datamanager.data.REFRESH | 3000);
+        sourceData.refresh = Number(refresh);
         ReactDOM.render(
             <UsageSummary {...sourceData}/>,
             document.getElementById("usage-summary"));
@@ -49,6 +51,9 @@ $('document').ready(function () {
             + datamanager.data.activeTenant.id
             + "/servers/detail";
         // pagination shows 10 items per page
+        // milliseconds
+        var refresh = (datamanager.data.REFRESH | 3000);
+        sourceData.refresh = Number(refresh);
         sourceData.recordsPerPage = 10;
         sourceData.dataKey = keyInstanceHost;
         ReactDOM.render(
@@ -60,6 +65,9 @@ $('document').ready(function () {
 
     // create group overview
     datamanager.onDataSourceSet('group-overview', function (sourceData) {
+        var refresh = (datamanager.data.REFRESH | 3000);
+        sourceData.refresh = Number(refresh);
+
         ReactDOM.render(
                 <GroupOverview {...sourceData}/>,
             document.getElementById("workloads-container"));

@@ -9,7 +9,8 @@ var instancesHost = React.createClass({
     getInitialState: function () {
         return {
             pagination: 0, // offset is 0,
-            items: 0
+            items: 0,
+            refresh: 3500
         };
     },
 
@@ -199,7 +200,7 @@ var instancesHost = React.createClass({
 
         window.setInterval(function () {
             callSource();
-        }.bind(this), 3500);
+        }.bind(this), this.props.refresh);
     },
 
     onChangePage: function (lastRecord) {

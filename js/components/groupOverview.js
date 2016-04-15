@@ -16,7 +16,9 @@ var groupOverview = React.createClass({
         var load = function () {
             if(this.flavorsDesc.length == 0)
                 this.props.flavors.forEach(function (flavor) {
-                    $.get({url:this.props.detailUrl + "/flavors/" + flavor.id})
+                    $.get({
+                        url:this.props.detailUrl + "/flavors/" + flavor.id,
+                        timeout:5000})
                         .done(function (data) {
                             if (data) {
                                 this.flavorsDesc.push({
@@ -29,7 +31,7 @@ var groupOverview = React.createClass({
                 }.bind(this));
         }.bind(this);
         load();
-        window.setInterval(load, 5000);
+        window.setInterval(load, this.props.refresh);
     },
 
     shouldComponentUpdate: function(nextProps, nextState) {
@@ -57,6 +59,18 @@ var groupOverview = React.createClass({
                                               dataKey: 'group-overview',
                                               detailUrl: this.props.detailUrl,
                                               flavors:data.flavors});
+                // Fallback, fix empty workloads
+                if (data.flavors.length == 0) {
+                    $.get({url: this.props.detailUrl + "/flavors"})
+                    .done(function (data) {
+                        datamanager
+                            .setDataSource('group-overview',
+                                           {
+                                               dataKey: 'group-overview',
+                                               detailUrl: this.props.detailUrl,
+                                               flavors:data.flavors});
+                    }.bind(this));
+                }
             }.bind(this))
                 .fail(function (err) {
                     console.log("Group overview update failed: "+err);

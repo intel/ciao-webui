@@ -180,7 +180,7 @@ router.get('/:tenant/flavors', function(req, res, next) {
                     // running. If workloads change, users must logout and
                     // login again..
                     // TODO: remove once a better optimization is implemented
-                    if (!req.session.workloads) {
+                    if (!req.session.workloads || req.session.workloads == []) {
                         req.session.workloads = data.json.flavors;
                     }
                     res.send({flavors:req.session.workloads});

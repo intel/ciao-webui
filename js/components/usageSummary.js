@@ -8,7 +8,8 @@ var usageSummary = React.createClass({
     getDefaultProps: function() {
         // source defaults to server details url
         return {
-            data: {}
+            data: {},
+            refresh: 3500
         };
     },
     componentDidMount: function() {
@@ -70,7 +71,7 @@ var usageSummary = React.createClass({
 
         window.setInterval(function () {
             callSource();
-        }.bind(this),2000);
+        }.bind(this), Number(this.props.refresh));
     },
     shouldComponentUpdate: function(nextProps, nextState) {
         //return this.props !== nextProps;
