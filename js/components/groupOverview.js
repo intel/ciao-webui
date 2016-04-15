@@ -33,7 +33,10 @@ var groupOverview = React.createClass({
     },
 
     shouldComponentUpdate: function(nextProps, nextState) {
-        return true;
+        if (!nextProps.flavors || nextProps.flavors.length == 0)
+            return false;
+        else
+            return true;
     },
 
     componentDidMount: function() {

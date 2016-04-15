@@ -235,7 +235,9 @@ router.get('/:tenant/flavors/detail', function(req, res, next) {
             }
         },
         "fail": () => {
-            res.send({flavors:[]});
+            res.send({
+                flavors:req.session.workloads?
+                    req.session.workloads:[]});
         }
     });
 });
