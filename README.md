@@ -20,7 +20,7 @@ Third party sofware packages can be found in the package.json file.
     
 #### Fill required information on the ciao_config.json file
 
-The cia_config.json file is a file in JSON format which contains the
+The ciao_config.json file is a file in JSON format which contains the
 information of the ciao-controller and keystone servers the Web UI is 
 going to connect to.
 The root of the ciao_config.json is the "environment", and should match
