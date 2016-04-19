@@ -42,18 +42,26 @@
          next();
      },
 
-     getIdentityFile: function () {
+     getConfig: function () {
          var file = __dirname +"/../config/ciao_config.json";
          var fs = require('fs');
          var config = JSON.parse(fs.readFileSync(file, 'utf8'));
-         return config[process.env.NODE_ENV].keystone;
+         var result = config[process.env.NODE_ENV].keystone;
+         // Global variable overwrite
+         if (global.KEYSTONE_ADDR)
+             result.host = global.KEYSTONE_ADDR;
+         if (global.KEYSTONE_PORT)
+             result.port = global.KEYSTONE_PORT;
+         if (global.PROTOCOL)
+             result.protocol = global.PROTOCOL;
+         return result;
      },
 
      // TODO: test this function with proper username, password,and options
      keystoneAuthenticate: function (bundle, next) {
          var username = bundle.username;
          var password = bundle.password;
-         var config = this.getIdentityFile();
+         var config = this.getConfig();
          var http = require((config.protocol)?config.protocol:"http");
          // if scope is set manually on identity file, it is overwritten
          if (bundle.scope) {
@@ -114,7 +122,7 @@
      // /v3/users/<user_UUID>/projects
      keystoneGetTenants: function (user_uuid, token, next) {
 
-         var config = this.getIdentityFile();
+         var config = this.getConfig();
          var http = require((config.protocol)?config.protocol:"http");
 
          var options = { host: config.host,
@@ -193,7 +201,7 @@
      // Ex: An unscoped token must be revoked after it
      // is replaced for scoped one
      keystoneRevokeToken: function (token, newToken, next) {
-         var config = this.getIdentityFile();
+         var config = this.getConfig();
          var http = require((config.protocol)?config.protocol:"http");
 
          var options = { host: config.host,
@@ -232,7 +240,7 @@
      },
 
      keystoneGetUsers: function (token,next) {
-         var config = this.getIdentityFile();
+         var config = this.getConfig();
          var http = require((config.protocol)?config.protocol:"http");
 
          var options = { host: config.host,

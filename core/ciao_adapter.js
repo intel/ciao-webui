@@ -6,7 +6,7 @@
 var ciaoAdapter = function (hostname, port, protocol) {
 
     if (!hostname || !port || !protocol) {
-        var config = getConfigFromFile();
+        var config = getConfig();
         this.host = config.host;
         this.port = config.port;
         this.protocol = config.protocol;
@@ -105,11 +105,20 @@ ciaoAdapter.prototype.getServersDetail = function (tenant_id,token, next){
 // Helper functions
 
 // Return json configuration from ciao_config.json file
-var getConfigFromFile = function () {
+var getConfig = function () {
     var file = "./config/ciao_config.json";
     var fs = require('fs');
     var config = JSON.parse(fs.readFileSync(file, 'utf8'));
-    return config[process.env.NODE_ENV].controller;
+    //GLOBAL overwrite
+    var result =  config[process.env.NODE_ENV].controller;
+    if (global.CONTROLLER_ADDR)
+        result.host = global.CONTROLLER_ADDR;
+    if (global.CONTROLLER_PORT)
+        result.port = global.CONTROLLER_PORT;
+    if (global.PROTOCOL)
+        result.protocol = global.PROTOCOL;
+
+    return result;
 };
 
 // Use this helper function to build an authenticated request, specify HTTP or

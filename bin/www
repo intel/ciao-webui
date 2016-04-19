@@ -4,7 +4,6 @@
  * Module dependencies.
  */
 
-var app = require('../app');
 var debug = require('debug')('ciao-webui:server');
 var http = require('http');
 var https = require('https');
@@ -12,14 +11,39 @@ var fs = require('fs');
 var args = {};
 
 // Get arguments
+// Set protocol, keystone and controller's addresses as global variables
 process.argv.forEach((value) => {
 
+    console.log(value);
     if (value.includes("protocol")) {
         args.protocol = value.split("=").pop();
+        global.PROTOCOL = args.protocol;
     }
-
+    if (value.includes("keystone_addr")) {
+        global.KEYSTONE_ADDR = value.split("=").pop();
+    }
+    if (value.includes("controller_addr")) {
+        global.CONTROLLER_ADDR  = value.split("=").pop();
+    }
+    if (value.includes("keystone_port")) {
+        global.KEYSTONE_PORT  = value.split("=").pop();
+    }
+    if (value.includes("controller_port")) {
+        global.CONTROLLER_PORT  = value.split("=").pop();
+    }
+    if (value.includes("key_path")) {
+        args.key_path  = value.split("=").pop();
+    }
+    if (value.includes("cert_path")) {
+        args.cert_path  = value.split("=").pop();
+    }
+    if (value.includes("passphrase")) {
+        args.passphrase  = value.split("=").pop();
+    }
 });
 
+// require App only after processing parameters
+var app = require('../app');
 
 /**
  * Get port from environment and store in Express.
@@ -39,11 +63,22 @@ var server = null;
 var uiConfig = JSON.parse(
 fs.readFileSync("./config/ciao_config.json"))[process.env.NODE_ENV].ui;
 
+// Overwrite ui config values if parameters were set
+if (args.protocol)
+    uiConfig.protocol = args.protocol;
+if (args.key_path)
+    uiConfig.certificates.key = args.key_path;
+if (args.cert_path)
+    uiConfig.certificates.cert = args.cert_path;
+if (args.passphrase)
+    uiConfig.certificates.passphrase = args.passphrase;
+
 // Use protocol specified in arguments, if  protocol was
 // not specified as an argument use app_config file
-var protocol = (args.protocol)? args.protocol: uiConfig.protocol;
+var protocol = uiConfig.protocol;
 var keyFile = uiConfig.certificates.key;
 var certFile = uiConfig.certificates.cert;
+var passphrase = uiConfig.certificates.passphrase;
 
 if (protocol == 'http')
     server = require(uiConfig.protocol).createServer(credentials,app);
@@ -52,7 +87,6 @@ else if (fs.existsSync(keyFile) && fs.existsSync(certFile)) {
     var pcert = fs.readFileSync(certFile, 'utf8');
     app.key = pkey;
     app.cert = pcert;
-    var passphrase = uiConfig.certificates.passphrase;
     var credentials = {key: pkey, cert: pcert,passphrase: passphrase};
 
     server = require(uiConfig.protocol).createServer(credentials,app);

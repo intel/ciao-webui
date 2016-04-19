@@ -21,11 +21,12 @@ Third party sofware packages can be found in the package.json file.
 #### Fill required information on the ciao_config.json file
 
 The ciao_config.json file is a file in JSON format which contains the
-information of the ciao-controller and keystone servers the Web UI is 
+information of the ciao-controller and keystone servers the Web UI is
 going to connect to.
 The root of the ciao_config.json is the "environment", and should match
-the NODE_ENV environment variable. Then the parameters **controller**, 
+the NODE_ENV environment variable. Then the parameters **controller**,
 **keystone** and **ui** will follow.
+
 
 ######controller
 
@@ -59,6 +60,8 @@ The following fields will determine how the Ciao Web UI will beconfigured.
   * passphrase - the passphrase assign to key.pem file.
   * trusted - array of trusted certificates. Each element in the array must contain the absolute path of a trusted cert.pem file.
 
+    Note: application can be started with this information specified on npm start parameters, see *Run application**.
+
 #### Execute instalation script specifying the desired Environment
 
     # install while setting a "development" environment
@@ -72,10 +75,26 @@ Executing the install.sh script will start the application.
 To skip full installation and just run the application use:
 
     $ npm start
-    
+
 App will then run on protocol://localhost:3000
 To serve the UI on an alternativa port set the PORT environment variable with the value of the desired port.
 Ex.
 
     $ export PORT=80
     $ npm start
+
+To run UI with specific set of configuration regardless of ciao_config.json's content, use the following paramters:
+
+1. protocol: set the protocol(Lowercase) that will be used by application, including controller, keystone and ui. For instance, if "https", the UI will run on https, and also controller and keystone are assumed to use this protocol as well.
+2. keystone_addr: Keystone's IP address or hostname reachable within the network.
+3. keystone_port: The port on which Kesytone's services are reachable.
+4. controller_addr: Ciao controller's IP address or hostname reachable within the network.
+5. controller_port: The port on which Controller services are reachable.
+6. key_path: Needed to run over HTTPS, The PATH (absolute or relative) that holds the location for the key.pem file.
+7. cert_path: Needed to run over HTTPS, the PATH (absolute or relative) that holds the location for the cert.pem file.
+8. passphrase: The passphrase or password set on the pem certificates used to run over HTTPS.
+
+Example.
+
+    npm start -- protocol=https controller_addr=127.0.0.1 controller_port=8774 keystone_addr=127.0.0.1 keystone_port=35357 key_path=certs/key-pass.pem cert_path=certs/cert.pem passphrase=asecurepassphrase     
+
