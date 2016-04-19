@@ -43,7 +43,8 @@
      },
 
      getConfig: function () {
-         var file = __dirname +"/../config/ciao_config.json";
+         var file = global.CONFIG_FILE?
+             global.CONFIG_FILE:__dirname +"/../config/ciao_config.json";
          var fs = require('fs');
          var config = JSON.parse(fs.readFileSync(file, 'utf8'));
          var result = config[process.env.NODE_ENV].keystone;

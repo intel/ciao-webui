@@ -106,7 +106,8 @@ ciaoAdapter.prototype.getServersDetail = function (tenant_id,token, next){
 
 // Return json configuration from ciao_config.json file
 var getConfig = function () {
-    var file = "./config/ciao_config.json";
+    var file = global.CONFIG_FILE?
+        global.CONFIG_FILE : "./config/ciao_config.json";
     var fs = require('fs');
     var config = JSON.parse(fs.readFileSync(file, 'utf8'));
     //GLOBAL overwrite

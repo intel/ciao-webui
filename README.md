@@ -26,7 +26,10 @@ going to connect to.
 The root of the ciao_config.json is the "environment", and should match
 the NODE_ENV environment variable. Then the parameters **controller**,
 **keystone** and **ui** will follow.
+Note: an alternate configuration file may be used by running npm start with a
+config_file parameter.
 
+....npm start -- config_file="Path to configuration file"
 
 ######controller
 

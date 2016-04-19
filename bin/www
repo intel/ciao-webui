@@ -14,7 +14,10 @@ var args = {};
 // Set protocol, keystone and controller's addresses as global variables
 process.argv.forEach((value) => {
 
-    console.log(value);
+    if (value.includes("config_file")) {
+        args.config_file = value.split("=").pop();
+        global.CONFIG_FILE = args.config_file;
+    }
     if (value.includes("protocol")) {
         args.protocol = value.split("=").pop();
         global.PROTOCOL = args.protocol;
@@ -58,10 +61,10 @@ app.set('port', port);
  */
 
 var server = null;
-
+var configFile = args.config_file?args.config_file:"./config/ciao_config.json";
 // Gather information from configuration file
 var uiConfig = JSON.parse(
-fs.readFileSync("./config/ciao_config.json"))[process.env.NODE_ENV].ui;
+fs.readFileSync(configFile))[process.env.NODE_ENV].ui;
 
 // Overwrite ui config values if parameters were set
 if (args.protocol)
