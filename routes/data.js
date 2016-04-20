@@ -378,7 +378,7 @@ router.get('/nodes', function (req, res, next) {
 router.get('/nodes/count', function (req, res, next) {
     var uri = "/v2.1/nodes";
 
-    var data = adapter.get(uri + query,req.session.token, () => {
+    var data = adapter.get(uri,req.session.token, () => {
         res.set('Content-Type','application/json');
         res.send({count:data.json.nodes.length});
     });
