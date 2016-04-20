@@ -15,6 +15,7 @@ var customPagination = React.createClass({
             itemsPerPage:10
         };
     },
+
     handleSelect: function(event, selectedEvent) {
         this.setState({
             activePage: selectedEvent.eventKey
@@ -22,6 +23,16 @@ var customPagination = React.createClass({
 
         this.props.onSelect(selectedEvent.eventKey);
     },
+
+    componentDidUpdate: function(prevProps, prevState) {
+        var pagButtons = document.querySelectorAll("ul.pagination li a");
+        // pagButtons is of type NodeList, iterate using for.
+        for (var i = 0; i < pagButtons.length; ++i) {
+            pagButtons[i].removeAttribute('href');
+        }
+
+    },
+
     render: function() {
         var items = Math.ceil(this.props.items/this.props.itemsPerPage);
         //var items = Math.ceil(this.props.items);

@@ -219,7 +219,7 @@ router.get('/:tenant/flavors/detail', function(req, res, next) {
                     controller_addr:global.CONTROLLER_ADDR,
                     controller_port:global.CONTROLLER_PORT,
                     protocol: global.PROTOCOL
-                }; 
+                };
                 child.send(JSON.stringify({
                     uri: uri,
                     token: req.session.token,
@@ -368,9 +368,19 @@ router.get('/:tenant/quotas', function (req, res, next) {
 
 router.get('/nodes', function (req, res, next) {
     var uri = "/v2.1/nodes";
-    var data = adapter.get(uri,req.session.token, () => {
+    var query = '?' + querystring.stringify(req.query);
+    var data = adapter.get(uri + query,req.session.token, () => {
         res.set('Content-Type','application/json');
         res.send(data.json);
+    });
+});
+
+router.get('/nodes/count', function (req, res, next) {
+    var uri = "/v2.1/nodes";
+
+    var data = adapter.get(uri + query,req.session.token, () => {
+        res.set('Content-Type','application/json');
+        res.send({count:data.json.nodes.length});
     });
 });
 

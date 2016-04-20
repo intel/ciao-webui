@@ -1,8 +1,15 @@
 // React js component
 var React = require('react');
 var CustomCatalogue = require('./catalogue/customCatalogue.js');
-var $ = require('jquery')
+
 var nodes = React.createClass({
+    getInitialState: function() {
+        return {
+            offset: 0,
+            limit: 10
+        };
+    },
+
     evacuateNode: function() { //this one
         if(!this.state.startDisabled){
 
@@ -12,9 +19,11 @@ var nodes = React.createClass({
 
         }
     },
+
     disabledEvacuate: function(){
         return true;
     },
+
     getActions: function(){
         return [
             {
@@ -25,6 +34,7 @@ var nodes = React.createClass({
             }
         ];
     },
+
     getDropdownActions: function(){
         return [
             {
@@ -49,30 +59,39 @@ var nodes = React.createClass({
             }
         ];
     },
+
     getSearchfields: function(){
         return  ['status', 'utilization', 'geography'];
     },
 
     componentDidMount: function() {
         var update = function () {
-            $.get({
-            url: this.props.source})
-            .done(function (data) {
-                if (data) {
-                    console.log("nodes");
-                    console.log(data);
-                    var fmtData = data.nodes.map((node) => {
-                        /* If JSON object for node needs to be altered
-                           do it here */
-                        delete node.updated;
-                        return node;
-                        });
-                    datamanager.setDataSource('nodes', {
-                        source: this.props.source,
-                        data: fmtData});
-                }
-            }.bind(this));
-        }.bind(this);
+            var query = "?limit=" + this.state.limit
+                + "&offset=" + this.state.offset;
+            $.get({url: this.props.source + "/count"})
+                .done(function (count) {
+
+                    $.get({
+                        url: this.props.source + query})
+                        .done(function (data) {
+                            if (data) {
+                                console.log("nodes");
+                                console.log(data);
+                                var fmtData = data.nodes.map((node) => {
+                                    /* If JSON object for node needs to be altered
+                                       do it here */
+                                    delete node.updated;
+                                    return node;
+                                });
+                                datamanager.setDataSource('nodes', {
+                                    source: this.props.source,
+                                    count: count.count,
+                                    data: fmtData});
+                            }
+                        }.bind(this));
+                }.bind(this));
+
+        }.bind(this); //end update function
 
         update();
         window.setInterval(update, 2000);
@@ -94,6 +113,8 @@ var nodes = React.createClass({
         return (
             <CustomCatalogue
                 data={this.props.data}
+                count = {this.props.count ? this.props.count:10}
+                limit = {this.state.limit}
                 link={link}
                 columns={columns}
                 actions={this.getActions()}

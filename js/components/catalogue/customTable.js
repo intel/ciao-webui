@@ -137,10 +137,14 @@ var customTable = React.createClass({
             React.createElement(
                 'div',
                 { className: 'frm-pagination' },
-                React.createElement(CustomPagination, _extends({ className: 'pagination',
-                    items: this.props.pagination.items
-                }, this.props.pagination, {
-                    onSelect: this.changePage }))
+                React.createElement(
+                    CustomPagination,
+                    _extends({
+                        className: 'pagination',
+                        items: this.props.pagination.items,
+                        itemsPerPage: this.props.pagination.limit
+                    }, this.props.pagination, {
+                        onSelect: this.changePage }))
             )
         );
     },

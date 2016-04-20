@@ -191,7 +191,8 @@ var catalogue = React.createClass({
 
         var config = this.props;
         var pagination = {
-            items: this.props.count
+            items: this.props.count,
+            itemsPerPage: this.props.limit
         };
         // var pagination = config.pagination ?
         //     config.pagination : this.props.paginationDefault;

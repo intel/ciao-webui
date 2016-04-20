@@ -57,17 +57,19 @@ $('document').ready(function () {
         sourceData.recordsPerPage = 10;
         sourceData.dataKey = keyInstanceHost;
         if (datamanager.data.flavors) {
-            if (datamanager.data.flavors[0].name)
-                sourceData.data = sourceData.data.map((x)=>{
-                    try {
-                    x.Image = datamanager.data.flavors.filter(
-                        function (y) {
-                        return y.disk.localeCompare(x.Image) == 0 ;
-                    })
-                    .pop()
-                    .name;}catch(e){}
-                    return x;
-                });
+            try {
+                if (datamanager.data.flavors[0].name)
+                    sourceData.data = sourceData.data.map((x)=>{
+                        try {
+                            x.Image = datamanager.data.flavors.filter(
+                                function (y) {
+                                    return y.disk.localeCompare(x.Image) == 0 ;
+                                })
+                                .pop()
+                                .name;}catch(e){}
+                        return x;
+                    });
+            } catch(e){}
         }
         ReactDOM.render(
             <InstancesHost {...sourceData}/>,
