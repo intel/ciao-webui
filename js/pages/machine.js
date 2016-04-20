@@ -65,6 +65,8 @@ $('document').ready(function () {
             + datamanager.data.idMachine
             + "/servers/detail";;
     datamanager.onDataSourceSet(key, function (sourceData) {
+        var refresh = (datamanager.data.REFRESH | 3000);
+        sourceData.refresh = Number(refresh);
         sourceData.recordsPerPage = 10;
         sourceData.source = ihSource;
         sourceData.dataKey = key;
