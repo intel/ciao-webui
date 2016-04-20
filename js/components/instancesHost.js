@@ -159,7 +159,8 @@ var instancesHost = React.createClass({
 
             query = query +
                 '&offset=' + (datamanager.data.offset ?
-                              datamanager.data.offset - 1:0);
+                              ((datamanager.data.offset -1)
+                              * this.props.recordsPerPage):0);
 
             console.log('query', query);
             var url = this.props.source + query;

@@ -67,7 +67,7 @@ var nodes = React.createClass({
     componentDidMount: function() {
         var update = function () {
             var query = "?limit=" + this.state.limit
-                + "&offset=" + this.state.offset;
+                + "&offset=" + (this.state.offset * this.state.limit);
             $.get({url: this.props.source + "/count"})
                 .done(function (count) {
 
