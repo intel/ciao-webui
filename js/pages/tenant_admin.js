@@ -90,7 +90,6 @@ $('document').ready(function () {
             timeout:5000})
             .done(function (data) {
                 if (data) {
-                    datamanager.data.flavors = data.flavors;
                     data.dataKey = 'group-overview';
                     data.detailUrl = '/data/' +
                         datamanager.data.activeTenant.id;

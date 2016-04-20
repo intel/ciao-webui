@@ -23,7 +23,9 @@ var groupOverview = React.createClass({
                             if (data) {
                                 this.flavorsDesc.push({
                                     id:data.flavor.id,
+                                    name:data.flavor.name,
                                     disk:data.flavor.disk});
+                                datamanager.data.flavors = this.flavorsDesc;
                                 console.log("Retrieved flavor information:");
                                 console.log(data);
                             }
