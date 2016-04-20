@@ -62,9 +62,6 @@ $('document').ready(function () {
                     try {
                     x.Image = datamanager.data.flavors.filter(
                         function (y) {
-                    console.log(y)
-                        console.log(x)
-                        console.log("yes)");
                         return y.disk.localeCompare(x.Image) == 0 ;
                     })
                     .pop()
@@ -83,7 +80,6 @@ $('document').ready(function () {
     datamanager.onDataSourceSet('group-overview', function (sourceData) {
         var refresh = (datamanager.data.REFRESH | 3000);
         sourceData.refresh = Number(refresh);
-        datamanager.data.flavors = sourceData.flavors;
         ReactDOM.render(
                 <GroupOverview {...sourceData}/>,
             document.getElementById("workloads-container"));
@@ -94,6 +90,7 @@ $('document').ready(function () {
             timeout:5000})
             .done(function (data) {
                 if (data) {
+                    datamanager.data.flavors = data.flavors;
                     data.dataKey = 'group-overview';
                     data.detailUrl = '/data/' +
                         datamanager.data.activeTenant.id;
