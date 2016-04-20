@@ -128,6 +128,7 @@ router.get('/:tenant/servers/detail',function(req, res, next) {
 
                         res.send(servers
                                  .map((value) => {
+                                     var image = value.image.id;
                                      var address = value.addresses.private[0];
                                      return {
                                          "instance_id": value.id,
@@ -136,7 +137,7 @@ router.get('/:tenant/servers/detail',function(req, res, next) {
                                          "IP Address": address.addr,
                                          "MAC address":address[
                                              "OS-EXT-IPS-MAC:mac_addr"],
-                                         "Image": value.image.id
+                                         "Image": image
                                      };
                                  }));
                     } else {
@@ -214,10 +215,16 @@ router.get('/:tenant/flavors/detail', function(req, res, next) {
                 // Spawn new process to handle
                 var child = spawn('./core/helpers/flavorDetails.js');
                 // send message to child
+                var globals = {
+                    controller_addr:global.CONTROLLER_ADDR,
+                    controller_port:global.CONTROLLER_PORT,
+                    protocol: global.PROTOCOL
+                }; 
                 child.send(JSON.stringify({
                     uri: uri,
                     token: req.session.token,
-                    workloads: req.session.workloads
+                    workloads: req.session.workloads,
+                    globals: globals
                 }));
                 //child.send("hello mundo");
                 child.on('message', function(m) {

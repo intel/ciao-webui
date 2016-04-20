@@ -56,6 +56,22 @@ $('document').ready(function () {
         sourceData.refresh = Number(refresh);
         sourceData.recordsPerPage = 10;
         sourceData.dataKey = keyInstanceHost;
+        if (datamanager.data.flavors) {
+            if (datamanager.data.flavors[0].name)
+                sourceData.data = sourceData.data.map((x)=>{
+                    try {
+                    x.Image = datamanager.data.flavors.filter(
+                        function (y) {
+                    console.log(y)
+                        console.log(x)
+                        console.log("yes)");
+                        return y.disk.localeCompare(x.Image) == 0 ;
+                    })
+                    .pop()
+                    .name;}catch(e){}
+                    return x;
+                });
+        }
         ReactDOM.render(
             <InstancesHost {...sourceData}/>,
             document.getElementById('instances-host'));
@@ -67,7 +83,7 @@ $('document').ready(function () {
     datamanager.onDataSourceSet('group-overview', function (sourceData) {
         var refresh = (datamanager.data.REFRESH | 3000);
         sourceData.refresh = Number(refresh);
-
+        datamanager.data.flavors = sourceData.flavors;
         ReactDOM.render(
                 <GroupOverview {...sourceData}/>,
             document.getElementById("workloads-container"));

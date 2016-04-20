@@ -1,14 +1,15 @@
 var ciaoAdapter = require('../ciao_adapter.js');
 
-var adapter = new ciaoAdapter();
-
 process.on('message', function(m) {
 
     m = JSON.parse(m);
     var uri = m.uri;
     var token = m.token;
     var sessionWorkloads = m.workloads;
-
+    global.PROTOCOL = m.globals.protocol;
+    global.CONTROLLER_ADDR = m.globals.controller_addr;
+    global.CONTROLLER_PORT = m.globals.controller_port;
+    var adapter = new ciaoAdapter();
     if (uri && token && sessionWorkloads)
         var data = adapter.get(
             uri,
