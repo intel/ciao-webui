@@ -514,6 +514,27 @@ router.post('/:tenant/servers', function (req, res, next) {
     });
 });
 
+router.post('/:tenant/servers/action', function (req, res, next) {
+    validateTokenScope(req, res, {
+        "success": (t) => {
+            var token = (t)?t:req.session.token;
+            var uri = "/v2.1/" + req.params.tenant +
+                "/servers/action";
+            // Implemented actions are:
+            // "-os-start":
+            // "-os-stop"
+            // " os-delete"
+            var d = {};
+            d["action"] = req.body.action;
+            d["status"] = req.body.status;
+            var data = adapter.post(uri,
+                                    d,
+                                    token,
+                                    () => res.send(data.raw));
+        }
+    });
+});
+
 router.post('/:tenant/servers/:server/action', function (req, res, next) {
     validateTokenScope(req, res, {
         "success": (t) => {

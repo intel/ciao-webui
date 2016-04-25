@@ -30,17 +30,21 @@ var CustomAlert = require('./customAlert.js');
 var CustomModal = require('./customModal.js');
 
 var AlertMixin = {
+
     getInitialState: function () {
         return { _alert: false };
     },
+
     renderAlert: function () {
         if (this.state._alert) {
             return React.createElement(CustomAlert, this.state._alert);
         }
     },
+
     hideAlert: function () {
         this.setState({ _alert: false });
     },
+
     showAlert: function (options) {
         this.setState({ _alert: options });
     }
@@ -50,19 +54,23 @@ var ModalMixin = {
     getInitialState: function () {
         return { _modal: false };
     },
+
     renderModal: function () {
         if (this.state._modal) {
             return React.createElement(CustomModal, this.state._modal);
         }
     },
+
     onClose: function () {
         this.setState({ _modal: false });
     },
+
     onAccept: function (callback) {
         this.setState({ _modal: false });
         this.setState({ selectedInstance: [] });
         callback(this.state.selectedInstance);
     },
+
     showModal: function (options) {
         options.onClose = this.onClose;
         options.onAccept = this.onAccept.bind(null, options.onAccept);

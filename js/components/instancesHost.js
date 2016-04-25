@@ -10,7 +10,8 @@ var instancesHost = React.createClass({
         return {
             pagination: 0, // offset is 0,
             items: 0,
-            refresh: 3500
+            refresh: 3500,
+            status: null // selected status
         };
     },
 
@@ -23,6 +24,22 @@ var instancesHost = React.createClass({
         };
     },
 
+    actionAllInstances: function (status,action) {
+        var url = "/data/" + datamanager.data.activeTenant.id +
+                "/servers/actions";
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: { status: status,
+                    action: action },
+            dataType: "application/json"
+        }).done(data => {
+            console.log(data);
+        }).fail(err => {
+            console.log(err);
+        });
+    },
+
     startInstance: function (elements) {
         console.log('Starting instance: ', elements);
         elements.forEach(el => {
@@ -30,53 +47,56 @@ var instancesHost = React.createClass({
                 //TODO: not having tenant_id may cause bugs
                 // for users with more than one tenant
                 "/servers/" + el.instance_id + "/action";
-        $.post({
-            url: url,
-            data: { server: el.instance_id, action: "os-start" },
-            dataType: "application/json"
-        }).done(data => {
-            console.log(data);
-    }).fail(err => {
-            console.log(err);
-    });
-    });
+            $.post({
+                url: url,
+                data: { server: el.instance_id, action: "os-start" },
+                dataType: "application/json"
+            }).done(data => {
+                console.log(data);
+            }).fail(err => {
+                console.log(err);
+            });
+        });
     },
+
     stopInstance: function (elements) {
         console.log('Stopping instance: ', elements);
         elements.forEach(el => {
             var url = "/data/" + datamanager.data.activeTenant.id +
-                    //el.tenant_id +
+                //el.tenant_id +
                 "/servers/" + el.instance_id + "/action";
-        $.post({
-            url: url,
-            data: { server: el.instance_id, action: "os-stop" },
-            dataType: "application/json"
-        }).done(data => {
-            console.log(data);
-    }).fail(err => {
-            console.log(err);
-    });
-    });
+            $.post({
+                url: url,
+                data: { server: el.instance_id, action: "os-stop" },
+                dataType: "application/json"
+            }).done(data => {
+                console.log(data);
+            }).fail(err => {
+                console.log(err);
+            });
+        });
     },
+
     deleteInstance: function (elements) {
         console.log('deleting instance: ', elements);
         elements.forEach(el => {
             var url = "/data/" + datamanager.data.activeTenant.id +
-                    //el.tenant_id +
+                //el.tenant_id +
                 "/servers/" + el.instance_id;
-        console.log(url);
-        $.ajax({
-            url: url,
-            type: "DELETE",
-            data: { server: el.instance_id, action: "os-delete" },
-            dataType: "application/json"
-        }).done(data => {
-            console.log(data);
-    }).fail(err => {
-            console.log(err);
-    });
-    });
+            console.log(url);
+            $.ajax({
+                url: url,
+                type: "DELETE",
+                data: { server: el.instance_id, action: "os-delete" },
+                dataType: "application/json"
+            }).done(data => {
+                console.log(data);
+            }).fail(err => {
+                console.log(err);
+            });
+        });
     },
+
     confirmDelete: function () {
         this.refs.catalogue.showModal({
             title: 'Remove Instance(s)',
@@ -85,6 +105,7 @@ var instancesHost = React.createClass({
             acceptText: 'Remove'
         });
     },
+
     disabledStartButton: function (item) {
         var disabled = true;
         if (item.length > 0) {
@@ -95,6 +116,7 @@ var instancesHost = React.createClass({
         }
         return disabled;
     },
+
     disabledStopButton: function (item) {
         var disabled = true;
         if (item.length > 0) {
@@ -105,6 +127,7 @@ var instancesHost = React.createClass({
         }
         return disabled;
     },
+
     disabledRemoveButton: function (item) {
         var disabled = true;
         if (item.length > 0) {
@@ -112,6 +135,7 @@ var instancesHost = React.createClass({
         }
         return disabled;
     },
+
     getActions: function () {
         return [{
             label: 'Start',
@@ -120,7 +144,6 @@ var instancesHost = React.createClass({
             onDisabled: this.disabledStartButton
         }, {
             label: 'Stop',
-
             name: 'Stop',
             onClick: this.stopInstance,
             onDisabled: this.disabledStopButton
@@ -131,6 +154,7 @@ var instancesHost = React.createClass({
             onDisabled: this.disabledRemoveButton
         }];
     },
+
     getDropdownActions: function () {
         return [{
             label: 'All Running',
@@ -142,12 +166,15 @@ var instancesHost = React.createClass({
             query: { 'State': 'exited' }
         }];
     },
+
     getSearchfields: function () {
         return ['instance_label', 'instance_state', 'instance_tags'];
     },
+
     shouldComponentUpdate: function (nextProps, nextState) {
         return true;
     },
+
     componentDidMount: function () {
         var executing = false;
         var callSource = function () {
@@ -161,8 +188,6 @@ var instancesHost = React.createClass({
                 '&offset=' + (datamanager.data.offset ?
                               ((datamanager.data.offset -1)
                               * this.props.recordsPerPage):0);
-
-            console.log('query', query);
             var url = this.props.source + query;
 
             $.get({url: url })
@@ -205,20 +230,21 @@ var instancesHost = React.createClass({
     },
 
     onChangePage: function (lastRecord) {
-
         this.setState({ pagination: lastRecord });
         //onStateChange
         //componentShouldUpdate
     },
-    componentWillMount: function () {
 
-        console.log('componentWillMount', this);
-        //onStateChange
-        //componentShouldUpdate
+    selectAll: function (status) {
+        var s = this.state;
+        s.status = status;
+        this.setState(s);
+    },
+
+    componentWillMount: function () {
     },
 
     render: function () {
-
         var columns = [];
         if (this.props.data.length > 0) {
             columns = Object.keys(this.props.data[0]).map(function (text) {
@@ -233,6 +259,7 @@ var instancesHost = React.createClass({
             dropDownActions: this.getDropdownActions(),
             searchFields: this.getSearchfields(),
             onChangePage: this.onChangePage,
+            selectAll: this.selectAll,
             ref: 'catalogue'
         });else return React.createElement('div', null);
     }
