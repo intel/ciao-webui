@@ -59,7 +59,6 @@ var usageSummary = React.createClass({
                             source: this.props.source,
                             data:data
                         });
-                        console.log(data);
                     }
                 }.bind(this))
                 .fail(function (err) {

@@ -30,6 +30,9 @@ process.on('message', function(m) {
                             }).length;
                             w.totalInstances = ti;
                             w.totalRunningInstances = tri;
+                        } else {
+                            w.totalInstances = 0;
+                            w.totalRunningInstances = 0;
                         }
                         return w;
                     });
