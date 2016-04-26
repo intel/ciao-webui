@@ -26,12 +26,13 @@ var instancesHost = React.createClass({
 
     actionAllInstances: function (status,action) {
         var url = "/data/" + datamanager.data.activeTenant.id +
-                "/servers/actions";
+                "/servers/action";
         $.ajax({
             url: url,
             type: "POST",
             data: { status: status,
-                    action: action },
+                    action: action
+                  },
             dataType: "application/json"
         }).done(data => {
             console.log(data);
@@ -41,7 +42,6 @@ var instancesHost = React.createClass({
     },
 
     startInstance: function (elements) {
-        console.log('Starting instance: ', elements);
         elements.forEach(el => {
             var url = "/data/" + datamanager.data.activeTenant.id +
                 //TODO: not having tenant_id may cause bugs
@@ -60,7 +60,6 @@ var instancesHost = React.createClass({
     },
 
     stopInstance: function (elements) {
-        console.log('Stopping instance: ', elements);
         elements.forEach(el => {
             var url = "/data/" + datamanager.data.activeTenant.id +
                 //el.tenant_id +
@@ -78,12 +77,10 @@ var instancesHost = React.createClass({
     },
 
     deleteInstance: function (elements) {
-        console.log('deleting instance: ', elements);
         elements.forEach(el => {
             var url = "/data/" + datamanager.data.activeTenant.id +
                 //el.tenant_id +
                 "/servers/" + el.instance_id;
-            console.log(url);
             $.ajax({
                 url: url,
                 type: "DELETE",
@@ -114,7 +111,7 @@ var instancesHost = React.createClass({
                 disabled = false;
             }
         }
-        return disabled;
+        return false;
     },
 
     disabledStopButton: function (item) {
@@ -235,10 +232,25 @@ var instancesHost = React.createClass({
         //componentShouldUpdate
     },
 
-    selectAll: function (status) {
-        var s = this.state;
-        s.status = status;
-        this.setState(s);
+    selectAll: function (status,action) {
+        return function () {
+            var actionString = "";
+            switch (action) {
+                case "Start":
+                actionString = "os-start";
+                break;
+                case "Stop":
+                actionString = "os-stop";
+                break;
+                case "Remove":
+                actionString = "os-delete";
+                break;
+            }
+            this.actionAllInstances(status,actionString);
+            var s = this.state;
+            s.selectAll = true;
+            this.setState(s);
+        }.bind(this);
     },
 
     componentWillMount: function () {

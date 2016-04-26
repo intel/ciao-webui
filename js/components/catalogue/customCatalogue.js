@@ -108,14 +108,16 @@ var catalogue = React.createClass({
         var allInstances = [];
         var key = [];
 
-        //var data = (inAllItems)?this.props.data:this.actualData;
-        var data = inAllItems ? this.props.data : this.props.data;
+        // inAllItems will trigger action by tenant on all instances matching
+        // the selected state
+        var data = inAllItems ? [] : this.props.data;
 
         if (query) {
             key = Object.keys(query);
         }
 
-        if (key.length > 0) {
+        if (key.length > 0 && inAllItems == false) {
+            this.setState({allItems:false, status:null});
             selectedInstance = data.filter(function (instance) {
                 return instance[key] == query[key];
             });
@@ -123,36 +125,35 @@ var catalogue = React.createClass({
             allInstances = this.props.data.filter(function (instance) {
                 return instance[key] == query[key];
             });
-
-            if (inAllItems === false) {
-
-                this.showAlert({
-                    selectedPage: {
-                        selectInPage: selectedInstance.length,
-                        selectInAllPages: allInstances.length,
-                        action: query[key],
-                        onClick: this.selectInstances.bind(null, query, true)
-                    },
-                    alertType: "alert frm-alert-information"
-                });
-            } else {
-                this.showAlert({
-                    selectedAll: {
-                        selectInAllPages: allInstances.length,
-                        onClick: this.unselectAllInstances
-                    },
-                    alertType: "alert frm-alert-information"
-                });
-            }
-        } else {
+            this.showAlert({
+                selectedPage: {
+                    selectInPage: selectedInstance.length,
+                    selectInAllPages: allInstances.length,
+                    action: query[key],
+                    onClick: this.selectInstances.bind(null, query, true)
+                },
+                alertType: "alert frm-alert-information"
+            });
+        } else if(inAllItems == true) {
+            this.setState({allItems:true, status:query[key]});
+            this.showAlert({
+                selectedAll: {
+                    selectInAllPages: allInstances.length,
+                    status: query[key],
+                    onClick: this.unselectAllInstances
+                },
+                alertType: "alert frm-alert-information"
+            });
+        }else {
             //select all
+            this.setState({allItems:false, status:null});
             selectedInstance = this.props.data;
             this.hideAlert();
         }
-        this.setState({ selectedInstance: selectedInstance });
+        this.setState({ selectedInstance: selectedInstance, selectAll:false });
     },
     unselectAllInstances: function () {
-        this.setState({ selectedInstance: [] });
+        this.setState({ allItems:false, selectedInstance: [] });
         this.hideAlert();
     },
     addDefaultDropDownActions: function (items) {
@@ -230,7 +231,10 @@ var catalogue = React.createClass({
             'div',
             null,
             React.createElement(TableActionToolbar, _extends({
-                selectedInstance: this.state.selectedInstance
+                selectedInstance: this.state.selectedInstance,
+                status: this.state.status,
+                allItems: this.state.allItems,
+                selectAll: this.props.selectAll
             }, toolbarconfiguration)),
             React.createElement(
                 'div',

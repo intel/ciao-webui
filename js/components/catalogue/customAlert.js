@@ -1,4 +1,3 @@
-
 // React js component
 var React = require('react');
 
@@ -21,28 +20,28 @@ var customAlert = React.createClass({
                         <span className="frm-link"
                                 onClick={selectedPage.onClick}>
                             Select all&nbsp;
-                            {selectedPage.selectInAllPages}&nbsp;
                             {selectedPage.action}&nbsp;
                             instances
                         </span>
-                    </div>
+                    </div>;
         }else{
             if(this.props.selectedAll){
                 var selectedAll = this.props.selectedAll;
                 return  <div className={this.props.alertType}>
                             <span>
-                                {selectedAll.selectInAllPages}&nbsp;
+                                All {this.props.status}
+                                {selectedAll.action}
                                 instances selected.&nbsp;
                             </span>
                             <span className="frm-link"
                                 onClick={selectedAll.onClick}>
                                 Clear selection
                             </span>
-                          </div>
+                          </div>;
             }else{
                 return  <div className={this.props.alertType}>
                             {this.props.message}
-                        </div>
+                        </div>;
             }
         }
    }
