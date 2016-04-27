@@ -32,12 +32,14 @@ var CustomModal = require('./customModal.js');
 var AlertMixin = {
 
     getInitialState: function () {
-        return { _alert: false };
+        return { _alert: false, allItems:false, status:null };
     },
 
     renderAlert: function () {
         if (this.state._alert) {
             return React.createElement(CustomAlert, this.state._alert);
+        } else {
+            return null;
         }
     },
 
@@ -58,6 +60,8 @@ var ModalMixin = {
     renderModal: function () {
         if (this.state._modal) {
             return React.createElement(CustomModal, this.state._modal);
+        } else {
+            return null;
         }
     },
 
@@ -111,13 +115,17 @@ var catalogue = React.createClass({
         // inAllItems will trigger action by tenant on all instances matching
         // the selected state
         var data = inAllItems ? [] : this.props.data;
-
+        var newState = {};
         if (query) {
             key = Object.keys(query);
+            newState.status = query.state;
+        } else {
+            newState.status = null;
         }
 
         if (key.length > 0 && inAllItems == false) {
-            this.setState({allItems:false, status:null});
+            newState.allItems = false;
+            newState.status = null;
             selectedInstance = data.filter(function (instance) {
                 return instance[key] == query[key];
             });
@@ -134,8 +142,9 @@ var catalogue = React.createClass({
                 },
                 alertType: "alert frm-alert-information"
             });
-        } else if(inAllItems == true) {
-            this.setState({allItems:true, status:query[key]});
+        } else if(inAllItems == true && query) {
+            newState.allItems = true;
+            newState.status = query[key];
             this.showAlert({
                 selectedAll: {
                     selectInAllPages: allInstances.length,
@@ -146,14 +155,22 @@ var catalogue = React.createClass({
             });
         }else {
             //select all
-            this.setState({allItems:false, status:null});
+            newState.allItems = true;
+            newState.status = null;
             selectedInstance = this.props.data;
             this.hideAlert();
         }
-        this.setState({ selectedInstance: selectedInstance, selectAll:false });
+
+        if(inAllItems ==true && query) {
+            if (!query.State)
+            newState.status = "all";
+        }
+        newState.selectedInstance = selectedInstance;
+        newState.selectAll = true;
+        this.setState(newState);
     },
     unselectAllInstances: function () {
-        this.setState({ allItems:false, selectedInstance: [] });
+        this.setState({ allItems:false, selectedInstance: [], status:"none" });
         this.hideAlert();
     },
     addDefaultDropDownActions: function (items) {
@@ -183,19 +200,20 @@ var catalogue = React.createClass({
 
         if (config.dropDownActions) {
             dropDownActions = config.dropDownActions;
-            for (i = 0; i < dropDownActions.length; i++) {
+            for (var i = 0; i < dropDownActions.length; i++) {
                 var query = dropDownActions[i]['query'];
-                dropDownActions[i]['onClick'] = this.selectInstances.bind(null, query, false);
+                dropDownActions[i]['onClick'] = this.selectInstances
+                    .bind(null, query, false);
             }
         }
         dropDownActions = this.addDefaultDropDownActions(dropDownActions);
-
         return {
             buttonItems: config.actions ? config.actions : [],
             searchFields: config.searchFields ? config.searchFields : [],
             dropDownActions: dropDownActions
         };
     },
+
     getTableConfiguration: function () {
 
         var config = this.props;
@@ -203,8 +221,57 @@ var catalogue = React.createClass({
             items: this.props.count,
             itemsPerPage: this.props.limit
         };
-        // var pagination = config.pagination ?
-        //     config.pagination : this.props.paginationDefault;
+        // TODO: select conditions based on state
+        // isCheked function is passed from customCatalogue and then executed
+        // on customTable component
+        var condition = -1; //default value
+        // of selection
+        var state = this.state.status;
+        if (this.state.allItems == false) {
+            // Calculate conditions when not selecting all items
+            condition = 0;
+            if (state == "none")
+                condition = 3;
+        } else {
+            // Calculate conditions when selecting all items(filtered by state)
+            condition = 2;
+            if (state == "all")
+                condition = 1;
+        }
+
+        var isChecked = (function (condition) {
+            var f = null;
+            switch (condition){
+            case 1:
+                // All elements are checked
+                f = function () {
+                    // When selecting ALL elements always return true
+                    return true;
+                };
+                break;
+            case 2:
+                // Use this function when selecting all instances by state
+                f = function (row) {
+                        return (row.State ==  state);
+                };
+                break;
+            case 3:
+                // Use this case when option "None" has been selected.
+                f = function (row) {
+                    return false;
+                };
+                break;
+            case 0:
+            default:
+                f = function (row, selectedRows) {
+                    var entry = selectedRows.find(function (element) {
+                        return element.instance_id == row.instance_id;
+                    });
+                    return entry;
+                };
+            }
+            return f;
+        }.bind(this))(condition);
 
         return {
             columns: config.columns ? config.columns : [],
@@ -212,6 +279,7 @@ var catalogue = React.createClass({
             pagination: pagination,
             onSelectRow: this.selectInstance,
             selectedRows: this.state.selectedInstance,
+            isChecked: isChecked,
             onChangePage: this.setActualItems,
             link: config.link ? config.link : false
         };

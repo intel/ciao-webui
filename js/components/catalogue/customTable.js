@@ -34,11 +34,8 @@ var customTable = React.createClass({
     },
 
     isChecked: function (row) {
-
-        var entry = this.props.selectedRows.find(function (element) {
-            return element.instance_id == row.instance_id;
-        });
-        return entry;
+        // isChecked function comes customCatalogue component
+        return this.props.isChecked(row,this.props.selectedRows);
     },
 
     changePage: function (page) {
