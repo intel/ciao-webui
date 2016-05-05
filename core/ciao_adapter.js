@@ -28,6 +28,11 @@ ciaoAdapter.prototype.delete = function (path,token, next){
                                  token);
     var response = new httpResponse(next);
     var req = this.http.request(options, response.callback);
+    req.on('error', function (err) {
+        if (process.env.NODE_ENV != 'production')
+            console.log("ERROR: %s",err);
+        next();
+    });
     req.end();
     return response;
 };
@@ -43,6 +48,11 @@ ciaoAdapter.prototype.get = function (path,token, next){
                                  token);
     var response = new httpResponse(next);
     var req = this.http.request(options, response.callback);
+    req.on('error', function (err) {
+        if (process.env.NODE_ENV != 'production')
+            console.log("ERROR: %s",err);
+        next();
+    });
     req.end();
     return response;
 };
@@ -63,6 +73,11 @@ ciaoAdapter.prototype.post = function (path, data,token, next){
 
     var response = new httpResponse(next);
     var req = this.http.request(options, response.callback);
+    req.on('error', function (err) {
+        if (process.env.NODE_ENV != 'production')
+            console.log("ERROR: %s",err);
+        next();
+    });
     req.write(dataString);
     req.end();
     return response;
@@ -83,6 +98,11 @@ ciaoAdapter.prototype.getFlavors = function (tenant_id,token, next){
 
     var response = new httpResponse(next);
     var req = this.http.request(options, response.callback);
+    req.on('error', function (err) {
+        if (process.env.NODE_ENV != 'production')
+            console.log("ERROR: %s",err);
+        next();
+    });
     req.end();
 
     return response;
@@ -98,6 +118,11 @@ ciaoAdapter.prototype.getServersDetail = function (tenant_id,token, next){
 
     var response = new httpResponse(next);
     var req = this.http.request(options, response.callback);
+    req.on('error', function (err) {
+        if (process.env.NODE_ENV != 'production')
+            console.log("ERROR: %s",err);
+        next();
+    });
     req.end();
     return response;
 };
