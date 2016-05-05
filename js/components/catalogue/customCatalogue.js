@@ -84,8 +84,8 @@ var ModalMixin = {
 
 var catalogue = React.createClass({
     displayName: 'catalogue',
-
     mixins: [AlertMixin, ModalMixin],
+
     getInitialState: function () {
         return {
             selectedInstance: [],
@@ -93,6 +93,7 @@ var catalogue = React.createClass({
         };
     },
     actualData: [],
+
     getDefaultProps: function () {
         return {
             paginationDefault: {
@@ -100,12 +101,13 @@ var catalogue = React.createClass({
             }
         };
     },
+
     selectInstance: function (selected) {
         //merge con selectInstances
-
         this.hideAlert();
         this.setState({ selectedInstance: selected });
     },
+
     selectInstances: function (query, inAllItems) {
 
         var selectedInstance = [];
@@ -173,6 +175,7 @@ var catalogue = React.createClass({
         this.setState({ allItems:false, selectedInstance: [], status:"none" });
         this.hideAlert();
     },
+
     addDefaultDropDownActions: function (items) {
 
         if (!items[0] || items[0].name != 'all') {
@@ -193,6 +196,7 @@ var catalogue = React.createClass({
 
         return items;
     },
+
     getToolbarConfiguration: function () {
 
         var config = this.props;
@@ -284,12 +288,14 @@ var catalogue = React.createClass({
             link: config.link ? config.link : false
         };
     },
+
     //here table component will set the actual items
     //TODO:  Better way?
     setActualItems: function (lastItem) {
         //this.actualData =  actualData;
         this.props.onChangePage(lastItem);
     },
+
     render: function () {
 
         var toolbarconfiguration = this.getToolbarConfiguration();
