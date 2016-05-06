@@ -286,23 +286,20 @@
      // express request and response objects.
      // If tenant is provided, token will be scoped
      getToken: function (req, res, bundle, tenant, next) {
-
          var ref = this;
+         var finalToken = null;
          // Since Authentication is done by keystone service
          // we have to create a Promise to handle that connection
          // before sending the http response
          new Promise(function (resolve, reject){
              //authenticate
              // username and pass are mandatory in bundle, scope is optional
-
              if (tenant) {
                  bundle.scope = {
                      project: {
                          id:tenant}
                  };
              }
-
-             var finalToken = null;
              var oldToken = null;
              var result = ref.keystoneAuthenticate(
                  bundle,
@@ -314,7 +311,6 @@
                          req.session.username = (bundle.username)?
                              bundle.username :
                              req.session.username;
-
                          req.session.token_scope = tenant;
                          finalToken = result.response
                              .headers['x-subject-token'];
@@ -322,18 +318,7 @@
                          req.session.token = finalToken;
                          req.session.user_uuid = result.json.token.user.id;
                          req.session.roles = result.json.token.roles;
-                         console.log("authenticate: keystone token retrieved: "+
-                                     req.session.token);
                      }
-                     // revoke previous token
-                     // if (oldToken)
-                     //     var r = ref.keystoneRevokeToken(
-                     //         oldToken,
-                     //         finalToken,
-                     //         () => {
-                     //             // TODO: impl validation on
-                     //             // token revocation process
-                     //         });
                      resolve(finalToken);
                  });
          })
@@ -346,6 +331,7 @@
                          else
                              next.success(token);
                      }
+                     return finalToken;
                  })
          // Promise failed, user was not authenticated
              .catch(
@@ -358,6 +344,7 @@
                          else
                              next.fail(resp);
                      }
+                     return finalToken;
                  });
      }
  };
