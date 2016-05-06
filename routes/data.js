@@ -6,12 +6,10 @@ var spawn = require('child_process').fork;
 var querystring = require('querystring');
 var adapter = new ciaoAdapter();
 var TokenManager = new require('../core/tokenManager');
-
+var NodeService = require('../core/nodeService');
+// Set up
 var tokenManager = new TokenManager(sessionHandler);
-// Scope token validation
-// This function checks if current token is scoped, if it isn't then
-// it will replace the token for an scoped one using the tenant ID
-// if it is scoped but the tenant differs, then it will update the token.
+var nodeService = new NodeService(adapter, tokenManager);
 
 // Validate session as an authorized token is required
 router.use(sessionHandler.validateSession);
@@ -307,121 +305,18 @@ router.get('/:tenant/quotas', function (req, res, next) {
     })
         .onError(() => {
             res.send({usageSummaryData:{}});
-        }
-                )
+        })
         .validate(req, res);
 });
 
-router.get('/nodes', function (req, res, next) {
-    var uri = "/v2.1/nodes";
-    var query = '?' + querystring.stringify(req.query);
-    var data = adapter.get(uri + query,req.session.token, () => {
-        res.set('Content-Type','application/json');
-        res.send(data.json);
-    });
-});
-
-router.get('/nodes/count', function (req, res, next) {
-    var uri = "/v2.1/nodes";
-
-    var data = adapter.get(uri,req.session.token, () => {
-        res.set('Content-Type','application/json');
-        res.send({count:data.json.nodes.length});
-    });
-});
-
-router.get('/nodes/summary', function (req, res, next) {
-    var uri = "/v2.1/nodes/summary";
-    var data = adapter.get(uri,req.session.token, () => {
-        res.set('Content-Type','application/json');
-        res.send(data.json);
-    });
-});
-
-router.get('/nodes/:node', function (req, res, next) {
-    var uri = "/v2.1/nodes";
-    var data = adapter.get(uri,req.session.token, () => {
-
-            if(data.json){
-                var nodes = data.json.nodes.filter(
-                        (node) => node.id == req.params.node);
-                if (nodes.length > 0)
-                    res.send(nodes.pop());
-                else
-                    res.send([]);
-            }else{
-                res.send([]);
-            }
-
-    }
-    );
-});
-
-router.get('/nodes/:node/servers/detail', function (req, res, next) {
-
-    var query = '?' + querystring.stringify(req.query);
-    if (process.env.NODE_ENV != 'production') {
-        console.log('servers/detail :query string:', query);
-    }
-
-    var uri = "/v2.1/nodes/" + req.params.node + "/servers/detail" +
-        query;
-    var data = adapter.get(uri,req.session.token, () => {
-        if (data.json) {
-            var servers = data.json.servers;
-            if (Array.prototype.isPrototypeOf(servers)) {
-                res.send(servers
-                         .map((value) => {
-                             for(key in value) {
-                                 if(Array.prototype.isPrototypeOf(value[key]))
-                                     value[key] = value[key].toString();
-                             }
-                             delete value.cpus_usage;
-                             return value;
-                         }));
-            } else {
-                res.send([]);
-            }
-        }
-    });
-});
-
-router.get('/nodes/:node/servers/detail/count',function(req, res, next) {
-
-    tokenManager.onSuccess((t) => {
-        var uri = "/v2.1/nodes/" + req.params.node + "/servers/detail";
-        var token = (t)? t: req.session.token;
-        var data = adapter.get(uri,token, () => {
-            if (data.json) {
-                var rcount;
-                try {
-                    rcount = (data.json.total_servers)?
-                        data.json.total_servers
-                        :data.json.servers.length;
-                    ;
-                } catch(e){
-                    rcount = 0;
-                } finally {
-                    res.send({count: rcount});
-                }
-            } else {
-                res.send({count:0});
-            }
-        });
-    })
-        .onError((resp) => {
-            if(resp) {
-                res.status(resp.error.code)
-                    .send({"count":0})
-                    .end();
-            } else {
-                res.status(500)
-                    .send({"count":0});
-            }
-        }
-                )
-        .validte(req, res);
-});
+// Handle node resources
+router.get('/nodes', nodeService.nodes());
+router.get('/nodes/count', nodeService.nodesCount());
+router.get('/nodes/summary', nodeService.nodesSummary());
+router.get('/nodes/:node', nodeService.getNode());
+router.get('/nodes/:node/servers/detail', nodeService.serversDetail());
+router.get('/nodes/:node/servers/detail/count',
+           nodeService.serversDetailCount());
 
 router.get('/cncis', function (req, res, next) {
     var uri = "/v2.1/cncis";
