@@ -67,7 +67,6 @@ nodeService.prototype.serversDetail = function () {
         if (process.env.NODE_ENV != 'production') {
             console.log('servers/detail :query string:', query);
         }
-
         var uri = "/v2.1/nodes/" + req.params.node + "/servers/detail" +
             query;
         var data = adapter.get(uri,req.session.token, () => {
@@ -94,9 +93,9 @@ nodeService.prototype.serversDetail = function () {
 
 nodeService.prototype.serversDetailCount = function () {
     var adapter = this.adapter;
+    var tokenManager = this.tokenManager;
     return function(req, res, next) {
-
-        this.tokenManager.onSuccess((t) => {
+        tokenManager.onSuccess((t) => {
             var uri = "/v2.1/nodes/" + req.params.node + "/servers/detail";
             var token = (t)? t: req.session.token;
             var data = adapter.get(uri,token, () => {
@@ -130,6 +129,6 @@ nodeService.prototype.serversDetailCount = function () {
                     )
             .validate(req, res);
     };
-
 };
+
 module.exports = nodeService;

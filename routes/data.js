@@ -7,9 +7,11 @@ var querystring = require('querystring');
 var adapter = new ciaoAdapter();
 var TokenManager = new require('../core/tokenManager');
 var NodeService = require('../core/nodeService');
+var TenantService = require('../core/tenantService');
 // Set up
 var tokenManager = new TokenManager(sessionHandler);
 var nodeService = new NodeService(adapter, tokenManager);
+var tenantService = new TenantService(adapter, tokenManager);
 
 // Validate session as an authorized token is required
 router.use(sessionHandler.validateSession);
@@ -26,127 +28,21 @@ router.delete('/:tenant/servers/:server', function (req, res, next) {
         .validate(req, res);
 });
 
-router.get('/:tenant/servers/detail/count',function(req, res, next) {
+// Tenant service POST Methods
+router.post('/:tenant/servers', tenantService.createServers());
+router.post('/:tenant/servers/action', tenantService.postServersAction());
+router.post('/:tenant/servers/:server/action',
+            tenantService.postServerAction());
 
-    tokenManager.onSuccess((t) => {
-                var uri = "/v2.1/" + req.params.tenant + "/servers/detail";
-                var token = (t)? t: req.session.token;
-                var data = adapter.get(uri,token, () => {
-                    if (data.json) {
-                        var rcount;
-                        try {
-                             rcount = (data.json.total_servers)?
-                                data.json.total_servers
-                                :data.json.servers.length;
-                            ;
-                        } catch(e){
-                            rcount = 0;
-                        } finally {
-                            res.send({count: rcount});
-                        }
-                    } else {
-                        res.send({count:0});
-                    }
-
-                });
-            })
-        .onError((resp) => {
-                if(resp) {
-                    res.status(resp.error.code)
-                        .send({"count":0})
-                        .end();
-                } else {
-                    res.status(500)
-                        .send({"count":0});
-                }
-        })
-        .validate(req, res);
-});
-
-
-router.get('/:tenant/servers/detail',function(req, res, next) {
-
-    var query = '?' + querystring.stringify(req.query);
-
-    if (process.env.NODE_ENV != 'production') {
-        console.log('servers/detail :query string:', query);
-    }
-
-    tokenManager.onSuccess((t) => {
-        var uri = "/v2.1/" + req.params.tenant + "/servers/detail"+query;
-        var token = (t)? t: req.session.token;
-        var data = adapter.get(uri,token, () => {
-            if (data.json) {
-                var servers = data.json.servers;
-                if (Array.prototype.isPrototypeOf(servers)) {
-                    res.send(servers
-                             .map((value) => {
-                                 var image = value.image.id;
-                                 var address = value.addresses.private[0];
-                                 return {
-                                     "instance_id": value.id,
-                                     "State": value.status,
-                                     "Node ID": value.hostId,
-                                     "IP Address": address.addr,
-                                     "MAC address":address[
-                                         "OS-EXT-IPS-MAC:mac_addr"],
-                                     "Image": image
-                                 };
-                             }));
-                } else {
-                    res.send({servers:[]});
-                }
-            } else {
-                res.send({servers:[]});
-            }
-        });
-    })
-        .onError((resp) => {
-            if(resp) {
-                res.status(resp.error.code)
-                    .send({"servers":[]})
-                    .end();
-            } else {
-                res.status(500)
-                    .send({"servers":[]});
-            }
-        }).validate(req,res);
-});
-
-router.get('/:tenant/servers/:server', function(req, res, next) {
-    var uri = "/v2.1/" + req.params.tenant + "/servers/" + req.params.server;
-    var data = adapter.get(uri,req.session.token, () => res.send(data.json));
-});
-
-router.get('/:tenant/flavors', function(req, res, next) {
-    tokenManager.onSuccess(
-        (t) => {
-            var uri = "/v2.1/" + req.params.tenant + "/flavors";
-            var data = adapter.get(
-                uri,req.session.token,
-                function() {
-                    // Temporal optimization
-                    // Cache current workload information.
-                    // Workloads aren't likely to change while UI is
-                    // running. If workloads change, users must logout and
-                    // login again..
-                    // TODO: remove once a better optimization is implemented
-                    if (!req.session.workloads || req.session.workloads == []) {
-                        req.session.workloads = data.json.flavors;
-                    }
-                    res.send({flavors:req.session.workloads});
-                }.bind(req));
-        })
-        .onError( () => {
-            res.status(500).end();
-        })
-        .validate(req, res);
-});
+router.get('/:tenant/servers/detail/count', tenantService.serversDetailCount());
+router.get('/:tenant/servers/detail', tenantService.serversDetail());
+router.get('/:tenant/servers/:server', tenantService.getServer());
+router.get('/:tenant/flavors', tenantService.flavors());
+router.get('/:tenant/flavors/:flavor', tenantService.getFlavor());
 
 // Ciao-webui only:
 // This helper service optimize usage for current Grouped Instances
 // implementation.
-
 router.get('/:tenant/flavors/detail', function(req, res, next) {
     tokenManager.onSuccess((t) => {
         var query = '?' + querystring.stringify(req.query);
@@ -194,32 +90,6 @@ router.get('/:tenant/flavors/detail', function(req, res, next) {
             res.send({
                 flavors:req.session.workloads?
                     req.session.workloads:[]});
-        })
-        .validate(req,res);
-});
-
-router.get('/:tenant/flavors/:flavor', function(req, res, next) {
-    tokenManager.onSuccess((t) => {
-        var uri = "/v2.1/" + req.params.tenant + "/flavors/" +
-            req.params.flavor;
-        var data = adapter.get(
-            uri,req.session.token,
-            function() {
-                //Add detailes to cached workloads
-                if (req.session.workloads)
-                    var workloads = req.session.workloads
-                    .map((w) => {
-                        if (w.id == req.params.flavor) {
-                            w.disk = data.json.flavor.disk;
-                        }
-                        return w;
-                    });
-                req.session.workloads = workloads;
-                res.send(data.json);
-            }.bind(req));
-    })
-        .onError(() => {
-            res.send({});
         })
         .validate(req,res);
 });
@@ -329,69 +199,6 @@ router.get('/cncis', function (req, res, next) {
 router.get('/cncis/:cnci/detail', function (req, res, next) {
     var uri = "/v2.1/cncis/" + req.params.cnci + "/detail";
     var data = adapter.get(uri,req.session.token, () => res.send(data.json));
-});
-
-// POST Methods
-router.post('/:tenant/servers', function (req, res, next) {
-    tokenManager.onSuccess((t) => {
-        var token = (t)?t:req.session.token;
-        var uri = "/v2.1/" + req.params.tenant + "/servers";
-        req.body.min_count = parseInt(req.body.min_count);
-        req.body.max_count = parseInt(req.body.max_count);
-
-        var server = {server:req.body};
-        var data = adapter.post(uri,
-                                server,
-                                token,
-                                () => res.send(
-                                    (data.json)?data.json:data.raw));
-    })
-        .onerror(function () {
-            res.status(500)
-                .end();
-        })
-        .validate(req, res);
-});
-
-router.post('/:tenant/servers/action', function (req, res, next) {
-    tokenManager.onSuccess((t) => {
-        var token = (t)?t:req.session.token;
-        var uri = "/v2.1/" + req.params.tenant +
-            "/servers/action";
-        // Implemented actions are:
-        // "-os-start":
-        // "-os-stop"
-        // " os-delete"
-        var d = {};
-        d["action"] = req.body.action;
-        d["status"] = req.body.status;
-        var data = adapter.post(uri,
-                                d,
-                                token,
-                                () => res.send(data.raw));
-    }
-                          )
-        .validate(req, res);
-});
-
-router.post('/:tenant/servers/:server/action', function (req, res, next) {
-    tokenManager.onSuccess((t) => {
-        var token = (t)?t:req.session.token;
-        var uri = "/v2.1/" + req.params.tenant +
-            "/servers/"+req.params.server + "/action";
-        // Implemented actions are:
-        // "-os-start":
-        // "-os-stop"
-        var d = {};
-        d["server"] = req.body.server;
-        d[req.body.action] = req.body.action;
-        var data = adapter.post(uri,
-                                d,
-                                token,
-                                () => res.send(data.json));
-    }
-                          )
-        .validate(req, res);
 });
 
 module.exports = router;
