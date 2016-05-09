@@ -4,11 +4,12 @@ var sessionHandler = require('../core/session');
 var ciaoAdapter = require('../core/ciao_adapter');
 var spawn = require('child_process').fork;
 var querystring = require('querystring');
-var adapter = new ciaoAdapter();
 var TokenManager = new require('../core/tokenManager');
 var NodeService = require('../core/nodeService');
 var TenantService = require('../core/tenantService');
+
 // Set up
+var adapter = new ciaoAdapter();
 var tokenManager = new TokenManager(sessionHandler);
 var nodeService = new NodeService(adapter, tokenManager);
 var tenantService = new TenantService(adapter, tokenManager);

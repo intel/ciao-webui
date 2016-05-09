@@ -23,7 +23,12 @@ nodeService.prototype.nodesCount = function () {
         var uri = "/v2.1/nodes";
         var data = adapter.get(uri,req.session.token, () => {
             res.set('Content-Type','application/json');
-            res.send({count:data.json.nodes.length});
+            if (data.json)
+                res.send({count:data.json.nodes.length});
+            else {
+                res.status(500);
+                res.send({error:"Nodes not available"});
+            }
         });
     };
 };

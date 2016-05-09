@@ -160,13 +160,18 @@ tenantService.prototype.getFlavor = function () {
                     if (req.session.workloads)
                         var workloads = req.session.workloads
                         .map((w) => {
-                            if (w.id == req.params.flavor) {
-                                w.disk = data.json.flavor.disk;
+                            try {
+                                if (w.id == req.params.flavor) {
+                                    w.disk = data.json.flavor.disk;
+                                }
                             }
-                            return w;
+                            finally {
+                                return w;
+                            }
                         });
                     req.session.workloads = workloads;
-                    res.send(data.json);
+                    res.send(
+                        data.json ? data.json : {error:"No data available"});
                 }.bind(req));
         })
             .onError(() => {
