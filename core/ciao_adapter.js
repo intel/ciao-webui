@@ -18,6 +18,20 @@ var ciaoAdapter = function (hostname, port, protocol) {
     this.http = require((config.protocol)?config.protocol:"http");
 };
 
+ciaoAdapter.prototype.onSuccess = function (callback) {
+    var ca = Object.assign(new ciaoAdapter(this.host, this.port, this.protocol),
+                           this);
+    ca.successCallback = callback;
+    return ca;
+};
+
+ciaoAdapter.prototype.onError = function (callback) {
+    var ca = Object.assign(new ciaoAdapter(this.host, this.port, this.protocol),
+                           this);
+    ca.errorCallback = callback;
+    return ca;
+};
+
 ciaoAdapter.prototype.delete = function (path,token, next){
 
     var options = getHttpOptions(this.host,
