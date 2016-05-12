@@ -1,3 +1,4 @@
+var spawn = require('child_process').fork;
 var querystring = require('querystring');
 
 var tenantService = function (adapter, tokenManager) {
@@ -12,7 +13,7 @@ tenantService.prototype.serversDetailCount = function () {
         tokenManager.onSuccess((t) => {
             var uri = "/v2.1/" + req.params.tenant + "/servers/detail";
             var token = (t)? t: req.session.token;
-            var data = adapter.get(uri,token, () => {
+            adapter.onSuccess((data) => {
                 if (data.json) {
                     var rcount;
                     try {
@@ -28,16 +29,18 @@ tenantService.prototype.serversDetailCount = function () {
                 } else {
                     res.send({count:0});
                 }
-            });
+            }).onError((data) => {
+                res.send({error:data.statusCode});
+            }).get(uri,token);
         })
             .onError((resp) => {
                 if(resp) {
-                    res.status(resp.error.code)
-                        .send({"count":0})
+                    res.status(401)
+                        .send({error:"Not authorized"})
                         .end();
                 } else {
                     res.status(500)
-                        .send({"count":0});
+                        .send({error:500});
                 }
             })
             .validate(req, res);
@@ -49,15 +52,13 @@ tenantService.prototype.serversDetail = function () {
     var tokenManager = this.tokenManager;
     return function (req, res, next) {
         var query = '?' + querystring.stringify(req.query);
-
         if (process.env.NODE_ENV != 'production') {
             console.log('servers/detail :query string:', query);
         }
-
         tokenManager.onSuccess((t) => {
             var uri = "/v2.1/" + req.params.tenant + "/servers/detail"+query;
             var token = (t)? t: req.session.token;
-            var data = adapter.get(uri,token, () => {
+            adapter.onSuccess((data) => {
                 if (data.json) {
                     var servers = data.json.servers;
                     if (Array.prototype.isPrototypeOf(servers)) {
@@ -81,7 +82,8 @@ tenantService.prototype.serversDetail = function () {
                 } else {
                     res.send({servers:[]});
                 }
-            });
+            }).onError((data) =>
+                       res.send({error:data.statusCode})).get(uri,token);
         })
             .onError((resp) => {
                 if(resp) {
@@ -102,8 +104,9 @@ tenantService.prototype.getServer = function () {
     return function (req, res, next) {
         var uri = "/v2.1/" + req.params.tenant + "/servers/" +
             req.params.server;
-        var data = adapter.get(uri,req.session.token,
-                               () => res.send(data.json));
+        adapter.onSuccess((data) => res.send(data.json))
+            .onError((data) => res.send({error:data.statusCode}))
+            .get(uri,req.session.token);
     };
 };
 
@@ -112,11 +115,9 @@ tenantService.prototype.flavors = function () {
     var tokenManager = this.tokenManager;
     return function (req, res, next) {
         tokenManager.onSuccess(
-            (t) => {
+            function (t) {
                 var uri = "/v2.1/" + req.params.tenant + "/flavors";
-                var data = adapter.get(
-                    uri,req.session.token,
-                    function() {
+                adapter.onSuccess(function(data) {
                         // Temporal optimization
                         // Cache current workload information.
                         // Workloads aren't likely to change while UI is
@@ -129,8 +130,10 @@ tenantService.prototype.flavors = function () {
                             req.session.workloads = data.json.flavors;
                         }
                         res.send({flavors:req.session.workloads});
-                    }.bind(req));
-            })
+                    }.bind(req))
+                    .onError((data) => res.send({error:data.statusCode}))
+                    .get(uri,req.session.token);
+            }.bind(req))
             .onError( () => {
                 res.status(500).end();
             })
@@ -139,10 +142,58 @@ tenantService.prototype.flavors = function () {
 };
 
 //TODO: Flavor details function is not working when isolated from data.js
-tenantService.prototype.flavorDetails = function () {
+tenantService.prototype.flavorsDetail = function () {
     var adapter = this.adapter;
     var tokenManager = this.tokenManager;
     return function (req, res, next) {
+        tokenManager.onSuccess(function (t){
+            var query = '?' + querystring.stringify(req.query);
+            if (process.env.NODE_ENV != 'production') {
+                console.log('servers/detail :query string:', query);
+            }
+            // Implement a processing flag to prevent overload
+            if (!req.session.wrefresh)
+                req.session.wrefresh = false;
+            if (req.session.wrefresh == false && req.session.workloads)  {
+                var uri = "/v2.1/" + req.params.tenant + "/servers/detail" +
+                    query;
+                req.session.wrefresh = true;
+
+                // Spawn new process to handle
+                var child = spawn('./core/helpers/flavorDetails.js');
+                // send message to child
+                var globals = {
+                    controller_addr:global.CONTROLLER_ADDR,
+                    controller_port:global.CONTROLLER_PORT,
+                    protocol: global.PROTOCOL
+                };
+                child.send(JSON.stringify({
+                    uri: uri,
+                    token: req.session.token,
+                    workloads: req.session.workloads,
+                    globals: globals
+                }));
+                //child.send("hello mundo");
+                child.on('message', function(m) {
+                    req.session.wrefresh = false;
+                    var resp = JSON.parse(m)
+                        .workloads;
+                    req.session.workloads = resp;
+                    res.send({flavors: resp});
+                });
+            }
+            else {
+                res.send({
+                    flavors:req.session.workloads?
+                        req.session.workloads:[]});
+            }
+        }.bind(req,res))
+            .onError(() => {
+                res.send({
+                    flavors:req.session.workloads?
+                        req.session.workloads:[]});
+            })
+            .validate(req,res);
     };
 };
 
