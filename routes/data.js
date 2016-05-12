@@ -2,7 +2,6 @@ var express = require('express');
 var router = express.Router();
 var sessionHandler = require('../core/session');
 var ciaoAdapter = require('../core/ciao_adapter');
-var spawn = require('child_process').fork;
 var querystring = require('querystring');
 var TokenManager = new require('../core/tokenManager');
 var NodeService = require('../core/nodeService');
@@ -39,61 +38,12 @@ router.get('/:tenant/servers/detail/count', tenantService.serversDetailCount());
 router.get('/:tenant/servers/detail', tenantService.serversDetail());
 router.get('/:tenant/servers/:server', tenantService.getServer());
 router.get('/:tenant/flavors', tenantService.flavors());
-router.get('/:tenant/flavors/:flavor', tenantService.getFlavor());
 
 // Ciao-webui only:
 // This helper service optimize usage for current Grouped Instances
 // implementation.
-router.get('/:tenant/flavors/detail', function(req, res, next) {
-    tokenManager.onSuccess((t) => {
-        var query = '?' + querystring.stringify(req.query);
-        if (process.env.NODE_ENV != 'production') {
-            console.log('servers/detail :query string:', query);
-        }
-        // Implement a processing flag to prevent overload
-        if (!req.session.wrefresh)
-            req.session.wrefresh = false;
-        if (req.session.wrefresh == false && req.session.workloads)  {
-            var uri = "/v2.1/" + req.params.tenant + "/servers/detail" +
-                query;
-            req.session.wrefresh = true;
-
-            // Spawn new process to handle
-            var child = spawn('./core/helpers/flavorDetails.js');
-            // send message to child
-            var globals = {
-                controller_addr:global.CONTROLLER_ADDR,
-                controller_port:global.CONTROLLER_PORT,
-                protocol: global.PROTOCOL
-            };
-            child.send(JSON.stringify({
-                uri: uri,
-                token: req.session.token,
-                workloads: req.session.workloads,
-                globals: globals
-            }));
-            //child.send("hello mundo");
-            child.on('message', function(m) {
-                req.session.wrefresh = false;
-                var resp = JSON.parse(m)
-                    .workloads;
-                req.session.workloads = resp;
-                res.send({flavors: resp});
-            });
-        }
-        else {
-            res.send({
-                flavors:req.session.workloads?
-                    req.session.workloads:[]});
-        }
-    })
-        .onError(() => {
-            res.send({
-                flavors:req.session.workloads?
-                    req.session.workloads:[]});
-        })
-        .validate(req,res);
-});
+router.get('/:tenant/flavors/detail', tenantService.flavorsDetail());
+router.get('/:tenant/flavors/:flavor', tenantService.getFlavor());
 
 // TODO: this services only works for users with admin role.
 // enable for common users

@@ -1,7 +1,6 @@
 var ciaoAdapter = require('../ciao_adapter.js');
 
 process.on('message', function(m) {
-
     m = JSON.parse(m);
     var uri = m.uri;
     var token = m.token;
@@ -11,43 +10,48 @@ process.on('message', function(m) {
     global.CONTROLLER_PORT = m.globals.controller_port;
     var adapter = new ciaoAdapter();
     if (uri && token && sessionWorkloads)
-        var data = adapter.get(
-            uri,
-            token,
-            function () {
-                var workloads;
-                try {
-                    workloads = sessionWorkloads.map((w,index) => {
-                        if (data.json.servers){
-                            var filteredData = data.json.servers.filter(
-                                function (server) {
-                                    return server.flavor.id == w.id;
-                                });
-                            // total instances and running instances
-                            var ti = filteredData.length;
-                            var tri = filteredData.filter((server) => {
-                                return server.status == 'running';
-                            }).length;
-                            w.totalInstances = ti;
-                            w.totalRunningInstances = tri;
-                        } else {
-                            w.totalInstances = 0;
-                            w.totalRunningInstances = 0;
-                        }
-                        return w;
-                    });
-                } catch(err) {
-                    workloads = sessionWorkloads;
-                }
-                finally {
-                    // send workloads back to parent
-                    process.send(
-                        JSON.stringify({workloads:workloads}));
-                    //res.send({flavors:req.session.workloads});
-                }
-            });
+        var data = adapter.onSuccess(function () {
+            var workloads;
+            try {
+                workloads = sessionWorkloads.map((w,index) => {
+                    if (data.json.servers){
+                        var filteredData = data.json.servers.filter(
+                            function (server) {
+                                return server.flavor.id == w.id;
+                            });
+                        // total instances and running instances
+                        var ti = filteredData.length;
+                        var tri = filteredData.filter((server) => {
+                            return server.status == 'running';
+                        }).length;
+                        w.totalInstances = ti;
+                        w.totalRunningInstances = tri;
+                    } else {
+                        w.totalInstances = 0;
+                        w.totalRunningInstances = 0;
+                    }
+                    return w;
+                });
+            } catch(err) {
+                workloads = sessionWorkloads;
+            }
+            finally {
+                // send workloads back to parent
+                process.send(
+                    JSON.stringify({workloads:workloads}),
+                    null,
+                    null,
+                    () => process.exit());
+                //res.send({flavors:req.session.workloads});
+            }
+        })
+        .onError((data) => process.send({error:data.statusCode}))
+        .get(uri, token);
 });
 
 process.on('error', function (error) {
-    process.send({error: error.message || error});
+    process.send({error: error.message || error},
+                null,
+                null,
+                () => process.exit());
 });

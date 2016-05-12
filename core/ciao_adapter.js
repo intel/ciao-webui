@@ -4,29 +4,47 @@
 // If no configuration file is set for ciao, hostname, port and protocol
 // may be set in this function.
 var ciaoAdapter = function (hostname, port, protocol) {
-
     if (!hostname || !port || !protocol) {
         var config = getConfig();
         this.host = config.host;
         this.port = config.port;
         this.protocol = config.protocol;
+        this.http = require((config.protocol)?config.protocol:"http");
     } else {
         this.protocol = protocol;
         this.host = hostname;
         this.port = port;
+        this.http = require(this.protocol);
     }
-    this.http = require((config.protocol)?config.protocol:"http");
+};
+
+ciaoAdapter.prototype.onSuccess = function (callback) {
+    var ca = Object.assign(new ciaoAdapter(this.host, this.port, this.protocol),
+                           this);
+    ca.successCallback = callback;
+    return ca;
+};
+
+ciaoAdapter.prototype.onError = function (callback) {
+    var ca = Object.assign(new ciaoAdapter(this.host, this.port, this.protocol),
+                           this);
+    ca.errorCallback = callback;
+    return ca;
 };
 
 ciaoAdapter.prototype.delete = function (path,token, next){
-
     var options = getHttpOptions(this.host,
                                  this.port,
                                  path,
                                  "DELETE",
                                  this.protocol,
                                  token);
-    var response = new httpResponse(next);
+    var response;
+    if (!next) {
+        response = new httpResponse(this.successCallback, this.errorCallback);
+    } else {
+        response = new httpResponse(next);
+    }
     var req = this.http.request(options, response.callback);
     req.on('error', function (err) {
         if (process.env.NODE_ENV != 'production')
@@ -39,14 +57,18 @@ ciaoAdapter.prototype.delete = function (path,token, next){
 
 // Use Path as the endpoint we want to request in accordance to the API
 ciaoAdapter.prototype.get = function (path,token, next){
-
     var options = getHttpOptions(this.host,
                                  this.port,
                                  path,
                                  "GET",
                                  this.protocol,
                                  token);
-    var response = new httpResponse(next);
+    var response;
+    if (!next) {
+        response = new httpResponse(this.successCallback, this.errorCallback);
+    } else {
+        response = new httpResponse(next);
+    }
     var req = this.http.request(options, response.callback);
     req.on('error', function (err) {
         if (process.env.NODE_ENV != 'production')
@@ -58,20 +80,21 @@ ciaoAdapter.prototype.get = function (path,token, next){
 };
 
 ciaoAdapter.prototype.post = function (path, data,token, next){
-
     var options = getHttpOptions(this.host,
                                  this.port,
                                  path,
                                  "POST",
                                  this.protocol,
                                  token);
-
     var dataString = JSON.stringify(data);
     // get content-length and add to header
-
     options.headers["Content-Length"] = dataString.length;
-
-    var response = new httpResponse(next);
+    var response;
+    if (!next) {
+        response = new httpResponse(this.successCallback, this.errorCallback);
+    } else {
+        response = new httpResponse(next);
+    }
     var req = this.http.request(options, response.callback);
     req.on('error', function (err) {
         if (process.env.NODE_ENV != 'production')
@@ -95,8 +118,12 @@ ciaoAdapter.prototype.getFlavors = function (tenant_id,token, next){
                                  "GET",
                                  this.protocol,
                                  token);
-
-    var response = new httpResponse(next);
+    var response;
+    if (!next) {
+        response = new httpResponse(this.successCallback, this.errorCallback);
+    } else {
+        response = new httpResponse(next);
+    }
     var req = this.http.request(options, response.callback);
     req.on('error', function (err) {
         if (process.env.NODE_ENV != 'production')
@@ -104,7 +131,6 @@ ciaoAdapter.prototype.getFlavors = function (tenant_id,token, next){
         next();
     });
     req.end();
-
     return response;
 };
 
@@ -115,8 +141,12 @@ ciaoAdapter.prototype.getServersDetail = function (tenant_id,token, next){
                                  "GET",
                                  this.protocol,
                                  token);
-
-    var response = new httpResponse(next);
+    var response;
+    if (!next) {
+        response = new httpResponse(this.successCallback, this.errorCallback);
+    } else {
+        response = new httpResponse(next);
+    }
     var req = this.http.request(options, response.callback);
     req.on('error', function (err) {
         if (process.env.NODE_ENV != 'production')
@@ -128,7 +158,6 @@ ciaoAdapter.prototype.getServersDetail = function (tenant_id,token, next){
 };
 
 // Helper functions
-
 // Return json configuration from ciao_config.json file
 var getConfig = function () {
     var file = global.CONFIG_FILE?
@@ -143,14 +172,12 @@ var getConfig = function () {
         result.port = global.CONTROLLER_PORT;
     if (global.PROTOCOL)
         result.protocol = global.PROTOCOL;
-
     return result;
 };
 
 // Use this helper function to build an authenticated request, specify HTTP or
 // HTTPS protocol, HTTP method, host and port.
 var getHttpOptions = function (host, port, path, method, protocol, token) {
-
     var options = {
         host: host,
         port: port,
@@ -165,29 +192,39 @@ var getHttpOptions = function (host, port, path, method, protocol, token) {
 
     // Accept Unauthorized Certificates
     options.rejectUnauthorized = false;
-
     return options;
 };
 
 // This httpResponse helper will handle and store response in JSON format
 // while accepting a callback function
-var httpResponse = function (next) {
-
+var httpResponse = function (next, errCallback) {
     this.callback = function (response) {
         var chunk = '';
+
+        response.on('error', function (err) {
+            this.json = {error:err};
+            if (errCallback)
+                errCallback(this);
+            else
+                next(this);
+        });
+
         response.on('data', function(c){chunk += c;});
+
         response.on('end', function() {
             this.response = response;
             this.raw = chunk;
+            this.statusCode = response.statusCode;
             if (response.statusCode == 200) {
                 try {
                     this.json = JSON.parse(chunk);
                 }catch(e){
                     this.json = {error:e};
                 }
+            } else {
+                this.json = {error:response.statusCode};
             }
-            if(next)
-                next(); // callback passed
+            next(this); // callback passed
         }.bind(this));
     }.bind(this);
 };
