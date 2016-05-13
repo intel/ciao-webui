@@ -151,8 +151,11 @@ ciaoAdapter.prototype.getServersDetail = function (tenant_id,token, next){
     req.on('error', function (err) {
         if (process.env.NODE_ENV != 'production')
             console.log("ERROR: %s",err);
-        next();
-    });
+        if (this.errorCallback)
+            this.errorCallback();
+        else if (next)
+            next();
+    }.bind(this));
     req.end();
     return response;
 };
@@ -215,6 +218,7 @@ var httpResponse = function (next, errCallback) {
             this.response = response;
             this.raw = chunk;
             this.statusCode = response.statusCode;
+            this.json = {};
             if (response.statusCode == 200) {
                 try {
                     this.json = JSON.parse(chunk);
