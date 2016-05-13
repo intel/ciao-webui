@@ -175,6 +175,7 @@ tenantService.prototype.flavorsDetail = function () {
                 }));
                 //child.send("hello mundo");
                 child.on('message', function(m) {
+                    child.disconnect();
                     req.session.wrefresh = false;
                     var resp = JSON.parse(m)
                         .workloads;
