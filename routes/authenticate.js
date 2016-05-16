@@ -20,10 +20,9 @@ router.get('/login', function (req, res, next) {
 
 router.post('/logout', function (req, res, next) {
 
-    req.session.destroy();
     res.status(200)
-        .send({next: "/authenticate/login"})
-        .end();
+        .send({next: "/authenticate/login"});
+    req.session.destroy();
 });
 
 /* POST user auth. */
