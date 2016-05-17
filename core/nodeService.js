@@ -10,10 +10,11 @@ nodeService.prototype.nodes = function () {
     return function (req, res, next) {
         var uri = "/v2.1/nodes";
         var query = '?' + querystring.stringify(req.query);
-        var data = adapter.get(uri + query,req.session.token, () => {
+        adapter.onSuccess((data) => {
             res.set('Content-Type','application/json');
             res.send(data.json);
-        });
+        }).onError((data) => req.send({error:data.statusCode}))
+            .get(uri + query,req.session.token);
     };
 };
 
@@ -21,15 +22,16 @@ nodeService.prototype.nodesCount = function () {
     var adapter = this.adapter;
     return function (req, res, next) {
         var uri = "/v2.1/nodes";
-        var data = adapter.get(uri,req.session.token, () => {
+        adapter.onSuccess((data) => {
             res.set('Content-Type','application/json');
-            if (data.json)
+            if (data.json.nodes)
                 res.send({count:data.json.nodes.length});
             else {
                 res.status(500);
                 res.send({error:"Nodes not available"});
             }
-        });
+        }).onError((data) => req.send({error:data.statusCode}))
+            .get(uri,req.session.token);
     };
 };
 
@@ -37,12 +39,11 @@ nodeService.prototype.nodesSummary = function () {
     var adapter = this.adapter;
     return function (req, res, next) {
         var uri = "/v2.1/nodes/summary";
-        var data = adapter.get(uri,req.session.token, () => {
-            console.log("send");
-            console.log(data);
+        adapter.onSuccess((data) => {
             res.set('Content-Type','application/json');
             res.send(data.json);
-        });
+        }).onError((data) => req.send({error:data.statusCode}))
+            .get(uri,req.session.token);
     };
 };
 
@@ -50,8 +51,8 @@ nodeService.prototype.getNode = function () {
     var adapter = this.adapter;
     return function (req, res, next) {
         var uri = "/v2.1/nodes";
-        var data = adapter.get(uri,req.session.token, () => {
-            if(data.json){
+        adapter.onSuccess((data) => {
+            if(data.json.nodes){
                 var nodes = data.json.nodes.filter(
                     (node) => node.id == req.params.node);
                 if (nodes.length > 0)
@@ -61,7 +62,9 @@ nodeService.prototype.getNode = function () {
             }else{
                 res.send([]);
             }
-        });
+        })
+            .onError((data) => req.send({error:data.statusCode}))
+            .get(uri,req.session.token);
     };
 };
 
@@ -74,7 +77,7 @@ nodeService.prototype.serversDetail = function () {
         }
         var uri = "/v2.1/nodes/" + req.params.node + "/servers/detail" +
             query;
-        var data = adapter.get(uri,req.session.token, () => {
+        adapter.onSuccess((data) => {
             if (data.json) {
                 var servers = data.json.servers;
                 if (Array.prototype.isPrototypeOf(servers)) {
@@ -92,7 +95,8 @@ nodeService.prototype.serversDetail = function () {
                     res.send([]);
                 }
             }
-        });
+        }).onError((data) => req.send({error:data.statusCode}))
+            .get(uri,req.session.token);
     };
 };
 
@@ -103,7 +107,7 @@ nodeService.prototype.serversDetailCount = function () {
         tokenManager.onSuccess((t) => {
             var uri = "/v2.1/nodes/" + req.params.node + "/servers/detail";
             var token = (t)? t: req.session.token;
-            var data = adapter.get(uri,token, () => {
+            adapter.onSuccess((data) => {
                 if (data.json) {
                     var rcount;
                     try {
@@ -119,7 +123,8 @@ nodeService.prototype.serversDetailCount = function () {
                 } else {
                     res.send({count:0});
                 }
-            });
+            }).onError((data) => req.send({error:data.statusCode}))
+                .get(uri,token);
         })
             .onError((resp) => {
                 if(resp) {

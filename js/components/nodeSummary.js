@@ -6,8 +6,15 @@ var NoData = require('./noData.js');
 
 var nodeSummary = React.createClass({
 
+    getInitialState: function() {
+        return {updating: false};
+    },
+
     componentDidMount: function() {
         var update = function () {
+            if (this.state.updating == true)
+                return;
+            this.setState({updating: true});
             $.get({
                 url:"/data/nodes/summary"
             }).done(function (data) {
@@ -24,16 +31,21 @@ var nodeSummary = React.createClass({
                     usageSummary:{
                         elements:[]
                     }};
-                    console.log("nodes summary data");
-                    console.log(fmtData);
+                    this.setState({updating:false});
                     datamanager.setDataSource('node-summary',fmtData);
                 }
-            });
+            }.bind(this));
         }.bind(this);
         update();
         window.setInterval(function () {
             update();
         }.bind(this), 2000);
+    },
+
+    shouldComponentUpdate: function(nextProps, nextState) {
+        if(nextState.updating != this.state.updating)
+            return false;
+        return true;
     },
 
     render: function() {

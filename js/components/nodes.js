@@ -6,7 +6,8 @@ var nodes = React.createClass({
     getInitialState: function() {
         return {
             offset: 0,
-            limit: 10
+            limit: 10,
+            updating: false
         };
     },
 
@@ -64,8 +65,17 @@ var nodes = React.createClass({
         return  ['status', 'utilization', 'geography'];
     },
 
+    shouldComponentUpdate: function(nextProps, nextState) {
+        if(nextState.updating != this.state.updating)
+            return false;
+        return true;
+    },
+
     componentDidMount: function() {
         var update = function () {
+            if(this.state.updating == true)
+                return;
+            this.setState({updating:true});
             var query = "?limit=" + this.state.limit
                 + "&offset=" + (this.state.offset * this.state.limit);
             $.get({url: this.props.source + "/count"})
@@ -83,6 +93,7 @@ var nodes = React.createClass({
                                     delete node.updated;
                                     return node;
                                 });
+                                this.setState({updating:false});
                                 datamanager.setDataSource('nodes', {
                                     source: this.props.source,
                                     count: count.count,

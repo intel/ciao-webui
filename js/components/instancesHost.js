@@ -11,7 +11,8 @@ var instancesHost = React.createClass({
             pagination: 0, // offset is 0,
             items: 0,
             refresh: 3500,
-            status: null // selected status
+            status: null, // selected status
+            updating: false
         };
     },
 
@@ -168,19 +169,18 @@ var instancesHost = React.createClass({
         return ['instance_label', 'instance_state', 'instance_tags'];
     },
 
-    shouldComponentUpdate: function (nextProps, nextState) {
+    shouldComponentUpdate: function(nextProps, nextState) {
+        if(nextState.updating != this.state.updating)
+            return false;
         return true;
     },
 
     componentDidMount: function () {
-        var executing = false;
         var callSource = function () {
-            if (executing == true)
+            if (this.state.updating == true)
                 return;
-            else
-                executing = true;
+            this.setState({updating: true});
             var query = '?limit=' + this.props.recordsPerPage;
-
             query = query +
                 '&offset=' + (datamanager.data.offset ?
                               ((datamanager.data.offset -1)
@@ -194,7 +194,6 @@ var instancesHost = React.createClass({
                         var url = this.props.source + '/count';
                         $.get({url: url })
                             .done(function (count) {
-                                executing = false;
                                 // if service returns complete data not
                                 // not delimited by limit and offset querys
                                 var fmtData = {
@@ -203,17 +202,14 @@ var instancesHost = React.createClass({
                                     data: data,
                                     count: count.count
                                 };
-                                //if (data.length > this.props.recordsPerPage) {
-                                //    fmtData.count = count.count;
-                                //} else {
-                                //    fmtData.count = 0;
-                                //}
+                                this.setState({updating: false});
                                 datamanager.setDataSource(this.props.dataKey,
                                                           fmtData);
                             }.bind(this));
                     }
                 }.bind(this))
                 .fail(function (err) {
+                    this.setState({updating: false});
                     datamanager.setDataSource(this.props.dataKey, {
                         dataKey: this.props.dataKey,
                         source: this.props.source });

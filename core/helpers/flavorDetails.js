@@ -37,11 +37,7 @@ process.on('message', function(m) {
             }
             finally {
                 // send workloads back to parent
-                process.send(
-                    JSON.stringify({workloads:workloads}),
-                    null,
-                    null,
-                    () => process.exit());
+                process.send(JSON.stringify({workloads:workloads}));
                 //res.send({flavors:req.session.workloads});
             }
         })
@@ -49,9 +45,8 @@ process.on('message', function(m) {
         .get(uri, token);
 });
 
+process.on('disconnect', () => process.exit());
+
 process.on('error', function (error) {
-    process.send({error: error.message || error},
-                null,
-                null,
-                () => process.exit());
+    process.send({error: error.message || error});
 });
