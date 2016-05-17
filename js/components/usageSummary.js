@@ -12,8 +12,16 @@ var usageSummary = React.createClass({
             refresh: 3500
         };
     },
+
+    getInitialState: function() {
+        return {updating:false};
+    },
+
     componentDidMount: function() {
         var callSource = function () {
+            if (this.state.updating == true)
+                return;
+            this.setState({updating: true});
             var url;
             var instancesValue = 0, instancesQuota=0,
             memoryValue = 0, memoryQuota=0, procesorValue=0;
@@ -35,26 +43,27 @@ var usageSummary = React.createClass({
                                 memoryQuota+=node.ram_total;
                                 procesorValue+= node.online_cpus;
                             });
-                            var data = [
-                                {
-                                    value: instancesValue,
-                                    quota: instancesQuota,
-                                    name: "Running Instances",
-                                    unit: ""
-                                },
-                                {
-                                    value: memoryValue,
-                                    quota: memoryQuota,
-                                    name: "Memory Usage",
-                                    unit: ""
-                                },
-                                {
-                                    value: procesorValue,
-                                    name: "Online Processor",
-                                    unit: ""
-                                }
-                            ];
+                            // data = [
+                            //     {
+                            //         value: instancesValue,
+                            //         quota: instancesQuota,
+                            //         name: "Running Instances",
+                            //         unit: ""
+                            //     },
+                            //     {
+                            //         value: memoryValue,
+                            //         quota: memoryQuota,
+                            //         name: "Memory Usage",
+                            //         unit: ""
+                            //     },
+                            //     {
+                            //         value: procesorValue,
+                            //         name: "Online Processor",
+                            //         unit: ""
+                            //     }
+                            // ];
                         }
+                        this.setState({updating: false});
                         datamanager.setDataSource('usage-summary',{
                             source: this.props.source,
                             data:data
@@ -62,6 +71,7 @@ var usageSummary = React.createClass({
                     }
                 }.bind(this))
                 .fail(function (err) {
+                    this.setState({updateing: false});
                     datamanager.setDataSource('usage-summary',{
                         source: this.props.source});
                 }.bind(this));
@@ -72,10 +82,13 @@ var usageSummary = React.createClass({
             callSource();
         }.bind(this), Number(this.props.refresh));
     },
+
     shouldComponentUpdate: function(nextProps, nextState) {
-        //return this.props !== nextProps;
+        if(nextState.updating != this.state.updating)
+            return false;
         return true;
     },
+
     render: function() {
         var dynamicWidth = Math.round(12 / this.props.data.length);
         var elements = [];

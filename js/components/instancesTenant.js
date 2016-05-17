@@ -1,7 +1,6 @@
 // React js component
 var React = require('react');
 var CustomCatalogue = require('./catalogue/customCatalogue.js');
-var $=require('jquery')
 
 var instancesTenant = React.createClass({
     getDefaultProps: function() {
