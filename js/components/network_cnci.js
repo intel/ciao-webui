@@ -2,14 +2,17 @@
 var React = require('react');
 var CustomCatalogue = require('./catalogue/customCatalogue.js');
 
-var $ = require('jquery')
-
 var networkCnci = React.createClass({
+
+    getInitialState: function() {
+        return {updating: false};
+    },
 
     restart: function(item) {
         console.log('Restaring instance: ', item);
         //TODO: Change state in server. Changing locally just for testing
     },
+
     disabledRestartButton: function(item){
 
         var disabled = true;
@@ -18,6 +21,7 @@ var networkCnci = React.createClass({
         }
         return disabled;
     },
+
     getActions: function(){
 
         return [
@@ -29,12 +33,16 @@ var networkCnci = React.createClass({
                 }
             ];
     },
+
     getSearchfields: function(){
         return ['tenant', 'geography', 'rack_identifier'];
     },
 
     componentDidMount: function() {
         var update = function () {
+            if (this.state.updating == true)
+                return;
+            this.setState({updating: true});
             $.get({url: this.props.source})
                 .done(function (data) {
                     if (data) {
@@ -64,7 +72,7 @@ var networkCnci = React.createClass({
                                 }
                                 return fmtCnci;
                             })};
-
+                        this.setState({updating: false});
                         datamanager.setDataSource('network-cnci',fmtData);
                     }
                 }.bind(this));;
@@ -72,6 +80,12 @@ var networkCnci = React.createClass({
 
         update();
         window.setInterval(update,2000);
+    },
+
+    shouldComponentUpdate: function(nextProps, nextState) {
+        if (nextState.updating != this.state.updating)
+            return false;
+        return true;
     },
 
     render: function() {
