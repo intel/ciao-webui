@@ -36,37 +36,37 @@ var usageSummary = React.createClass({
                 .done(function (data) {
                     if (data) {
                         if (!datamanager.data.activeTenant){
-                            data.nodes.map((node) => {
+                            data.nodes.forEach((node) => {
                                 instancesValue+= node.total_running_instances;
                                 instancesQuota+= node.total_instances;
                                 memoryValue+= node.ram_total-node.ram_available;
                                 memoryQuota+=node.ram_total;
                                 procesorValue+= node.online_cpus;
                             });
-                            // data = [
-                            //     {
-                            //         value: instancesValue,
-                            //         quota: instancesQuota,
-                            //         name: "Running Instances",
-                            //         unit: ""
-                            //     },
-                            //     {
-                            //         value: memoryValue,
-                            //         quota: memoryQuota,
-                            //         name: "Memory Usage",
-                            //         unit: ""
-                            //     },
-                            //     {
-                            //         value: procesorValue,
-                            //         name: "Online Processor",
-                            //         unit: ""
-                            //     }
-                            // ];
+                            var fmtData = [
+                                {
+                                    value: instancesValue,
+                                    quota: instancesQuota,
+                                    name: "Running Instances",
+                                    unit: ""
+                                },
+                                {
+                                    value: memoryValue,
+                                    quota: memoryQuota,
+                                    name: "Memory Usage",
+                                    unit: ""
+                                },
+                                {
+                                    value: procesorValue,
+                                    name: "Online Processor",
+                                    unit: ""
+                                }
+                            ];
                         }
                         this.setState({updating: false});
                         datamanager.setDataSource('usage-summary',{
                             source: this.props.source,
-                            data:data
+                            data:fmtData
                         });
                     }
                 }.bind(this))
