@@ -3,17 +3,25 @@ var React = require('react');
 var reactBootstrap = require('react-bootstrap');
 
 var instancesCounter = React.createClass({
+
     getDefaultProps: function() {
         // source defaults to server details url
         return {
             data: {}
         };
     },
+
+    getInitialState: function() {
+        return {updating: false};
+    },
+
     componentDidMount: function() {
         var callSource = function () {
+            if (this.state.updating == true)
+                return;
+            this.setState({updating: true});
             var url;
             var instancesQuota=0;
-
             url = "/data"+this.props.source;
 
             $.get({
@@ -24,15 +32,16 @@ var instancesCounter = React.createClass({
                             //console.log(node.total_instances);
                             instancesQuota+= node.total_instances;
                         });
-                        var data = {total_instances: instancesQuota};
+                        data = {total_instances: instancesQuota};
                     }
+                    this.setState({updating: false});
                     datamanager.setDataSource('instances-counter',{
                         source: this.props.source,
                         data:data
                     });
-                    console.log(data);
                 }.bind(this))
                 .fail(function (err) {
+                    this.setState({updating: false});
                     datamanager.setDataSource('instances-counter',{
                         source: this.props.source});
             }.bind(this));
@@ -43,10 +52,14 @@ var instancesCounter = React.createClass({
             callSource();
         }.bind(this),2000);
     },
+
     shouldComponentUpdate: function(nextProps, nextState) {
         //return this.props !== nextProps;
+        if (nextState.updating != this.state.updating)
+            return false;
         return true;
     },
+
     render: function() {
         console.log(this.props);
         console.log("total Instances",this.props.data.total_instances);
