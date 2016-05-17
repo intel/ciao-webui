@@ -23,7 +23,6 @@ var networkCnci = React.createClass({
     },
 
     getActions: function(){
-
         return [
                 {
                     label:'Restart',
@@ -39,10 +38,13 @@ var networkCnci = React.createClass({
     },
 
     componentDidMount: function() {
+
+        // function used on time interval to keep component updated
         var update = function () {
             if (this.state.updating == true)
                 return;
             this.setState({updating: true});
+
             $.get({url: this.props.source})
                 .done(function (data) {
                     if (data) {
@@ -72,6 +74,7 @@ var networkCnci = React.createClass({
                                 }
                                 return fmtCnci;
                             })};
+
                         this.setState({updating: false});
                         datamanager.setDataSource('network-cnci',fmtData);
                     }

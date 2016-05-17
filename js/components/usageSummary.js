@@ -34,7 +34,9 @@ var usageSummary = React.createClass({
             $.get({
                 url:url})
                 .done(function (data) {
+                    var fmtData;
                     if (data) {
+                        // if there isn't an active tenant, look for nodes
                         if (!datamanager.data.activeTenant){
                             data.nodes.forEach((node) => {
                                 instancesValue+= node.total_running_instances;
@@ -43,7 +45,7 @@ var usageSummary = React.createClass({
                                 memoryQuota+=node.ram_total;
                                 procesorValue+= node.online_cpus;
                             });
-                            var fmtData = [
+                            fmtData = [
                                 {
                                     value: instancesValue,
                                     quota: instancesQuota,
@@ -62,16 +64,22 @@ var usageSummary = React.createClass({
                                     unit: ""
                                 }
                             ];
+                            this.setState({updating: false});
+                            datamanager.setDataSource('usage-summary',{
+                                source: this.props.source,
+                                data:fmtData
+                            });
+                        } else {
+                            this.setState({updating: false});
+                            datamanager.setDataSource('usage-summary',{
+                                source: this.props.source,
+                                data:data
+                            });
                         }
-                        this.setState({updating: false});
-                        datamanager.setDataSource('usage-summary',{
-                            source: this.props.source,
-                            data:fmtData
-                        });
                     }
                 }.bind(this))
                 .fail(function (err) {
-                    this.setState({updateing: false});
+                    this.setState({updating: false});
                     datamanager.setDataSource('usage-summary',{
                         source: this.props.source});
                 }.bind(this));
@@ -94,20 +102,22 @@ var usageSummary = React.createClass({
         var elements = [];
         var columnGrid;
 
-        if((this.props.data).length > 3) {
-            columnGrid = "col-xs-3 col-sm-3";
-        } else {
-            columnGrid = "col-xs-4 col-sm-4";
-        }
+        if (this.props.data)  {
+            if(this.props.data.length > 3) {
+                columnGrid = "col-xs-3 col-sm-3";
+            } else {
+                columnGrid = "col-xs-4 col-sm-4";
+            }
 
-        if (this.props.data) this.props.data.forEach(
-            (props) => {
-                elements.push(
-                    <div key={props.name} className={columnGrid}>
-                        <ElementSummary {...props}/>
-                    </div>);
+            this.props.data.forEach(
+                (props) => {
+                    elements.push(
+                            <div key={props.name} className={columnGrid}>
+                            <ElementSummary {...props}/>
+                            </div>);
                 }
-        );
+            );
+        }
 
         return (
             <div className="row">
