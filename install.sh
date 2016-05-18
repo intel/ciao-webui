@@ -14,25 +14,8 @@ npm install
 npm install --global babel-cli
 npm install --global browserify
 
-# Create javascript directory
-mkdir public/javascripts
-# Create library working directory
-mkdir public/javascripts/library
-
 #Build react + jsx code and put in build directory
 npm run babel-react &
-
-# get vendor libraries
-# Copy all the js libraries to the public Path
-if [ ! -f public/javascripts/library/jquery.js ]; then
-    curl https://code.jquery.com/jquery-2.2.1.min.js -o jquery-2.2.1.min.js
-    mv jquery-2.2.1.min.js public/javascripts/library/jquery.js
-fi
-
-if [ ! -f public/javascripts/library/jquery-ui.js ]; then
-    curl  https://code.jquery.com/ui/1.11.4/jquery-ui.min.js -o jquery-ui.min.js
-    mv jquery-ui.min.js public/javascripts/library/jquery-ui.js
-fi
 
 # Download required font
 mkdir tempDownloads
@@ -109,7 +92,3 @@ npm run build-machine
 npm run build-network
 npm run build-subnet
 npm run build-group
-
-
-# Start the application
-npm start
