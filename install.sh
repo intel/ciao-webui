@@ -45,8 +45,8 @@ cp -r tempDownloads/fonts public/stylesheets/
 rm -rf tempDownloads
 
 # Relocating bootstrap files
-cp -r node_modules/bootstrap/dist/fonts/* public/stylesheets/fonts
-cp -r node_modules/bootstrap/dist/css/bootstrap.min.css public/stylesheets
+cp -r node_modules/bootstrap/dist/fonts/* vendor/stylesheets/fonts
+cp -r node_modules/bootstrap/dist/css/bootstrap.min.css vendor/stylesheets
 
 # Copy datamanager.js to public directory
 cp build/data/dataManager.js public/javascripts/datamanager.js
