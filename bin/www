@@ -4,7 +4,6 @@
  * Module dependencies.
  */
 
-var debug = require('debug')('ciao-webui:server');
 var http = require('http');
 var https = require('https');
 var fs = require('fs');
@@ -63,8 +62,12 @@ app.set('port', port);
 var server = null;
 var configFile = args.config_file?args.config_file:"./config/ciao_config.json";
 // Gather information from configuration file
-var uiConfig = JSON.parse(
-fs.readFileSync(configFile))[process.env.NODE_ENV].ui;
+var fileRead = JSON.parse(fs.readFileSync(configFile));
+var uiConfig;
+if (fileRead[process.env.NODE_ENV])
+    uiConfig = fileRead[process.env.NODE_ENV].ui;
+else
+    uiConfig = {certificates:{}};
 
 // Overwrite ui config values if parameters were set
 if (args.protocol)
@@ -162,5 +165,4 @@ function onListening() {
   var bind = typeof addr === 'string'
     ? 'pipe ' + addr
     : 'port ' + addr.port;
-  debug('Listening on ' + bind);
 }
