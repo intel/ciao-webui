@@ -65,27 +65,23 @@ The following fields will determine how the Ciao Web UI will beconfigured.
 
     Note: application can be started with this information specified on npm start parameters, see *Run application**.
 
-#### Execute instalation script specifying the desired Environment
+#### Building application
+
+In order to build application the 'install.sh' must be executed. This script will intsall dependencies using the npm package manager and also build minified JS scripts used with browser compatibility.
+Note: this process is only necessary for development as minified scripts and dependencies are already provided by the application.
 
     # install while setting a "development" environment
     $ ./install.sh development
     # In this case NODE_ENV will be set to "development"
 
-#### Run application:
+#### Running application:
 
-Configuration file located on config/ciao_config.json must have proper configuration.
-Executing the install.sh script will start the application.
-To skip full installation and just run the application use:
+In order to run the application use the deployment script 'deploy.sh'. Deployment supports using a configuration file located on config/ciao_config. Otherwise, parameters may be passed on to deploy.sh to specify controller, keystone and ui settings. deploy.sh also requires NODE_ENV as a first parameter, and will set it as the environment variable for running the UI (valid values for NODE_ENV are 'development' or 'production').
+**Usage with valid configuration file:**
 
-    $ npm start
+    $ ./deploy.sh [NODE_ENV]
 
-App will then run on protocol://localhost:3000
-To serve the UI on an alternativa port set the PORT environment variable with the value of the desired port.
-Ex.
-
-    $ export PORT=80
-    $ npm start
-
+**Usage without configuration file:**
 To run UI with specific set of configuration regardless of ciao_config.json's content, use the following paramters:
 
 1. protocol: set the protocol(Lowercase) that will be used by application, including controller, keystone and ui. For instance, if "https", the UI will run on https, and also controller and keystone are assumed to use this protocol as well.
@@ -96,8 +92,17 @@ To run UI with specific set of configuration regardless of ciao_config.json's co
 6. key_path: Needed to run over HTTPS, The PATH (absolute or relative) that holds the location for the key.pem file.
 7. cert_path: Needed to run over HTTPS, the PATH (absolute or relative) that holds the location for the cert.pem file.
 8. passphrase: The passphrase or password set on the pem certificates used to run over HTTPS.
+Usage:
 
+....$ ./deploy.sh [NODE_ENV] [protocol=**protocol**] [controller_addr=**ip_address**] [controller_port=**port**] [keystone_addr=**ip_address**] [key_path=**pem_file**] [cert_path=**pem_file**] [passphrase=**certificate_passphrase**]
+
+Example:
+
+    $ deploy.sh development protocol=https controller_addr=127.0.0.1 controller_port=8774 keystone_addr=127.0.0.1 keystone_port=35357 key_path=certs/key-pass.pem cert_path=certs/cert.pem passphrase=asecurepassphrase
+
+App will then run on protocol://localhost:3000
+To serve the UI on an alternativa port set the PORT environment variable with the value of the desired port.
 Example.
 
-    npm start -- protocol=https controller_addr=127.0.0.1 controller_port=8774 keystone_addr=127.0.0.1 keystone_port=35357 key_path=certs/key-pass.pem cert_path=certs/cert.pem passphrase=asecurepassphrase     
-
+    $ export PORT=80
+    $ ./deploy.sh development
