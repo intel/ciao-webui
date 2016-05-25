@@ -37,7 +37,6 @@ var addInstances = React.createClass({
             "max_count":data.number_instances
         };
 
-        console.log('Adding instance: ', body);
         $.post({
             url:"/data/"+tenantId+"/servers",
             data:body
@@ -94,8 +93,25 @@ var AddInstanceModal = React.createClass({
         return {
             number_instances: 1,
             selectedWorkload: this.props.body.flavors[0],
-            showModal: true
+            showModal: true,
+            showMessage : false
         };
+    },
+    handleSubmit: function () {
+        // Vanilla validation for number of instances input
+        if(Number.isInteger(this.state.number_instances) === true) {
+            this.setState({ showMessage: false });
+            this.onAccept();
+        } else {
+            var isnum = /^[0-9]+$/.test((this.state.number_instances).trim());
+            if(isnum === true) {
+                this.setState({ showMessage: true });
+                this.state.number_instances = parseInt((this.state.number_instances).trim());
+                this.onAccept();
+            } else {
+                this.setState({ showMessage: true });
+            }
+        }
     },
     onAccept: function(){
         var selectedWorkload;
@@ -170,31 +186,47 @@ var AddInstanceModal = React.createClass({
                     </div>
                     <div className="row add-margin-bottom">
                         <div className="col-md-8 col-md-offset-2">
-                        <Input
-                            type="select"
-                            label="Instance Workload"
-                            onChange={this.selectWorkload}
-                            placeholder="Instance Workload">
+                            <Input
+                                type="select"
+                                label="Instance Workload"
+                                onChange={this.selectWorkload}
+                                placeholder="Instance Workload">
                                 {workloadOptions}
-                        </Input>
+                            </Input>
 
-                         <Input label="Number of Instances"
+                            <Input label="Number of Instances"
                                 value={this.state.number_instances}
                                 onChange={this.setNumberOfInstances}
                                 type="text" buttonBefore={buttonMinus}
-                                buttonAfter={buttonPlus} />
-                        </div>
+                                buttonAfter={buttonPlus}/>
+                            { this.state.showMessage ? <Message /> : null }
+                       </div>
                     </div>
 
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button onClick={this.onAccept}
+                    <Button onClick={this.handleSubmit}
                         bsStyle={null}
                         className="btn frm-btn-primary">
                         {this.props.acceptText}
                     </Button>
                 </Modal.Footer>
             </Modal>
+        );
+    }
+});
+
+var Message = React.createClass({
+    render: function() {
+        return (
+            <div id="Message"
+                className="frm-alert-danger-icon">
+                <span className="glyphicon glyphicon-alert">
+                </span>
+                <span className="frm-danger-message">
+                    This value must be numeric
+                </span>
+            </div>
         );
     }
 });
