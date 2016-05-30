@@ -67,6 +67,8 @@ cp -r node_modules/bootstrap/dist/css/bootstrap.min.css public/stylesheets
 
 # Copy datamanager.js to public directory
 cp build/data/dataManager.js public/javascripts/datamanager.js
+# Copy validation script file to public directory
+cp js/util/validations.js public/javascripts/library/validations.js
 
 # Verify the environment to define the template
 if [ $env == "default" ]
@@ -93,9 +95,10 @@ jquery="$jsStart/javascripts/library/jquery.js$jsEnd"
 jqueryui="$jsStart/javascripts/library/jquery-ui.js$jsEnd"
 datamanager="$jsStart/javascripts/datamanager.js$jsEnd"
 loadDatamanager="<script type='text/javascript'>window.datamanager.loadData((<%- JSON.stringify(data)%>));</script>"
+validations="$jsStart/javascripts/library/validations.js$jsEnd"
 # Delete .bak (this is just for mac)
 # Replace \\ for \n (this is just for mac)
-sed -i.bak "s~$match~$match\\$bootstrap\\$framework\\$d3\\$jquery\\$jqueryui\\$datamanager\\$loadDatamanager~" views/$file
+sed -i.bak "s~$match~$match\\$bootstrap\\$framework\\$d3\\$jquery\\$jqueryui\\$datamanager\\$loadDatamanager\\$validations~" views/$file
 
 
 # Run build scripts
