@@ -22,7 +22,7 @@ var customTable = React.createClass({
 
         if (Object.keys(selected).length == 1) {
 
-            if (selected[0].instance_id == row.instance_id) {
+            if (selected[0].id == row.id) {
                 newSelected = [];
             } else {
                 newSelected.push(row);
@@ -52,51 +52,52 @@ var customTable = React.createClass({
         var body;
         try {
             body = actualData.map((row, i) => {
-                var columns = [];
+                    var columns = [];
+
+            columns.push(React.createElement(
+                'td',
+                null,
+                React.createElement('input', {
+                    type: 'checkbox',
+                    onClick: this.select.bind(null, row),
+                    checked: this.isChecked(row) })
+            ));
+
+            //first element is a link
+            if (this.props.link) {
 
                 columns.push(React.createElement(
                     'td',
                     null,
-                    React.createElement('input', {
-                        type: 'checkbox',
-                        onClick: this.select.bind(null, row),
-                        checked: this.isChecked(row) })
+                    React.createElement(
+                        'a',
+                        { className: 'frm-link',
+                            href: this.props.link.url +
+                            row[this.props.link.field] },
+                        row[this.props.link.field]
+                    )
                 ));
 
-                //first element is a link
-                if (this.props.link) {
+            }
 
-                    columns.push(React.createElement(
-                        'td',
-                        null,
-                        React.createElement(
-                            'a',
-                            { className: 'frm-link',
-                              href: this.props.link.url +
-                              row[this.props.link.field] },
-                            row[this.props.link.field]
-                        )
-                    ));
+            for (var key in row) {
 
-                    delete row[this.props.link.field];
-                }
-
-                for (var key in row) {
-
+                if(key != this.props.link.field){
                     columns.push(React.createElement(
                         'td',
                         { key: key, className: key + '-' + row[key] },
                         row[key]
                     ));
                 }
+            }
 
-                return React.createElement(
-                    'tr',
-                    { className: this.isChecked(row) ? 'active ' : '',
-                      key: i },
-                    columns
-                );
-            });
+            return React.createElement(
+                'tr',
+                { className: this.isChecked(row) ? 'active ' : '',
+                    key: i },
+                columns
+            );
+        });
         } catch(err) {
             body = [];
         }
