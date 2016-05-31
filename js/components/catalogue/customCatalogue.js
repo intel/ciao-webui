@@ -165,7 +165,7 @@ var catalogue = React.createClass({
 
         if(inAllItems ==true && query) {
             if (!query.State)
-            newState.status = "all";
+                newState.status = "all";
         }
         newState.selectedInstance = selectedInstance;
         newState.selectAll = true;
@@ -246,33 +246,33 @@ var catalogue = React.createClass({
         var isChecked = (function (condition) {
             var f = null;
             switch (condition){
-            case 1:
-                // All elements are checked
-                f = function () {
-                    // When selecting ALL elements always return true
-                    return true;
-                };
-                break;
-            case 2:
-                // Use this function when selecting all instances by state
-                f = function (row) {
+                case 1:
+                    // All elements are checked
+                    f = function () {
+                        // When selecting ALL elements always return true
+                        return true;
+                    };
+                    break;
+                case 2:
+                    // Use this function when selecting all instances by state
+                    f = function (row) {
                         return (row.State ==  state);
-                };
-                break;
-            case 3:
-                // Use this case when option "None" has been selected.
-                f = function (row) {
-                    return false;
-                };
-                break;
-            case 0:
-            default:
-                f = function (row, selectedRows) {
-                    var entry = selectedRows.find(function (element) {
-                        return element.instance_id == row.instance_id;
-                    });
-                    return entry;
-                };
+                    };
+                    break;
+                case 3:
+                    // Use this case when option "None" has been selected.
+                    f = function (row) {
+                        return false;
+                    };
+                    break;
+                case 0:
+                default:
+                    f = function (row, selectedRows) {
+                        var entry = selectedRows.find(function (element) {
+                            return element.id == row.id;
+                        });
+                        return entry;
+                    };
             }
             return f;
         }.bind(this))(condition);
