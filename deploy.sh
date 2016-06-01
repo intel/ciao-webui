@@ -24,7 +24,6 @@ cp -r vendor/* node_modules/
 mkdir -p build/stylesheets
 cp css/css_framework/framework.css build/stylesheets
 cp css/d3_components/d3Framework.css build/stylesheets
-
 # Install any additional dependencies on node_modules directory
 npm install --production 
 
