@@ -637,3 +637,13 @@ ul> li> a{
 .add-margin-left{margin-left: 20px;}
 .add-margin-right{margin-right: 20px;}
 .add-padding-left{padding-left: 20px}
+
+.frm-hidden {
+    opacity: 0;
+}
+.frm-icon-extraSize {
+    font-size: 25px;
+}
+.frm-icon-container {
+    display: inline-flex;
+}
