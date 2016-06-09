@@ -20,6 +20,9 @@ fi
 mkdir node_modules
 cp -r vendor/* node_modules/
 
+# Copy validation script file to public directory
+cp js/util/validations.js public/javascripts/library/validations.js
+
 # Relocate css files to build directory
 mkdir -p build/stylesheets
 cp css/css_framework/framework.css build/stylesheets
@@ -41,8 +44,9 @@ jquery="$jsStart/jquery/dist/jquery.js$jsEnd"
 jqueryui="$jsStart/jquery-ui/jquery-ui.js$jsEnd"
 datamanager="$jsStart/data/dataManager.js$jsEnd"
 loadDatamanager="<script type='text/javascript'>window.datamanager.loadData((<%- JSON.stringify(data)%>));</script>"
+validations="$jsStart/javascripts/library/validations.js$jsEnd"
 # Delete .bak (this is just for mac)
 # Replace \\ for \n (this is just for mac)
-sed -i.bak "s~$match~$match\\$bootstrap\\$framework\\$d3\\$jquery\\$jqueryui\\$datamanager\\$loadDatamanager~" views/$file
+sed -i.bak "s~$match~$match\\$bootstrap\\$framework\\$d3\\$jquery\\$jqueryui\\$datamanager\\$loadDatamanager\\$validations~" views/$file
 
 npm start -- "$@"
