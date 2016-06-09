@@ -20,6 +20,7 @@ fi
 mkdir node_modules
 cp -r vendor/* node_modules/
 
+mkdir -p public/javascripts/library
 # Copy validation script file to public directory
 cp js/util/validations.js public/javascripts/library/validations.js
 
