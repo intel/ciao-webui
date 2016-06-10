@@ -1,0 +1,89 @@
+{
+  "_args": [
+    [
+      "style-attr@^1.0.1"
+    ]
+  ],
+  "_from": "style-attr@>=1.0.1 <2.0.0",
+  "_id": "style-attr@1.1.0",
+  "_inCache": true,
+  "_installable": true,
+  "_location": "/style-attr",
+  "_nodeVersion": "4.2.6",
+  "_npmOperationalInternal": {
+    "host": "packages-5-east.internal.npmjs.com",
+    "tmp": "tmp/style-attr-1.1.0.tgz_1456176230859_0.470115760108456"
+  },
+  "_npmUser": {
+    "email": "josh@x-team.com",
+    "name": "joshwnj"
+  },
+  "_npmVersion": "2.14.12",
+  "_phantomChildren": {},
+  "_requested": {
+    "name": "style-attr",
+    "raw": "style-attr@^1.0.1",
+    "rawSpec": "^1.0.1",
+    "scope": null,
+    "spec": ">=1.0.1 <2.0.0",
+    "type": "range"
+  },
+  "_requiredBy": [
+    "/react-faux-dom"
+  ],
+  "_resolved": "https://registry.npmjs.org/style-attr/-/style-attr-1.1.0.tgz",
+  "_shasum": "e3c598dbfdf353830f55f77a64426e5097794d6a",
+  "_shrinkwrap": null,
+  "_spec": "style-attr@^1.0.1",
+  "author": {
+    "name": "joshwnj"
+  },
+  "bugs": {
+    "url": "https://github.com/joshwnj/style-attr/issues"
+  },
+  "dependencies": {},
+  "description": "Parse and stringify style attributes",
+  "devDependencies": {
+    "babel-cli": "^6.5.1",
+    "babel-plugin-transform-flow-strip-types": "^6.5.0",
+    "flow-bin": "^0.21.0",
+    "tape": "^3.0.2"
+  },
+  "directories": {},
+  "dist": {
+    "shasum": "e3c598dbfdf353830f55f77a64426e5097794d6a",
+    "tarball": "https://registry.npmjs.org/style-attr/-/style-attr-1.1.0.tgz"
+  },
+  "files": [
+    "lib"
+  ],
+  "gitHead": "efcc7498e44b43f861c36b035348b39bc3fbcd01",
+  "homepage": "https://github.com/joshwnj/style-attr",
+  "keywords": [
+    "style",
+    "parse",
+    "stringify"
+  ],
+  "license": "MIT",
+  "main": "lib/index.js",
+  "maintainers": [
+    {
+      "email": "josh@x-team.com",
+      "name": "joshwnj"
+    }
+  ],
+  "name": "style-attr",
+  "optionalDependencies": {},
+  "readme": "ERROR: No README data found!",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joshwnj/style-attr.git"
+  },
+  "scripts": {
+    "build": "babel --out-dir lib src",
+    "flow": "flow check src/",
+    "prepublish": "npm run build",
+    "test": "tape test.js"
+  },
+  "version": "1.1.0"
+}

@@ -1,0 +1,96 @@
+{
+  "_args": [
+    [
+      "cookie@0.2.4"
+    ]
+  ],
+  "_from": "cookie@0.2.4",
+  "_id": "cookie@0.2.4",
+  "_inCache": true,
+  "_installable": true,
+  "_location": "/cookie",
+  "_npmOperationalInternal": {
+    "host": "packages-16-east.internal.npmjs.com",
+    "tmp": "tmp/cookie-0.2.4.tgz_1463790764235_0.7945549874566495"
+  },
+  "_npmUser": {
+    "email": "doug@somethingdoug.com",
+    "name": "dougwilson"
+  },
+  "_npmVersion": "1.4.28",
+  "_phantomChildren": {},
+  "_requested": {
+    "name": "cookie",
+    "raw": "cookie@0.2.4",
+    "rawSpec": "0.2.4",
+    "scope": null,
+    "spec": "0.2.4",
+    "type": "version"
+  },
+  "_requiredBy": [
+    "/cookie-parser"
+  ],
+  "_resolved": "https://registry.npmjs.org/cookie/-/cookie-0.2.4.tgz",
+  "_shasum": "a8c155aa7b9b2cf2c4d32ebc7b9a0aa288ccc6bd",
+  "_shrinkwrap": null,
+  "_spec": "cookie@0.2.4",
+  "author": {
+    "email": "shtylman@gmail.com",
+    "name": "Roman Shtylman"
+  },
+  "bugs": {
+    "url": "https://github.com/jshttp/cookie/issues"
+  },
+  "contributors": [
+    {
+      "email": "doug@somethingdoug.com",
+      "name": "Douglas Christopher Wilson"
+    }
+  ],
+  "dependencies": {},
+  "description": "cookie parsing and serialization",
+  "devDependencies": {
+    "istanbul": "0.4.3",
+    "mocha": "1.21.5"
+  },
+  "directories": {},
+  "dist": {
+    "shasum": "a8c155aa7b9b2cf2c4d32ebc7b9a0aa288ccc6bd",
+    "tarball": "https://registry.npmjs.org/cookie/-/cookie-0.2.4.tgz"
+  },
+  "engines": {
+    "node": ">= 0.6"
+  },
+  "files": [
+    "HISTORY.md",
+    "LICENSE",
+    "README.md",
+    "index.js"
+  ],
+  "gitHead": "0c6fe48e2976d66ed73c03817bb5cb10180b50ee",
+  "homepage": "https://github.com/jshttp/cookie",
+  "keywords": [
+    "cookie",
+    "cookies"
+  ],
+  "license": "MIT",
+  "maintainers": [
+    {
+      "email": "doug@somethingdoug.com",
+      "name": "dougwilson"
+    }
+  ],
+  "name": "cookie",
+  "optionalDependencies": {},
+  "readme": "ERROR: No README data found!",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jshttp/cookie.git"
+  },
+  "scripts": {
+    "test": "mocha --reporter spec --bail --check-leaks test/",
+    "test-ci": "istanbul cover node_modules/mocha/bin/_mocha --report lcovonly -- --reporter spec --check-leaks test/",
+    "test-cov": "istanbul cover node_modules/mocha/bin/_mocha -- --reporter dot --check-leaks test/"
+  },
+  "version": "0.2.4"
+}

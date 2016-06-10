@@ -1,0 +1,59 @@
+/**
+ * Compilation and rendering options.
+ *
+ * @typedef Options
+ * @type {Object}
+ *
+ * @property {Boolean} [debug=false]
+ * Log generated JavaScript source for the EJS template to the console.
+ *
+ * @property {Boolean} [compileDebug=true]
+ * Include additional runtime debugging information in generated template
+ * functions.
+ *
+ * @property {Boolean} [_with=true]
+ * Whether or not to use `with () {}` construct in the generated template
+ * functions. If set to `false`, data is still accessible through the object
+ * whose name is specified by {@link module:ejs.localsName} (default to
+ * `locals`).
+ *
+ * @property {Boolean} [rmWhitespace=false]
+ * Remove all safe-to-remove whitespace, including leading and trailing
+ * whitespace. It also enables a safer version of `-%>` line slurping for all
+ * scriptlet tags (it does not strip new lines of tags in the middle of a
+ * line).
+ *
+ * @property {Boolean} [client=false]
+ * Whether or not to compile a {@link ClientFunction} that can be rendered 
+ * in the browser without depending on ejs.js. Otherwise, a {@link TemplateFunction} 
+ * will be compiled.
+ * 
+ * @property {EscapeCallback} [escape={@link module:utils.escapeXML}]
+ * The escaping function used with `<%=` construct. It is used in rendering
+ * and is `.toString()`ed in the generation of client functions.
+ *
+ * @property {String}  [filename='undefined']
+ * The filename of the template. Required for inclusion and caching unless 
+ * you are using {@link module:ejs.renderFile}. Also used for error reporting.
+ * 
+ * @property {String}  [delimiter='%']
+ * The delimiter used in template compilation.
+ *
+ * @property {Boolean} [cache=false]
+ * Whether or not to enable caching of template functions. Beware that
+ * the options of compilation are not checked as being the same, so
+ * special handling is required if, for example, you want to cache client
+ * and regular functions of the same file.
+ *
+ * Requires `filename` to be set. Only works with rendering function.
+ *
+ * @property {Object}  [context=this]
+ * The Object to which `this` is set during rendering.
+ *
+ * @property {Object}  [scope=this]
+ * Alias of `context`. Deprecated.
+ *
+ * @static
+ * @global
+ */
+
