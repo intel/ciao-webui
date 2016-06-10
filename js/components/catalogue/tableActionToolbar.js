@@ -26,7 +26,7 @@ var tableActionToolbar = React.createClass({
                 item.onClick.bind(null, this.props.selectedInstance);
 
             //disabled={item.onDisabled(this.props.selectedInstance)}
-                return  <Button bsStyle="primary" key={i}
+                return  <Button bsStyle={null} className="btn frm-btn-primary" key={i}
                             onClick={execute}>
                             {item.name}
                         </Button>;
@@ -36,7 +36,7 @@ var tableActionToolbar = React.createClass({
 
         var dropDownActions = this.props.dropDownActions.map((item, i) => {
 
-                return  <MenuItem bsStyle="primary" key={i}
+                return  <MenuItem bsStyle={null} className="btn frm-btn-primary" key={i}
                             onClick={item.onClick}>
                             {item.label}
                         </MenuItem>;
@@ -48,7 +48,8 @@ var tableActionToolbar = React.createClass({
                     <div className="pull-left">
                         <ButtonToolbar>
                             <Dropdown  id="dropdown-custom-1">
-                                <Dropdown.Toggle bsStyle="primary">
+                                <Dropdown.Toggle bsStyle={null}
+                                className="btn frm-btn-primary">
                                     <input type="checkbox" value="" />
                                 </Dropdown.Toggle>
                                 <Dropdown.Menu>
