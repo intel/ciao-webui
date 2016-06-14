@@ -68,7 +68,7 @@ tenantService.prototype.serversDetail = function () {
                                      var address = value.addresses.private[0];
                                      return {
                                          "instance_id": value.id,
-                                         "State": value.status,
+                                         "State": 'active',
                                          "Node ID": value.hostId,
                                          "IP Address": address.addr,
                                          "MAC address":address[

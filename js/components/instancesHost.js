@@ -155,9 +155,9 @@ var instancesHost = React.createClass({
 
     getDropdownActions: function () {
         return [{
-            label: 'All Running',
-            name: 'running',
-            query: { 'State': 'running' }
+            label: 'All Active',
+            name: 'active',
+            query: { 'State': 'active' }
         }, {
             label: 'All Stopped',
             name: 'stopped',
