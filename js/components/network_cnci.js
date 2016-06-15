@@ -103,6 +103,26 @@ var networkCnci = React.createClass({
         return true;
     },
 
+    selectAll: function (status,action) {
+        return function () {
+            var actionString = "";
+            switch (action) {
+                case "Start":
+                    actionString = "os-start";
+                    break;
+                case "Stop":
+                    actionString = "os-stop";
+                    break;
+                case "Remove":
+                    actionString = "os-delete";
+                    break;
+            }
+            this.actionAllInstances(status,actionString);
+            var s = this.state;
+            s.selectAll = true;
+            this.setState(s);
+        }.bind(this);
+    },
     render: function() {
         var columns = [];
         if (this.props.data) {
@@ -124,7 +144,9 @@ var networkCnci = React.createClass({
             count = {this.props.count ? this.props.count:10}
             link={link}
             columns={columns}
+            id='cnci_uuid'
             actions={this.getActions()}
+            selectAll= {this.selectAll}
             searchFields={this.getSearchfields()}
             />
         );
