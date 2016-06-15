@@ -155,9 +155,9 @@ var instancesHost = React.createClass({
 
     getDropdownActions: function () {
         return [{
-            label: 'All Running',
-            name: 'running',
-            query: { 'State': 'running' }
+            label: 'All Active',
+            name: 'active',
+            query: { 'State': 'active' }
         }, {
             label: 'All Stopped',
             name: 'stopped',
@@ -268,6 +268,7 @@ var instancesHost = React.createClass({
             searchFields: this.getSearchfields(),
             onChangePage: this.onChangePage,
             selectAll: this.selectAll,
+            id:'instance_id',
             ref: 'catalogue'
         });else return React.createElement('div', null);
     }

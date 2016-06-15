@@ -5,12 +5,23 @@ var CustomCatalogue = require('./catalogue/customCatalogue.js');
 var networkCnci = React.createClass({
 
     getInitialState: function() {
-        return {updating: false};
+        return {
+            updating: false,
+            count: 0
+        };
     },
 
     restart: function(item) {
         console.log('Restaring instance: ', item);
         //TODO: Change state in server. Changing locally just for testing
+    },
+
+    getDefaultProps: function () {
+        // source defaults to server details url
+        return {
+            count : 0,
+            limit : 10
+        };
     },
 
     disabledRestartButton: function(item){
@@ -50,6 +61,7 @@ var networkCnci = React.createClass({
                     if (data) {
                         var fmtData = {
                             source:this.props.source,
+                            count: (data.cncis).length,
                             data:data.cncis.map((cnci) => {
                                 var fmtCnci = {};
                                 for(key in cnci) {
@@ -91,10 +103,31 @@ var networkCnci = React.createClass({
         return true;
     },
 
+    selectAll: function (status,action) {
+        return function () {
+            var actionString = "";
+            switch (action) {
+                case "Start":
+                    actionString = "os-start";
+                    break;
+                case "Stop":
+                    actionString = "os-stop";
+                    break;
+                case "Remove":
+                    actionString = "os-delete";
+                    break;
+            }
+            this.actionAllInstances(status,actionString);
+            var s = this.state;
+            s.selectAll = true;
+            this.setState(s);
+        }.bind(this);
+    },
     render: function() {
-
         var columns = [];
         if (this.props.data) {
+            //this.props.count = (this.props.data).length;
+            //console.log("count2", this.props.count);
             columns= Object.keys(this.props.data[0]).map(function(text){
                 return text.replace('_', ' ');
             });
@@ -108,9 +141,12 @@ var networkCnci = React.createClass({
         return (
         <CustomCatalogue
             data={this.props.data}
+            count = {this.props.count ? this.props.count:10}
             link={link}
             columns={columns}
+            id='cnci_uuid'
             actions={this.getActions()}
+            selectAll= {this.selectAll}
             searchFields={this.getSearchfields()}
             />
         );
