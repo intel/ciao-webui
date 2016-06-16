@@ -5,11 +5,15 @@ var GroupOverview = require('../components/groupOverview.js');
 var UsageSummary = require('../components/usageSummary.js');
 var AddInstances = require('../components/addInstances.js');
 var navbar = require('../components/navbar.js');
+var Logger = require('../util/logger.js');
 var $ = require('jquery');
 
 $('document').ready(function () {
 
-    //create usage summary
+    // Create Logger object
+    var logger = new Logger('logger-container');
+    
+    // create usage summary
     // How to use Usage Summary
     // first use a data source compatible for componenet.
 
@@ -28,8 +32,8 @@ $('document').ready(function () {
     // Component to Add instances
     datamanager.onDataSourceSet('add-instances', function (sourceData) {
         ReactDOM.render(
-        <AddInstances sourceData={sourceData}/>,
-        document.getElementById("add-instances"));
+            <AddInstances sourceData={sourceData} logger={logger}/>,
+            document.getElementById("add-instances"));
     });
 
     //Usage summary

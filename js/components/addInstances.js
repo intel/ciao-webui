@@ -7,6 +7,13 @@ var Input = reactBootstrap.Input;
 var $ = require('jquery');
 
 var addInstances = React.createClass({
+
+    getDefaultProps: function() {
+	return {
+	    logger: null
+	};
+    },
+
     getInitialState: function () {
         return {
             showAddInstances: false,
@@ -21,9 +28,11 @@ var addInstances = React.createClass({
     hideModal: function () {
         this.setState({showAddInstances: false});
     },
+
     showModal: function (options) {
         this.setState({showAddInstances: options});
     },
+
     addInstances: function (data) {
         this.hideModal();
           datamanager.trigger('add-instances');
@@ -37,6 +46,10 @@ var addInstances = React.createClass({
             "max_count":data.number_instances
         };
 
+	if (this.props.logger != null) {
+	    lReqInstances =this.props.logger.push("Add Instances",
+				   "Request has been sent to server");
+	}
         $.post({
             url:"/data/"+tenantId+"/servers",
             data:body
@@ -47,8 +60,13 @@ var addInstances = React.createClass({
         })
         .fail(function (err) {
             console.log('err', err);
+	    if (this.props.logger != null) {
+		this.props.logger.error(err.responseJSON.title,
+					err.responseJSON.message);
+	    }
         });
     },
+    
     confirmAddInstances: function (){
         var body = {
             activeTenant : this.state.activeTenant,
