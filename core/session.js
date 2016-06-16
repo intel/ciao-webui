@@ -103,7 +103,7 @@
          var result = new function () {
              this.callback = function (response) {
                  var chunk = '';
-		 response.on('error', function (err) { next(err)})
+		 response.on('error', function (err) { next(err);});
                  response.on('data', function (c) {chunk += c;});
                  response.on('end', function () {
                      this.response = response;
@@ -171,6 +171,10 @@
 
          // Send data to keystone service
          var req = http.request(options, result.callback);
+	 req.on('error', function (err) {
+	     if (process.env != 'production')
+		 console.log(err);
+	 });
          req.end();
          return result;
      },
@@ -247,6 +251,10 @@
 
          // Send data to keystone service
          var req = http.request(options, result.callback);
+	 req.on('error', function (err) {
+	     if (process.env != 'production')
+		 console.log(err);
+	 });
          req.end();
          return result;
      },
@@ -289,7 +297,11 @@
 
          // Send data to keystone service
          var req = http.request(options, result.callback);
-         req.end();
+	 req.on('error', function (err) {
+	     if (process.env != 'production')
+		 console.log(err);
+	 });
+	 req.end();
          return result;
      },
 
