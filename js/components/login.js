@@ -87,11 +87,11 @@ var loginForm = React.createClass({
                     this.setState({'showMsgDanger': false});
                 }
                 this.setState({'showMsgWarning': true});
-		if (this.props.logger != null) {
-		    this.props.logger.remove(logid);
-		    this.props.logger.error(err.responseJSON.title,
-					    err.responseJSON.message);
-		}
+                if (this.props.logger != null) {
+                    this.props.logger.remove(logid);
+                    this.props.logger.error(err.responseJSON.title,
+                                            err.responseJSON.message);
+                }
                 console.log('err', err);
             }.bind(this));
     },

@@ -60,7 +60,6 @@ logger.prototype.remove = function (id) {
 
 logger.prototype.update = function (sourceData) {
     // TODO: requires logger visual component
-    console.log("updating..", sourceData);
     ReactDOM.render(
         <Messages {...sourceData}/>,
         document.getElementById(container));
