@@ -667,3 +667,17 @@ ul> li> a{
 .frm-icon-container {
     display: inline-flex;
 }
+
+/*Logger*/
+#logger {
+    position: fixed;
+    width: 100%;
+    bottom: 0px;
+    left: 0;
+    text-align: center;
+}
+
+.log-content {
+    display: none;
+    height: 150px;
+}
