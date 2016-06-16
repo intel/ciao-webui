@@ -6,10 +6,13 @@
    - id: unique to manage rows
    - title: a code or title for an error/warning/message
    - type: error, warning or message
-   - description: description of the error
+   - message: description of the error
    - action: an executable function associated with 
- */
+*/
 
+var React = require('react');
+var ReactDOM = require('react-dom');
+var Messages = require('../components/messages.js');
 var container = "logger";
 
 var logger = function (name) {
@@ -18,42 +21,49 @@ var logger = function (name) {
     datamanager.onDataSourceSet(container,
 				this.update);
     // Initialize as empty object
-    datamanager.setDataSource(container, {data: []});
-}
+    datamanager.setDataSource(container, {"data": []});
+};
 
 logger.prototype.push = function (title, message) {
-    log = {title: title, message: message};
+    var log = {title: title, message: message};
     log.id = this.cindex;
     log.type = 'message';
     this.cindex++;
-    var data = datamanager.sources[container].data;
+    var data = [];
+    datamanager.sources[container].data.forEach((x) => {
+	data.push(x);
+    });
     data.push(log);
-    datamanager.setDataSource({data: data});
+    datamanager.setDataSource(container,{"data": data});
     return log.id;
-}
+};
 
 logger.prototype.error = function (title, message) {
-    log = {title: title, message: message}; 
+    var log = {title: title, message: message}; 
     log.id = this.cindex;
     log.type = 'error';
     this.cindex++;
-    var data = datamanager.sources[container].data;
+    var data = [];
+    datamanager.sources[container].data.forEach((x) => {
+	data.push(x);
+    });
     data.push(log);
-    datamanager.setDataSource({data: data});
+    datamanager.setDataSource(container,{"data": data});
     return log.id;
-}
+};
 
 logger.prototype.remove = function (id) {
     var data = datamanager.sources[container].data
-	.filter((d) => d.id != id )
+	.filter((d) => d.id != id );
     datamanager.setDataSource(container, {data: data});
-}
+};
 
-logger.prototype.update = function (data) {
-    console.log(data);
+logger.prototype.update = function (sourceData) {
     // TODO: requires logger visual component
-    // ReactDOM.render(    //         <Logger {...sourceData}/>,
-    //     document.getElementById(container));
-}
+    console.log("updating..", sourceData);
+    ReactDOM.render(
+        <Messages {...sourceData}/>,
+	document.getElementById(container));
+};
 
 module.exports = logger;
