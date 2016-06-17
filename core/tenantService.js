@@ -87,8 +87,8 @@ tenantService.prototype.serversDetail = function () {
         })
             .onError((resp) => {
                 if(resp) {
-                    res.status(resp.error.code)
-                        .send({"servers":[]})
+                    res.status(500)
+                        .send({"servers":[], error: resp.error})
                         .end();
                 } else {
                     res.status(500)

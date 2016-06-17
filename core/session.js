@@ -156,8 +156,9 @@
          var result = new function () {
              this.callback = function (response) {
                  var chunk = '';
-                 response.on('data', function(c){chunk += c;});
-                 response.on('end', function() {
+		 response.on('error', function () {next();});
+                 response.on('data', function (c) {chunk += c;});
+                 response.on('end', function () {
                      this.response = response;
                      try {
                          this.json = JSON.parse(chunk);
@@ -236,7 +237,8 @@
              this.callback = function (response) {
                  var chunk = '';
                  response.on('data', function(c){chunk += c;});
-                 response.on('end', function() {
+                 response.on('error', function () {next();});
+		 response.on('end', function() {
                      this.response = response;
                      try {
                          // TODO: his.json = JSON.parse(chunk);
@@ -283,7 +285,8 @@
              this.callback = function (response) {
                  var chunk = '';
                  response.on('data', function(c){chunk += c;});
-                 response.on('end', function() {
+		 response.on('error', function () {next();});
+		 response.on('end', function() {
                      this.response = response;
                      try {
                          this.json = JSON.parse(chunk);
