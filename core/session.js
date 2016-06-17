@@ -103,21 +103,28 @@
          var result = new function () {
              this.callback = function (response) {
                  var chunk = '';
-                 response.on('data', function(c){chunk += c;});
-                 response.on('end', function() {
+		 response.on('error', function (err) { next(err);});
+                 response.on('data', function (c) {chunk += c;});
+                 response.on('end', function () {
                      this.response = response;
                      try {
                          this.json = JSON.parse(chunk);
+			 next(); // callback passed
                      }catch(e){
                          this.json = {error:e};
+			 next(e); // callback passed
                      }
-                     next(); // callback passed
                  }.bind(this));
              }.bind(this);
          };
 
          // Send data to keystone service
          var req = http.request(options, result.callback);
+	 req.on('error', function (err) {
+	     if (process.env != 'production')
+		 console.log(err);
+	     next(err);
+	 });
          req.write(JSON.stringify(data));
          req.end();
 
@@ -149,8 +156,9 @@
          var result = new function () {
              this.callback = function (response) {
                  var chunk = '';
-                 response.on('data', function(c){chunk += c;});
-                 response.on('end', function() {
+		 response.on('error', function () {next();});
+                 response.on('data', function (c) {chunk += c;});
+                 response.on('end', function () {
                      this.response = response;
                      try {
                          this.json = JSON.parse(chunk);
@@ -164,6 +172,10 @@
 
          // Send data to keystone service
          var req = http.request(options, result.callback);
+	 req.on('error', function (err) {
+	     if (process.env != 'production')
+		 console.log(err);
+	 });
          req.end();
          return result;
      },
@@ -225,7 +237,8 @@
              this.callback = function (response) {
                  var chunk = '';
                  response.on('data', function(c){chunk += c;});
-                 response.on('end', function() {
+                 response.on('error', function () {next();});
+		 response.on('end', function() {
                      this.response = response;
                      try {
                          // TODO: his.json = JSON.parse(chunk);
@@ -240,6 +253,10 @@
 
          // Send data to keystone service
          var req = http.request(options, result.callback);
+	 req.on('error', function (err) {
+	     if (process.env != 'production')
+		 console.log(err);
+	 });
          req.end();
          return result;
      },
@@ -268,7 +285,8 @@
              this.callback = function (response) {
                  var chunk = '';
                  response.on('data', function(c){chunk += c;});
-                 response.on('end', function() {
+		 response.on('error', function () {next();});
+		 response.on('end', function() {
                      this.response = response;
                      try {
                          this.json = JSON.parse(chunk);
@@ -282,7 +300,11 @@
 
          // Send data to keystone service
          var req = http.request(options, result.callback);
-         req.end();
+	 req.on('error', function (err) {
+	     if (process.env != 'production')
+		 console.log(err);
+	 });
+	 req.end();
          return result;
      },
 
@@ -307,10 +329,12 @@
              var oldToken = null;
              var result = ref.keystoneAuthenticate(
                  bundle,
-                 function () {
-                     if(result.json.error) {
-                         reject(result.json);
-                     } else {
+                 function (err) {
+                     if (err) {
+			 reject(err);
+		     } else if (result.json.error) {
+			 reject(result.json.error);
+		     } else {
                          req.session.authorized = true;
                          req.session.username = (bundle.username)?
                              bundle.username :
@@ -322,14 +346,14 @@
                          req.session.token = finalToken;
                          req.session.user_uuid = result.json.token.user.id;
                          req.session.roles = result.json.token.roles;
+			 resolve(finalToken);
                      }
-                     resolve(finalToken);
                  });
          })
          // Promise of authentication is succesful
              .then(
                  function (token) {
-                     if(next) {
+		     if(next) {
                          if (next instanceof Function)
                              next(token);
                          else
@@ -339,14 +363,16 @@
                  })
          // Promise failed, user was not authenticated
              .catch(
-                 function (resp) {
-                     console.log("Failed to retrieve token");
-                     console.log(resp);
+                 function (err) {
+		     if (process.env != 'production') {
+			 console.log("Failed to retrieve token");
+			 console.log(err);
+		     }
                      if (next) {
-                         if (next instanceof Function)
-                             next();
+                         if (next.fail)
+                             next.fail({error:err});
                          else
-                             next.fail(resp);
+                             next();
                      }
                      return finalToken;
                  });
