@@ -13,6 +13,14 @@ var config = {
 
 };
 
+// Get expiration time
+router.get('/expires', function (req, res, next) {
+    if (req.session)
+	res.send({expires: req.session.expires});
+    else
+	res.status(403).end();
+});
+
 /* GET login page*/
 router.get('/login', function (req, res, next) {
     res.render(process.env.NODE_ENV+'_template', config);

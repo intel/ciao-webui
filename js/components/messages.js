@@ -20,9 +20,34 @@ var messages = React.createClass({
         logger.removeAll();
     },
 
+    componentDidMount: function() {
+        // Alert for token expiration time
+        var update = function () {
+            $.get('/authenticate/expires')
+                .done(function (resp){
+                    console.log("Asking for token expiration date", resp);
+                    var current_time = new Date();
+                    var expiration_time = new Date(resp.expires);
+                    if (current_time.getTime() < expiration_time.getTime()) {
+                        var remaining = Math.floor(
+                            (expiration_time.getTime() -
+                             current_time.getTime())/(1000 * 60));
+                        if (remaining < 5)
+                            logger.warning("Token about to expire",
+                                           "Token will expire in less than "+
+                                           remaining +" minutes");
+                    }
+                })
+                .fail(function (err){});
+        };
+        update();
+        setInterval(update, 15000);
+    },
+
     render: function() {
 
-        var count = 0; //String that holds the number of messages
+        var count = 0; // holds the number of messages
+
         var rows = this.props.data.map((row) => {
             var type;
             switch (row.type) {

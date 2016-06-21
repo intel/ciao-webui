@@ -11,8 +11,8 @@ var $ = require('jquery');
 $('document').ready(function () {
 
     // Create Logger object
-    var logger = new Logger('logger-container');
-    
+    window.logger = new Logger('logger-container');
+
     // create usage summary
     // How to use Usage Summary
     // first use a data source compatible for componenet.

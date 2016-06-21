@@ -1,4 +1,5 @@
 // Core session policy handler for ciao web ui
+var EventEmitter = require('events');
 
  var sessionHandler = {
 
@@ -346,6 +347,7 @@
                          req.session.token = finalToken;
                          req.session.user_uuid = result.json.token.user.id;
                          req.session.roles = result.json.token.roles;
+			 req.session.expires = result.json.token.expires_at;
 			 resolve(finalToken);
                      }
                  });

@@ -38,6 +38,20 @@ logger.prototype.push = function (title, message) {
     return log.id;
 };
 
+logger.prototype.warning = function (title, message) {
+    var log = {title: title, message: message};
+    log.id = this.cindex;
+    log.type = 'warning';
+    this.cindex++;
+    var data = [];
+    datamanager.sources[container].data.forEach((x) => {
+	data.push(x);
+    });
+    data.push(log);
+    datamanager.setDataSource(container,{"data": data});
+    return log.id;
+};
+
 logger.prototype.error = function (title, message) {
     var log = {title: title, message: message};
     log.id = this.cindex;
