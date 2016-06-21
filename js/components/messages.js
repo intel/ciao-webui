@@ -4,14 +4,27 @@ var React = require('react');
 
 var messages = React.createClass({
 
+    refLogElement: null,
+
     toggle: function () {
         $(".log-content").slideToggle(200);
     },
 
+    removeRow: function (id) {
+        return function() {
+            logger.remove(id);
+        }.bind(this);
+    },
+
+    removeAll: function () {
+        logger.removeAll();
+    },
+
     render: function() {
+
         var count = 0; //String that holds the number of messages
-        var type;
         var rows = this.props.data.map((row) => {
+            var type;
             switch (row.type) {
             case "error":
                 type = "alert-danger";
@@ -19,8 +32,13 @@ var messages = React.createClass({
             default:
                 type = "alert-info";
             }
-            return (<div className={type}> {row.title ? row.title: "Unknown error"}</div>);
+            return (<div className={type}>
+                    {row.title ? row.title: "Unknown error"}
+                    <button
+                    onClick={this.removeRow(row.id)}>x
+                    </button></div>);
         });
+        count = rows.length;
 
         $("#logger").removeClass();
         $("#logger").addClass("alert");

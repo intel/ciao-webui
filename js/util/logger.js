@@ -58,7 +58,12 @@ logger.prototype.remove = function (id) {
     datamanager.setDataSource(container, {data: data});
 };
 
+logger.prototype.removeAll = function (id) {
+    datamanager.setDataSource(container, {data: []});
+};
+
 logger.prototype.update = function (sourceData) {
+    var _this = this;
     // TODO: requires logger visual component
     ReactDOM.render(
         <Messages {...sourceData}/>,
