@@ -15,68 +15,91 @@ var ReactDOM = require('react-dom');
 var Messages = require('../components/messages.js');
 var container = "logger";
 
-var logger = function (name) {
+var logger = function(name) {
     this.cindex = 0; //initial index start at 0
     this.name = name;
     datamanager.onDataSourceSet(container,
                                 this.update);
+
     // Initialize as empty object
-    datamanager.setDataSource(container, {"data": []});
+    datamanager.setDataSource(container, {
+        "data": []
+    });
 };
 
-logger.prototype.push = function (title, message) {
-    var log = {title: title, message: message};
+logger.prototype.push = function(title, message, action) {
+    var log = {
+        title: title,
+        message: message
+    };
     log.id = this.cindex;
     log.type = 'message';
+    if (action) log.action = action;
     this.cindex++;
     var data = [];
     datamanager.sources[container].data.forEach((x) => {
         data.push(x);
     });
     data.push(log);
-    datamanager.setDataSource(container,{"data": data});
+    datamanager.setDataSource(container, {
+        "data": data
+    });
     return log.id;
 };
 
-logger.prototype.warning = function (title, message) {
-    var log = {title: title, message: message};
+logger.prototype.warning = function(title, message, action) {
+    var log = {
+        title: title,
+        message: message
+    };
     log.id = this.cindex;
     log.type = 'warning';
-    this.cindex++;
-    var data = [];
-    datamanager.sources[container].data.forEach((x) => {
-	data.push(x);
-    });
-    data.push(log);
-    datamanager.setDataSource(container,{"data": data});
-    return log.id;
-};
-
-logger.prototype.error = function (title, message) {
-    var log = {title: title, message: message};
-    log.id = this.cindex;
-    log.type = 'error';
+    if (action) log.action = action;
     this.cindex++;
     var data = [];
     datamanager.sources[container].data.forEach((x) => {
         data.push(x);
     });
     data.push(log);
-    datamanager.setDataSource(container,{"data": data});
+    datamanager.setDataSource(container, {
+        "data": data
+    });
     return log.id;
 };
 
-logger.prototype.remove = function (id) {
+logger.prototype.error = function(title, message, action) {
+    var log = {
+        title: title,
+        message: message
+    };
+    log.id = this.cindex;
+    log.type = 'error';
+    if (action) log.action = action;
+    this.cindex++;
+    var data = [];
+    datamanager.sources[container].data.forEach((x) => {
+        data.push(x);
+    });
+    data.push(log);
+    datamanager.setDataSource(container, {
+        "data": data
+    });
+    return log.id;
+};
+
+logger.prototype.remove = function(id) {
     var data = datamanager.sources[container].data
             .filter((d) => d.id != id );
     datamanager.setDataSource(container, {data: data});
 };
 
-logger.prototype.removeAll = function (id) {
-    datamanager.setDataSource(container, {data: []});
+logger.prototype.removeAll = function(id) {
+    datamanager.setDataSource(container, {
+        data: []
+    });
 };
 
-logger.prototype.update = function (sourceData) {
+logger.prototype.update = function(sourceData) {
     var _this = this;
     // TODO: requires logger visual component
     ReactDOM.render(

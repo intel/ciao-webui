@@ -2,6 +2,18 @@
 
 var React = require('react');
 
+// utility function to renew token
+var renew = function () {
+    $.post('../authenticate/renew')
+        .done(function (resp) {
+            logger.push("Token renewed", "");
+        })
+        .fail(function (err) {
+            console.log(err);
+            logger.error("An error occurred", err.error.message);
+        });
+};
+
 var messages = React.createClass({
 
     refLogElement: null,
@@ -32,10 +44,11 @@ var messages = React.createClass({
                         var remaining = Math.floor(
                             (expiration_time.getTime() -
                              current_time.getTime())/(1000 * 60));
-                        if (remaining < 5)
+                        //if (remaining < 5)
                             logger.warning("Token about to expire",
                                            "Token will expire in less than "+
-                                           remaining +" minutes");
+                                           remaining +" minutes",
+                                          renew);
                     }
                 })
                 .fail(function (err){});
@@ -57,11 +70,20 @@ var messages = React.createClass({
             default:
                 type = "alert-info";
             }
+            console.log("Action:", row.action);
             return (<div className={type}>
                     {row.title ? row.title: "Unknown error"}
                     <button
                     onClick={this.removeRow(row.id)}>x
-                    </button></div>);
+                    </button>
+                    {(() => {
+                        if (row.action) {
+                            return (<button onClick={row.action}>
+                                    renew
+                                    </button>);
+                        }
+                    })()}
+                    </div>);
         });
         count = rows.length;
 
