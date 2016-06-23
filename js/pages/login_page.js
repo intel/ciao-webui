@@ -12,7 +12,7 @@ $('document').ready(function () {
     window.logger = logger;
     // create logger visual component
     ReactDOM.render(<Messages data={[]} logger={logger}/>,
-		    document.getElementById("logger"));
+                    document.getElementById("logger"));
 
     var n = React.createElement(navbar, {});
     ReactDOM.render(n, document.getElementById("main-top-navbar"));

@@ -7,7 +7,11 @@
    - title: a code or title for an error/warning/message
    - type: error, warning or message
    - message: description of the error
-   - action: an executable function associated with
+   - action: Object with contains a function to be executed associated with
+     a log object.
+
+       action.fn: function to be executed
+       action.msg: message related to the action in place
 */
 
 var React = require('react');
