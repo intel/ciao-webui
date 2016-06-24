@@ -59,7 +59,8 @@ var groupOverview = React.createClass({
                 datamanager.setDataSource('group-overview',
                                           {
                                               dataKey: 'group-overview',
-                                              detailUrl: this.props.detailUrl,
+                                              detailUrl: '/data/' +
+						  datamanager.data.activeTenant.id,
                                               flavors:data.flavors});
                 // Fallback, fix empty workloads
                 if (data.flavors.length == 0) {
@@ -69,7 +70,8 @@ var groupOverview = React.createClass({
                             .setDataSource('group-overview',
                                            {
                                                dataKey: 'group-overview',
-                                               detailUrl: this.props.detailUrl,
+                                               detailUrl: '/data/'+
+						   datamanager.data.activeTenant.id,
                                                flavors:data.flavors});
                     }.bind(this));
                 }
