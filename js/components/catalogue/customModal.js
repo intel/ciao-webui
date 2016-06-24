@@ -17,7 +17,7 @@ var customModal = React.createClass({
     },
     render: function() {
         return  (
-            <Modal show="true" onHide={this.props.onClose}>
+            <Modal show={true} onHide={this.props.onClose}>
                 <Modal.Header closeButton>
                     <Modal.Title>{this.props.title}</Modal.Title>
                 </Modal.Header>
