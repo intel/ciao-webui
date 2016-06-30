@@ -128,8 +128,8 @@ nodeService.prototype.serversDetailCount = function () {
         })
             .onError((resp) => {
                 if(resp) {
-                    res.status(resp.error.code)
-                        .send({"count":0})
+                    res.status(500)
+                        .send({"count":0, error: resp.error})
                         .end();
                 } else {
                     res.status(500)

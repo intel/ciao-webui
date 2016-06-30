@@ -44,15 +44,6 @@ cp -r tempDownloads/fonts public/stylesheets/
 # removing temporal files
 rm -rf tempDownloads
 
-# Relocating bootstrap files
-cp -r node_modules/bootstrap/dist/fonts/* vendor/stylesheets/fonts
-cp -r node_modules/bootstrap/dist/css/bootstrap.min.css vendor/stylesheets
-
-# Copy datamanager.js to public directory
-cp build/data/dataManager.js public/javascripts/datamanager.js
-# Copy validation script file to public directory
-cp js/util/validations.js public/javascripts/library/validations.js
-
 # Verify the environment to define the template
 if [ $env == "default" ]
 then
@@ -71,14 +62,14 @@ jsEnd="'></script>"
 # * insert them after tittle html tag *
 match="</title>"
 # * "files" *
-bootstrap="$cssStart/stylesheets/bootstrap.min.css$cssEnd"
+bootstrap="$cssStart/bootstrap/dist/css/bootstrap.min.css$cssEnd"
 framework="$cssStart/stylesheets/framework.css$cssEnd"
 d3="$cssStart/stylesheets/d3Framework.css$cssEnd"
-jquery="$jsStart/javascripts/library/jquery.js$jsEnd"
-jqueryui="$jsStart/javascripts/library/jquery-ui.js$jsEnd"
+jquery="$jsStart/jquery/dist/jquery.js$jsEnd"
+jqueryui="$jsStart/jquery-ui/jquery-ui.js$jsEnd"
 datamanager="$jsStart/javascripts/datamanager.js$jsEnd"
 loadDatamanager="<script type='text/javascript'>window.datamanager.loadData((<%- JSON.stringify(data)%>));</script>"
-validations="$jsStart/javascripts/library/validations.js$jsEnd"
+validations="$jsStart/util/validations.js$jsEnd"
 # Delete .bak (this is just for mac)
 # Replace \\ for \n (this is just for mac)
 sed -i.bak "s~$match~$match\\$bootstrap\\$framework\\$d3\\$jquery\\$jqueryui\\$datamanager\\$loadDatamanager\\$validations~" views/$file
@@ -92,3 +83,5 @@ npm run build-machine
 npm run build-network
 npm run build-subnet
 npm run build-group
+
+npm start

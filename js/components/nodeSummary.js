@@ -1,7 +1,7 @@
 // React js component
 var React = require('react');
 var reactBootstrap = require('react-bootstrap');
-//var NodeSummaryChart = require('./nodeSummaryChart.js');
+var NodeSummaryChart = require('./nodeSummaryChart.js');
 var NoData = require('./noData.js');
 
 var nodeSummary = React.createClass({
@@ -79,6 +79,7 @@ var nodeSummary = React.createClass({
                     </div>
                 );
             });
+
             return (
                     <div className="element-summary-panel">
                         <div className="frm-panel-heading frm-panel-regular">
@@ -96,6 +97,11 @@ var nodeSummary = React.createClass({
                                     <div className="col-xs-8">
                                         <div className="row">
                                             {sections}
+                                        </div>
+                                    </div>
+                                    <div className="col-xs-4">
+                                        <div className="row">
+                                            <NodeSummaryChart {...this.props}/>
                                         </div>
                                     </div>
                                 </div>

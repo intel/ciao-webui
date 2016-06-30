@@ -444,6 +444,12 @@ fieldset[disabled] .frm-btn-secondary.focus {
 /*
 * Tables
 */
+.table>caption+thead>tr:first-child>td, .table>caption+thead>tr:first-child>th,
+.table>colgroup+thead>tr:first-child>td, .table>colgroup+thead>tr:first-child>th,
+.table>thead:first-child>tr:first-child>td,
+.table>thead:first-child>tr:first-child>th {
+    font-family: 'ClearSans-Bold';
+}
 
 /*
 * Tabs
@@ -644,3 +650,13 @@ ul> li> a{
 .add-margin-left{margin-left: 20px;}
 .add-margin-right{margin-right: 20px;}
 .add-padding-left{padding-left: 20px}
+
+.frm-hidden {
+    opacity: 0;
+}
+.frm-icon-extraSize {
+    font-size: 25px;
+}
+.frm-icon-container {
+    display: inline-flex;
+}

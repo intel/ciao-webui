@@ -8,16 +8,42 @@ var loginForm = React.createClass({
 
     getInitialState: function() {
         return {
-            showMsgWarning: false
+            showMsgWarning: false,
+            showMsgDanger: false
         };
     },
 
     renderMessage: function() {
-        if (this.state.showMsgWarning) {
+        /*if (this.state.showMsgWarning) {
             return (<div className="alert frm-alert-warning-icon" role="alert">
                 The username or password you entered is not correct. Please, verify and try again
             </div>);
         } else {
+            return null;
+        }*/
+        if (this.state.showMsgWarning) {
+            return (<div className="alert frm-alert-warning-icon" role="alert">
+                <div className="frm-icon-container">
+                    <span className="glyphicon glyphicon-alert frm-icon-extraSize">
+                    </span>
+                    <div className="frm-danger-message">
+                        The username or password you entered is not correct.
+                        Please, verify and try again
+                    </div>
+                </div>
+            </div>);
+        } else if(this.state.showMsgDanger) {
+            return (<div className="alert frm-alert-information-icon" role="alert">
+                <div className="frm-icon-container">
+                    <span className="glyphicon glyphicon-info-sign frm-icon-extraSize">
+                    </span>
+                    <div className="frm-danger-message">
+                        Sorry, we could not connect with CIAO.
+                        Please try again later.
+                    </div>
+                </div>
+            </div>);
+        }else {
             return null;
         }
     },
@@ -43,7 +69,13 @@ var loginForm = React.createClass({
                 }
             }.bind(this))
             .fail(function (err) {
-                this.setState({'showMsgWarning': true});
+                if (err.status === 0) {
+                    this.setState({'showMsgWarning': false});
+                    this.setState({'showMsgDanger': true});
+                } else if (err.status === 401) {
+                    this.setState({'showMsgWarning': true});
+                    this.setState({'showMsgdanger': false});
+                }
                 console.log('err', err);
             }.bind(this));
     },
@@ -57,6 +89,8 @@ var loginForm = React.createClass({
     render: function() {
         return (<div className="col-xs-6 col-md-4">
                 <h6 className="frm-bold-text">Log In</h6>
+                <span className="glyphicon glyphicon-info-sign frm-hidden">
+                </span>
 
                 {this.renderMessage()}
                 <form className="frm-login-container">

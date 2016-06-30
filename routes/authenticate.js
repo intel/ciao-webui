@@ -56,18 +56,13 @@ router.post('/login', function(req, res, next) {
                 .end();
 
         },
-        fail: function (resp) {
-            if (process.env.NODE_ENV != 'production') {
-                console.log(resp);
+        fail: function (err) {
+	    if (process.env.NODE_ENV != 'production') {
+                console.log(err);
             }
-            if(resp) {
-                res.status(resp.error.code)
-                    .send(resp.error)
-                    .end();
-            } else {
-                res.status(500)
-                    .end();
-            }
+            res.status(500)
+                .send(err?err:{error: "Unknown error"})
+                .end(); 
         }
     };
 
