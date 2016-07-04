@@ -148,6 +148,7 @@ var networkCnci = React.createClass({
             actions={this.getActions()}
             selectAll= {this.selectAll}
             searchFields={this.getSearchfields()}
+            searchTitle= 'Search Network'
             />
         );
     }

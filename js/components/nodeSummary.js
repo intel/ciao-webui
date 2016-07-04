@@ -49,7 +49,6 @@ var nodeSummary = React.createClass({
     },
 
     render: function() {
-        console.log(this.props);
         var panelTitle;
 
         if(this.props.sections.length > 0){

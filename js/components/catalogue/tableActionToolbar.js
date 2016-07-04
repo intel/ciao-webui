@@ -60,7 +60,7 @@ var tableActionToolbar = React.createClass({
                         </ButtonToolbar>
                     </div>
                     <div className="pull-rigth">
-                        <CustomSearch title="Search Instances" />
+                        <CustomSearch title={this.props.searchTitle} />
                     </div>
                 </div>
             </div>

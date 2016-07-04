@@ -306,7 +306,8 @@ var instancesHost = React.createClass({
             onChangePage: this.onChangePage,
             selectAll: this.selectAll,
             id:'instance_id',
-            ref: 'catalogue'
+            ref: 'catalogue',
+            searchTitle: 'Search Instances',
         });else return React.createElement('div', null);
     }
 });

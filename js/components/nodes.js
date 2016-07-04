@@ -162,7 +162,8 @@ var nodes = React.createClass({
             onChangePage: this.onChangePage,
             selectAll: this.selectAll,
             id:'id',
-            ref: 'catalogue'
+            ref: 'catalogue',
+            searchTitle: "Search Nodes"
         });else return React.createElement('div', null);
     }
 });
