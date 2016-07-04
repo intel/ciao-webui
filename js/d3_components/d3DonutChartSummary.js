@@ -29,7 +29,6 @@ d3NodeElementSummary.update = function (svgEl, props, state) {
                     {label:data.name,
                     value:data.number}
                 );
-                console.log("data",elements);
             }
         }
     });
