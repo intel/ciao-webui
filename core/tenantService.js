@@ -190,9 +190,8 @@ tenantService.prototype.flavorsDetail = function () {
             }
         }.bind(req,res))
             .onError(() => {
-                res.send({
-                    flavors:req.session.workloads?
-                        req.session.workloads:[]});
+                res.status(500).end();
+
             })
             .validate(req,res);
     };
