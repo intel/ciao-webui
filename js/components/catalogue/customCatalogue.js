@@ -214,7 +214,8 @@ var catalogue = React.createClass({
         return {
             buttonItems: config.actions ? config.actions : [],
             searchFields: config.searchFields ? config.searchFields : [],
-            dropDownActions: dropDownActions
+            dropDownActions: dropDownActions,
+            searchTitle : config.searchTitle
         };
     },
 

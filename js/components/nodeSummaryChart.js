@@ -38,7 +38,6 @@ var nodeSummaryChart = React.createClass({
     },
 
     render: function() {
-        console.log(this.props);
 
         if (this.state.d3node != null) {
             var DonutChart = this.state.d3node.toReact();

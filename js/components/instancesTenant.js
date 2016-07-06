@@ -158,6 +158,7 @@ var instancesTenant = React.createClass({
                 dropDownActions={this.getDropdownActions()}
                 searchFields={this.getSearchfields()}
                 ref="catalogue"
+                searchTitle= "Search Nodes"
             />);
     }
 });
