@@ -561,7 +561,8 @@ var catalogue = React.createClass({
         return {
             buttonItems: config.actions ? config.actions : [],
             searchFields: config.searchFields ? config.searchFields : [],
-            dropDownActions: dropDownActions
+            dropDownActions: dropDownActions,
+            searchTitle: config.searchTitle
         };
     },
 
@@ -1003,7 +1004,7 @@ var tableActionToolbar = React.createClass({
                 React.createElement(
                     'div',
                     { className: 'pull-rigth' },
-                    React.createElement(CustomSearch, { title: 'Search Instances' })
+                    React.createElement(CustomSearch, { title: this.props.searchTitle })
                 )
             )
         );
@@ -1430,7 +1431,8 @@ var instancesHost = React.createClass({
             onChangePage: this.onChangePage,
             selectAll: this.selectAll,
             id: 'instance_id',
-            ref: 'catalogue'
+            ref: 'catalogue',
+            searchTitle: 'Search Instances'
         });else return React.createElement('div', null);
     }
 });
