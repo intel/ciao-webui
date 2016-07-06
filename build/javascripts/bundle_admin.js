@@ -290,7 +290,8 @@ var catalogue = React.createClass({
         return {
             buttonItems: config.actions ? config.actions : [],
             searchFields: config.searchFields ? config.searchFields : [],
-            dropDownActions: dropDownActions
+            dropDownActions: dropDownActions,
+            searchTitle: config.searchTitle
         };
     },
 
@@ -732,7 +733,7 @@ var tableActionToolbar = React.createClass({
                 React.createElement(
                     'div',
                     { className: 'pull-rigth' },
-                    React.createElement(CustomSearch, { title: 'Search Instances' })
+                    React.createElement(CustomSearch, { title: this.props.searchTitle })
                 )
             )
         );
@@ -1228,7 +1229,8 @@ var networkCnci = React.createClass({
             id: 'cnci_uuid',
             actions: this.getActions(),
             selectAll: this.selectAll,
-            searchFields: this.getSearchfields()
+            searchFields: this.getSearchfields(),
+            searchTitle: 'Search Network'
         });
     }
 });
@@ -1306,7 +1308,6 @@ var nodeSummary = React.createClass({
     },
 
     render: function () {
-        console.log(this.props);
         var panelTitle;
 
         if (this.props.sections.length > 0) {
@@ -1445,7 +1446,6 @@ var nodeSummaryChart = React.createClass({
     },
 
     render: function () {
-        console.log(this.props);
 
         if (this.state.d3node != null) {
             var DonutChart = this.state.d3node.toReact();
@@ -1624,7 +1624,8 @@ var nodes = React.createClass({
             onChangePage: this.onChangePage,
             selectAll: this.selectAll,
             id: 'id',
-            ref: 'catalogue'
+            ref: 'catalogue',
+            searchTitle: "Search Nodes"
         });else return React.createElement('div', null);
     }
 });
@@ -1785,7 +1786,6 @@ d3NodeElementSummary.update = function (svgEl, props, state) {
             if (data.number !== 0) {
                 elements.push({ label: data.name,
                     value: data.number });
-                console.log("data", elements);
             }
         }
     });
