@@ -2,6 +2,8 @@
 var React = require('react');
 var ReactDOM = require('react-dom/server');
 var ElementSummary = require('./elementSummary.js');
+var reactBootstrap = require('react-bootstrap');
+var Button = reactBootstrap.Button;
 
 var usageSummary = React.createClass({
 
@@ -27,8 +29,10 @@ var usageSummary = React.createClass({
             memoryValue = 0, memoryQuota=0, procesorValue=0;
 
             if (!datamanager.data.activeTenant){
+                // admin
                 url = "/data"+this.props.source;
             } else {
+                // tenant
                 url = "/data/"+datamanager.data.activeTenant.id+this.props.source;
             }
             $.get({
@@ -100,21 +104,26 @@ var usageSummary = React.createClass({
     render: function() {
         var dynamicWidth = Math.round(12 / this.props.data.length);
         var elements = [];
-        var columnGrid;
+        var columnGrid, reference;
 
         if (this.props.data)  {
             if(this.props.data.length > 3) {
+                // tenant
                 columnGrid = "col-xs-3 col-sm-3";
+                reference = "tenant/underConstruction";
             } else {
+                // admin
                 columnGrid = "col-xs-4 col-sm-4";
+                reference = "admin/underConstruction"
             }
 
             this.props.data.forEach(
                 (props) => {
                     elements.push(
-                            <div key={props.name} className={columnGrid}>
+                        <div key={props.name} className={columnGrid}>
                             <ElementSummary {...props}/>
-                            </div>);
+                        </div>
+                    );
                 }
             );
         }
@@ -122,7 +131,15 @@ var usageSummary = React.createClass({
         return (
             <div className="row">
                 {elements}
-            </div>);
+                <div className="col-xs-12 frm-body-h6">
+                    <Button bsStyle={null}
+                        className="btn frm-btn-secondary pull-right"
+                        href={reference}>
+                        View Usage History
+                    </Button>
+                </div>
+            </div>
+        );
     }
 
 });

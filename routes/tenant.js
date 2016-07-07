@@ -127,4 +127,32 @@ router.get('/group/:id', validatePermissions, function (req, res, next) {
     res.render(process.env.NODE_ENV+'_template', groupConfig);
 });
 
+var underConstruction = {
+    title: 'Coming Soon',
+    page: 'pages/under_construction.ejs',
+    scripts: [
+        '/javascripts/bundle_under_construction.js'
+    ],
+    data: {
+        title: 'CIAO',
+        section: 'Coming Soon'
+    }
+};
+
+router.get('/underConstruction', function (req, res, next) {
+
+    underConstruction.data.username = req.session.username;
+    underConstruction.data.tenants = req.session.tenants;
+    underConstruction.data.activeTenant = req.session.activeTenant;
+    underConstruction.data.idSubnet =  req.params.idSubnet;
+    underConstruction.data.idNetwork =  req.params.idNetwork;
+    underConstruction.data.navbar = {
+        username: req.session.username,
+        tenants: req.session.tenants,
+        logoutUrl: "/authenticate/logout"
+    };
+    res.render(process.env.NODE_ENV+'_template', underConstruction);
+});
+
+
 module.exports = router;
