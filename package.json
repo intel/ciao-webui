@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "babel-react": "babel --presets react js/ --watch --out-dir build",
+    "babel-react": "babel --presets react js/ --out-dir build",
     "build-tenant-detail": "browserify build/pages/tenant_usage_details.js -o build/javascripts/bundle_tenant_usage_detail.js",
     "build-login": "browserify build/pages/login_page.js -o build/javascripts/bundle_login.js",
     "build-tenant": "browserify build/pages/tenant_admin.js -o build/javascripts/bundle_tenant_admin.js",
