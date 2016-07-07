@@ -47,6 +47,7 @@ else
 	-rm /usr/share/ciao-webui/ciao_config.json
 endif
 	-rm -r /usr/local/ciao-webui
+	-rm $(NPM_LINK)/ciao-webui
 
 install:
 	# Update/download the required dependencies for the project

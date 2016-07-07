@@ -1,5 +1,9 @@
 #!/bin/bash
-
+OS=`uname`
+CONFIG_FILE='config_file=/usr/share/ciao-webui/ciao_config.json'
+if [[ "$OS" == 'Darwin' ]]; then
+	CONFIG_FILE='config_file=/usr/local/share/ciao-webui/ciao_config.json'
+fi
 
 if [ "$1" == "" ]; then
     env="production"
@@ -11,7 +15,7 @@ echo "Environment: "$env
 export NODE_ENV=$env
 
 if [ "$2" == "" ]; then
-    node /usr/local/ciao-webui/bin/www  "config_file=/usr/share/ciao-webui/ciao_config.json"
+    node /usr/local/ciao-webui/bin/www "$CONFIG_FILE" 
 
 else
     node /usr/local/ciao-webui/bin/www " $@"
