@@ -31,23 +31,14 @@ install:
 	-cp js/util/*.js public/javascripts/library/
 	sed -i.bak "s~$(subst $\",,$(match))~$(subst $\",,$(match))\\$(bootstrap)\\$(subst $\",,$(framework))\\$(subst $\",,$(d3))\\ $(subst $\",,$(jquery))\\$(subst $\",,$(jqueryui))\\$(subst $\",,$(datamanager))\\$(subst $\",,$(loadDatamanager))\\ $(subst $\",,$(validations))~" views/$(subst $\",,$(file))
 	-mkdir -p $(DESTDIR)/ciao-webui/
-ifeq ($(OS), Darwin)
 	-mkdir -p $(DESTDIR)/share/ciao-webui
 	-cp config/ciao_config.json $(DESTDIR)/share/ciao-webui/
-else
-	-mkdir -p /usr/share/ciao-webui
-	-cp config/ciao_config.json /usr/share/ciao-webui/
-endif
 	-cp -rf * $(DESTDIR)/ciao-webui/
 	sed "s/\".\" #executable/\"$(subst $\/,\\/,$(DESTDIR))\"/" ./ciao-webui.sh > $(NPM_LINK)/ciao-webui
 	chmod u+rx $(NPM_LINK)/ciao-webui
 
 uninstall:
-ifeq ($(OS), Darwin)
 	-rm $(DESTDIR)/share/ciao-webui/ciao_config.json
-else
-	-rm /usr/share/ciao-webui/ciao_config.json
-endif
 	-rm -r /usr/local/ciao-webui
 	-rm $(NPM_LINK)/ciao-webui
 
@@ -78,13 +69,8 @@ install-dev:
 	-cp js/util/*.js public/javascripts/library/
 	sed -i.bak "s~$(subst $\",,$(match))~$(subst $\",,$(match))\\$(bootstrap)\\$(subst $\",,$(framework))\\$(subst $\",,$(d3))\\ $(subst $\",,$(jquery))\\$(subst $\",,$(jqueryui))\\$(subst $\",,$(datamanager))\\$(subst $\",,$(loadDatamanager))\\ $(subst $\",,$(validations))~" views/$(subst $\",,$(file))
 	-mkdir -p $(DESTDIR)/ciao-webui/
-ifeq ($(OS), Darwin)
 	-mkdir -p $(DESTDIR)/share/ciao-webui
 	-cp config/ciao_config.json $(DESTDIR)/share/ciao-webui/
-else
-	-mkdir -p /usr/share/ciao-webui
-	-cp config/ciao_config.json /usr/share/ciao-webui/
-endif
 	-cp -rf * $(DESTDIR)/ciao-webui/
 	sed "s/\".\" #executable/\"$(subst $\/,\\/,$(DESTDIR))\"/" ./ciao-webui.sh > $(NPM_LINK)/ciao-webui
 	chmod u+rx $(NPM_LINK)/ciao-webui
