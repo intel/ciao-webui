@@ -1,10 +1,7 @@
 #!/bin/bash
 OS=`uname`
 LOCATION="." #executable
-CONFIG_FILE='config_file=/usr/share/ciao-webui/ciao_config.json'
-if [[ "$OS" == 'Darwin' ]]; then
-    CONFIG_FILE='config_file=/usr/local/share/ciao-webui/ciao_config.json'
-fi
+CONFIG_FILE="config_file=$LOCATION/share/ciao-webui/ciao_config.json"
 
 if [ "$1" == "" ]; then
     env="production"
