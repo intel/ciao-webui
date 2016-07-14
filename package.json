@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "babel-react": "babel --presets react js/ --watch --out-dir build",
+    "babel-react": "babel --presets react js/ --out-dir build",
     "build-tenant-detail": "browserify build/pages/tenant_usage_details.js -o build/javascripts/bundle_tenant_usage_detail.js",
     "build-login": "browserify build/pages/login_page.js -o build/javascripts/bundle_login.js",
     "build-tenant": "browserify build/pages/tenant_admin.js -o build/javascripts/bundle_tenant_admin.js",
@@ -13,7 +13,8 @@
     "build-network": "browserify build/pages/tenant_network.js -o build/javascripts/bundle_tenant_network.js",
     "build-machine": "browserify build/pages/machine.js -o build/javascripts/bundle_tenant_machine.js",
     "build-admin": "browserify build/pages/admin.js -o build/javascripts/bundle_admin.js",
-    "build-forbidden": "browserify build/pages/forbidden.js -o build/javascripts/bundle_forbidden.js"
+    "build-forbidden": "browserify build/pages/forbidden.js -o build/javascripts/bundle_forbidden.js",
+    "build-notice": "browserify build/pages/under_construction.js -o build/javascripts/bundle_under_construction.js"
   },
   "dependencies": {
     "body-parser": "https://github.com/expressjs/body-parser#1.15.1",
