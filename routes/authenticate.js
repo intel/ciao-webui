@@ -57,12 +57,15 @@ router.post('/login', function(req, res, next) {
 
         },
         fail: function (err) {
-	    if (process.env.NODE_ENV != 'production') {
+        for (var error in err) {
+            var status = err[error].code == 'ETIMEDOUT' ? 500 : 401;
+        }
+        if (process.env.NODE_ENV != 'production') {
                 console.log(err);
             }
-            res.status(500)
+            res.status(status)
                 .send(err?err:{error: "Unknown error"})
-                .end(); 
+                .end();
         }
     };
 
