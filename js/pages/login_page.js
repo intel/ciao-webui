@@ -11,7 +11,7 @@ $('document').ready(function () {
 
     var n = React.createElement(navbar, {});
     ReactDOM.render(n, document.getElementById("main-top-navbar"));
-    
+
     var l = React.createElement(loginComponent, {logger: logger});
     ReactDOM.render(l,document.getElementById("login-container"));
 

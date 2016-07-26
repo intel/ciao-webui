@@ -7,10 +7,10 @@ var ButtonInput = reactBootstrap.ButtonInput;
 var loginForm = React.createClass({
 
     getDefaultProps: function() {
-	// Logger defaults to null 
-	return {
-	    logger: null
-	};
+        // Logger defaults to null
+        return {
+            logger: null
+        };
     },
 
     getInitialState: function() {
@@ -64,11 +64,9 @@ var loginForm = React.createClass({
         // TODO: validate inputs (credentials)
         // ... validate parameters
         var url = "/authenticate/login";
-	var logid;
-	if (this.props.logger)
-	    this.props.logger.push("Logging In", "Credentials sent to server...");
+        var logid;
 
-	$.post({
+        $.post({
                 url:"/authenticate/login",
                 data:credentials
             })
@@ -78,7 +76,7 @@ var loginForm = React.createClass({
                     console.log(response);
                     window.location.replace(response.next);
                 }
-		this.props.logger.remove(logid);
+                this.props.logger.remove(logid);
             }.bind(this))
             .fail(function (err) {
                 if (err.status === 503) {
