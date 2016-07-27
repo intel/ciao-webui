@@ -63,9 +63,9 @@ var messages = React.createClass({
     render: function() {
 
         var count = 0; // holds the number of messages
+        var type;
 
         var rows = this.props.data.map((row) => {
-            var type;
             switch (row.type) {
             case "error":
                 type = "alert-danger";
