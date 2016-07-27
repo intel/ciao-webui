@@ -58,7 +58,8 @@ router.post('/login', function(req, res, next) {
         },
         fail: function (err) {
         for (var error in err) {
-            var status = err[error].code == 'ETIMEDOUT' ? 500 : 401;
+            var status = ['EHOSTDOWN', 'ETIMEDOUT', 'ECONNREFUSED']
+                .indexOf(err[error].code) >= 0 ? 503 : 401;
         }
         if (process.env.NODE_ENV != 'production') {
                 console.log(err);

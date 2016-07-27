@@ -69,7 +69,7 @@ var loginForm = React.createClass({
                 }
             }.bind(this))
             .fail(function (err) {
-                if (err.status === 500) {
+                if (err.status === 503) {
                     this.setState({'showMsgWarning': false});
                     this.setState({'showMsgDanger': true});
                 } else if (err.status === 401) {
