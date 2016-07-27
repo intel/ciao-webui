@@ -64,7 +64,6 @@ var loginForm = React.createClass({
         // TODO: validate inputs (credentials)
         // ... validate parameters
         var url = "/authenticate/login";
-        var logid;
 
         $.post({
                 url:"/authenticate/login",
@@ -76,22 +75,21 @@ var loginForm = React.createClass({
                     console.log(response);
                     window.location.replace(response.next);
                 }
-                this.props.logger.remove(logid);
             }.bind(this))
             .fail(function (err) {
-                if (err.status === 503) {
+                if (Number(err.status) >= 500 || Number(err.status) == 408) {
                     this.setState({'showMsgWarning': false});
                     this.setState({'showMsgDanger': true});
+
+                    if (this.props.logger != null) {
+                        this.props.logger.error(err.responseJSON.error.title,
+                                                err.responseJSON.error.message);
+                    }
                 } else if (err.status === 401) {
                     this.setState({'showMsgWarning': true});
                     this.setState({'showMsgDanger': false});
                 }
                 this.setState({'showMsgWarning': true});
-                if (this.props.logger != null) {
-                    this.props.logger.remove(logid);
-                    this.props.logger.error(err.responseJSON.error.title,
-                                            err.responseJSON.error.message);
-                }
             }.bind(this));
     },
 

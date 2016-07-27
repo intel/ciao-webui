@@ -10,6 +10,9 @@ var InstancesCounter = require('../components/instancesCounter.js');
 
 $('document').ready(function () {
 
+    // Create Logger object
+    window.logger = new Logger('logger-container');
+
     var getUnitString = function (value) {
 
         if (value == null)
@@ -24,7 +27,7 @@ $('document').ready(function () {
     datamanager.onDataSourceSet('node-summary', function (sourceData) {
 
         ReactDOM.render(
-        <NodeSummary {...sourceData}/>,
+        <NodeSummary {...sourceData} logger={logger}/>,
         document.getElementById("node-summary"));
     });
     // react hierarchy would be re-rendered
@@ -34,7 +37,7 @@ $('document').ready(function () {
     datamanager.onDataSourceSet('usage-summary', function (sourceData) {
         sourceData.source = "/nodes";
         ReactDOM.render(
-        <UsageSummary {...sourceData}/>,
+        <UsageSummary {...sourceData} logger={logger}/>,
         document.getElementById("usage-summary"));
     });
     datamanager.setDataSource('usage-summary', {data:[]});

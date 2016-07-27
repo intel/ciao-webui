@@ -11,7 +11,8 @@ var usageSummary = React.createClass({
         // source defaults to server details url
         return {
             data: {},
-            refresh: 3500
+            refresh: 3500,
+            logger: null
         };
     },
 
@@ -83,6 +84,10 @@ var usageSummary = React.createClass({
                     }
                 }.bind(this))
                 .fail(function (err) {
+                    if (this.props.logger != null) {
+                        this.props.logger.error(err.responseJSON.error.title,
+                                                err.responseJSON.error.message);
+                    }
                     this.setState({updating: false});
                     datamanager.setDataSource('usage-summary',{
                         source: this.props.source});

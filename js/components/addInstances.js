@@ -9,9 +9,9 @@ var $ = require('jquery');
 var addInstances = React.createClass({
 
     getDefaultProps: function() {
-	return {
-	    logger: null
-	};
+        return {
+            logger: null
+        };
     },
 
     getInitialState: function () {
@@ -46,10 +46,11 @@ var addInstances = React.createClass({
             "max_count":data.number_instances
         };
 
-	if (this.props.logger != null) {
-	    lReqInstances =this.props.logger.push("Add Instances",
-				   "Request has been sent to server");
-	}
+        if (this.props.logger != null) {
+            lReqInstances =this.props
+                .logger.push("Add Instances",
+                             "Request has been sent to server");
+        }
         $.post({
             url:"/data/"+tenantId+"/servers",
             data:body
@@ -60,13 +61,13 @@ var addInstances = React.createClass({
         })
         .fail(function (err) {
             console.log('err', err);
-	    if (this.props.logger != null) {
-		this.props.logger.error(err.responseJSON.title,
-					err.responseJSON.message);
-	    }
+            if (this.props.logger != null) {
+                this.props.logger.error(err.responseJSON.title,
+                                        err.responseJSON.message);
+            }
         });
     },
-    
+
     confirmAddInstances: function (){
         var body = {
             activeTenant : this.state.activeTenant,
@@ -81,6 +82,7 @@ var addInstances = React.createClass({
             acceptText:'Launch'
         });
     },
+
     render: function () {
         return (<div className="pull-right">
                 <h6>

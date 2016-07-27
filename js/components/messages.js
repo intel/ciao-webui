@@ -8,7 +8,7 @@ var renew = {
     fn: function () {
         $.post('../authenticate/renew')
             .done(function (resp) {
-                logger.push("Token renewed", "");
+                logger.push("Token renewed!", "");
             })
             .fail(function (err) {
                 console.log(err);
@@ -47,8 +47,13 @@ var messages = React.createClass({
                         var remaining = Math.floor(
                             (expiration_time.getTime() -
                              current_time.getTime())/(1000 * 60));
-                        if (remaining == 5)
+                        if (remaining == 10)
                             logger.warning("Token about to expire",
+                                           "Token will expire in less than "+
+                                           remaining +" minutes",
+                                          renew);
+                        if (remaining == 5)
+                            logger.error("Token about to expire",
                                            "Token will expire in less than "+
                                            remaining +" minutes",
                                           renew);
@@ -70,8 +75,11 @@ var messages = React.createClass({
             case "error":
                 type = "alert-danger";
                 break;
+            case "warning":
+                type = "alert-warning";
+                break;
             default:
-                type = "alert-info";
+                type = "alert-success";
             }
             console.log("Action:", row.action);
             return (<div className={type}>

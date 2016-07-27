@@ -42,7 +42,7 @@ $('document').ready(function () {
         var refresh = (datamanager.data.REFRESH | 3000);
         sourceData.refresh = Number(refresh);
         ReactDOM.render(
-            <UsageSummary {...sourceData}/>,
+            <UsageSummary {...sourceData} logger={logger}/>,
             document.getElementById("usage-summary"));
     });
     // react hierarchy would be re-rendered
@@ -87,7 +87,7 @@ $('document').ready(function () {
         var refresh = (datamanager.data.REFRESH | 3000);
         sourceData.refresh = Number(refresh);
         ReactDOM.render(
-                <GroupOverview {...sourceData}/>,
+                <GroupOverview {...sourceData} logger={logger}/>,
             document.getElementById("workloads-container"));
     });
     var getFlavors = function (attempts) {

@@ -3,7 +3,10 @@ var InstancesGroup = require('./instancesGroup.js');
 
 var groupOverview = React.createClass({
     getInitialState: function() {
-        return {updates:0};
+        return {
+            updates:0,
+            logger:null
+        };
     },
 
     instancesWereAdded: function(){
@@ -60,7 +63,7 @@ var groupOverview = React.createClass({
                                           {
                                               dataKey: 'group-overview',
                                               detailUrl: '/data/' +
-						  datamanager.data.activeTenant.id,
+                                              datamanager.data.activeTenant.id,
                                               flavors:data.flavors});
                 // Fallback, fix empty workloads
                 if (data.flavors.length == 0) {
@@ -71,13 +74,25 @@ var groupOverview = React.createClass({
                                            {
                                                dataKey: 'group-overview',
                                                detailUrl: '/data/'+
-						   datamanager.data.activeTenant.id,
+                                               datamanager.data.activeTenant.id,
                                                flavors:data.flavors});
-                    }.bind(this));
+                    }.bind(this))
+                        .fail(function (err) {
+                            console.log("Error:",err);
+                            if (this.props.logger != null) {
+                                this.props.logger.error(
+                                    err.responseJSON.error.title,
+                                    err.responseJSON.error.message);
+                            }
+                        });
                 }
             }.bind(this))
                 .fail(function (err) {
-                    console.log("Group overview update failed: "+err);
+                    console.log("Error:",err);
+                    if (this.props.logger != null) {
+                        this.props.logger.error(err.responseJSON.error.title,
+                                                err.responseJSON.error.message);
+                    }
                 });
         }.bind(this);
 
