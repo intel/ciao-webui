@@ -688,7 +688,7 @@ ul> li> a{
     font-family: arial;
 }
 
-#log-content div.alert-danger {
+div .alert-danger {
     float: left;
     width: 100%;
 }
