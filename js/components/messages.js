@@ -125,7 +125,7 @@ var messages = React.createClass({
             <div>
                 {render}
             <div className="log-content">
-                {rows}
+                {(() => count > 1?rows:null)()}
             </div>
             </div>
         );
