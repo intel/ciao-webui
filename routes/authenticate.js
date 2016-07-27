@@ -128,13 +128,20 @@ router.post('/login', function(req, res, next) {
 
         },
         fail: function (err) {
-        for (var error in err) {
-            var status = ['EHOSTDOWN', 'ETIMEDOUT', 'ECONNREFUSED']
-                .indexOf(err[error].code) >= 0 ? 503 : 401;
-        }
-        if (process.env.NODE_ENV != 'production') {
+            for (var error in err) {
+                var status = ['EHOSTDOWN',
+                              'ETIMEDOUT',
+                              'ECONNREFUSED',
+                              'EHOSTUNREACH']
+                        .indexOf(err[error].code) >= 0 ? 503 : 401;
+            }
+            if (process.env.NODE_ENV != 'production') {
                 console.log(err);
             }
+            if (err.error.title === undefined)
+                err.error.title = err.error.title = "A '"
+                + err.error.code
+                +"' has ocurred";
             res.status(status)
                 .send(err?err:{error: "Unknown error"})
                 .end();

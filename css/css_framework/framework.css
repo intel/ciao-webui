@@ -678,3 +678,17 @@ ul> li> a{
     display: none;
     height: 150px;
 }
+
+.alert-btn-close {
+    float: right;
+    background: none;
+    border: none;
+    color: gray;
+    font-weight: bold;
+    font-family: arial;
+}
+
+#log-content div.alert-danger {
+    float: left;
+    width: 100%;
+}

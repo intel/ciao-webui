@@ -85,7 +85,8 @@ var messages = React.createClass({
             return (<div className={type}>
                     {row.title ? row.title: "Unknown error"}
                     <button
-                    onClick={this.removeRow(row.id)}>x
+                        className="alert-btn-close"
+                        onClick={this.removeRow(row.id)}>x
                     </button>
                     {(() => {
                         if (row.action) {
