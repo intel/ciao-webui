@@ -89,7 +89,6 @@ var loginForm = React.createClass({
                     this.setState({'showMsgWarning': true});
                     this.setState({'showMsgDanger': false});
                 }
-                this.setState({'showMsgWarning': true});
             }.bind(this));
     },
 
