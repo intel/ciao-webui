@@ -15,7 +15,7 @@ var customTable = React.createClass({
         };
     },
     selectRow: function (selectedRow) {
-        var key = 'id';
+        var key = this.props.id;
         var newSelected = [];
 
         //first element
@@ -67,7 +67,6 @@ var customTable = React.createClass({
     getTableBody: function(){
         var table_body;
 
-        console.log('this.props.data', this.props.data);
         try {
             table_body = this.props.data.map((row, i) => {
                     var columns = [];
