@@ -38,6 +38,9 @@ router.post('/:tenant/volumes', blockService.createVolume());
 //Block Service DELETE Methods
 router.delete('/:tenant/volumes/:volume_id', blockService.deleteVolume());
 
+// Block Service PUT Methods
+router.put('/:tenant/volumes/:volume_id', blockService.updateVolume());
+
 /* Endpoints compatible with ciao native API*/
 // Tenant service POST Methods
 router.post('/:tenant/servers', tenantService.createServers());

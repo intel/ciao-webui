@@ -45,4 +45,20 @@ blockService.prototype.createVolume = function () {
     };
 };
 
+blockService.prototype.updateVolume = function () {
+    var adapter = this.adapter;
+    var tokenManager = this.tokenManager;
+    return function (req, res, next) {
+        var uri = "/v2/"+req.params.tenant+"/volumes/"+req.params.volume_id;
+
+        var volume = req.body.volume? req.body :{ volume: {
+            size:req.body.size,
+            name: req.body.name
+        }};
+        return adapter.onSuccess((data) => res.send(data.json))
+            .onError((data) => res.send(data))
+            .put(uri,volume,req.session.token);
+    };
+};
+
 module.exports = blockService;
