@@ -225,11 +225,13 @@ var httpResponse = function (next, errCallback) {
             this.raw = chunk;
             this.statusCode = response.statusCode;
             this.json = {};
-            if (response.statusCode == 200) {
+            if (response.statusCode == 200 || response.statusCode == 202) {
                 try {
+                    console.log(chunk);
                     this.json = JSON.parse(chunk);
                 }catch(e){
-                    this.json = {error:e};
+                    // No response body in JSON format
+                    this.json = null;
                 }
             } else {
                 this.json = {error:response.statusCode};

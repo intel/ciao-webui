@@ -3,9 +3,9 @@ var repl = require("repl");
 var ciaoAdapter = require('../core/ciao_adapter');
 var querystring = require('querystring');
 var TokenManager = new require('../core/tokenManager');
-var NodeService = require('../core/nodeService');
-var TenantService = require('../core/tenantService');
 var sessionHandler = require('../core/session');
+var BlockService = require('../core/blockService');
+
 var username, password, token;
 
 process.argv.forEach((value) => {
@@ -60,23 +60,50 @@ token = sessionHandler
                     };
 
                     replServer.context.scope = scope;
+
+                    // Block service methods
                     replServer.context.block = {};
                     replServer.context.block.adapter =
                         new ciaoAdapter(blockHostname,blockPort, blockProtocol);
+
+                    var blockService = new BlockService(
+                        replServer.context.block.adapter,
+                        tokenManager);
+
                     replServer.context.block.volumes = function () {
-                        return replServer.context.block.adapter.onSuccess(
-                            (data) => {return data;})
-                            .get("/v2/"+replServer.context.project+"/volumes",
-                                 replServer.context.req.session.token);
+                        return blockService.getVolumes()(
+                            Object.assign({
+                                params:{tenant:replServer.context.project}
+                            },replServer.context.req),
+                            {send:function(d){
+                                console.log(d);
+                            }}
+                            ,null);
                     };
-                    replServer.context.block.createVolume = function (name,
-                                                                      size) {
-                        var obj = {volume: {name:name, size:size}};
-                        return replServer.context.block.adapter.onSuccess(
-                            (data) => {return data;})
-                            .post("/v2/"+replServer.context.project+"/volumes",
-                                  obj,
-                                  replServer.context.req.session.token);
+
+                    replServer.context.block.deleteVolume = function (id) {
+                        return blockService.deleteVolume()(
+                            Object.assign({
+                                params:{tenant:replServer.context.project,
+                                        volume_id:id}
+                            },replServer.context.req),
+                            {send:function(d){
+                                console.log(d);
+                            }}
+                            ,null);
+                    };
+
+                    replServer.context.block.createVolume = function (n, s) {
+                        return blockService.createVolume()(
+                            Object.assign({
+                                params:{tenant:replServer.context.project},
+                                body: {name:n,size:s}
+                            },replServer.context.req),
+                            {send:function(d){
+                                console.log(d);
+                            }}
+                            ,null);
+
                     };
 
                     var tenants = sessionHandler
