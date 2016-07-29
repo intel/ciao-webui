@@ -34,7 +34,8 @@ blockService.prototype.createVolume = function () {
     var tokenManager = this.tokenManager;
     return function (req, res, next) {
         var uri = "/v2/"+req.params.tenant+"/volumes";
-        var volume = { volume: {
+
+        var volume = req.body.volume? req.body :{ volume: {
             size:req.body.size,
             name: req.body.name
         }};
