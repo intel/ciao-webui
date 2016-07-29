@@ -30,13 +30,13 @@ router.delete('/:tenant/servers/:server', function (req, res, next) {
 
 /* Enpoints compatible with block storage API */
 // Block service GET Methods
-router.get('/:tenant/volumes', BlockService.getVolumes());
+router.get('/:tenant/volumes', blockService.getVolumes());
 
 // Block service POST Methods
-router.post('/:tenant/volumes', BlockService.createVolume());
+router.post('/:tenant/volumes', blockService.createVolume());
 
 //Block Service DELETE Methods
-router.delete('/:tenant/volumes/:volume_id', BlockService.deleteVolume());
+router.delete('/:tenant/volumes/:volume_id', blockService.deleteVolume());
 
 /* Endpoints compatible with ciao native API*/
 // Tenant service POST Methods
