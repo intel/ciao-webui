@@ -49,7 +49,8 @@ ciaoAdapter.prototype.delete = function (path,token, next){
     req.on('error', function (err) {
         if (process.env.NODE_ENV != 'production')
             console.log("ERROR: %s",err);
-        next();
+        if (next instanceof Function)
+            next();
     });
     req.end();
     return response;
@@ -73,7 +74,8 @@ ciaoAdapter.prototype.get = function (path,token, next){
     req.on('error', function (err) {
         if (process.env.NODE_ENV != 'production')
             console.log("ERROR: %s",err);
-        next();
+        if (next instanceof Function)
+            next();
     });
     req.end();
     return response;

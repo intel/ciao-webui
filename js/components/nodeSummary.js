@@ -7,7 +7,10 @@ var NoData = require('./noData.js');
 var nodeSummary = React.createClass({
 
     getInitialState: function() {
-        return {updating: false};
+        return {
+            updating: false,
+            logger: null
+        };
     },
 
     componentDidMount: function() {
@@ -34,7 +37,15 @@ var nodeSummary = React.createClass({
                     this.setState({updating:false});
                     datamanager.setDataSource('node-summary',fmtData);
                 }
-            }.bind(this));
+            }.bind(this))
+                .fail(function (err) {
+                    console.log("Error:",err);
+                    if (this.props.logger != null) {
+                        this.props.logger.error(
+                            err.responseJSON.error.title,
+                            err.responseJSON.error.message);
+                    }
+                });
         }.bind(this);
         update();
         window.setInterval(function () {

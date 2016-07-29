@@ -5,11 +5,15 @@ var GroupOverview = require('../components/groupOverview.js');
 var UsageSummary = require('../components/usageSummary.js');
 var AddInstances = require('../components/addInstances.js');
 var navbar = require('../components/navbar.js');
+var Logger = require('../util/logger.js');
 var $ = require('jquery');
 
 $('document').ready(function () {
 
-    //create usage summary
+    // Create Logger object
+    window.logger = new Logger('logger-container');
+
+    // create usage summary
     // How to use Usage Summary
     // first use a data source compatible for componenet.
 
@@ -28,8 +32,8 @@ $('document').ready(function () {
     // Component to Add instances
     datamanager.onDataSourceSet('add-instances', function (sourceData) {
         ReactDOM.render(
-        <AddInstances sourceData={sourceData}/>,
-        document.getElementById("add-instances"));
+            <AddInstances sourceData={sourceData} logger={logger}/>,
+            document.getElementById("add-instances"));
     });
 
     //Usage summary
@@ -38,7 +42,7 @@ $('document').ready(function () {
         var refresh = (datamanager.data.REFRESH | 3000);
         sourceData.refresh = Number(refresh);
         ReactDOM.render(
-            <UsageSummary {...sourceData}/>,
+            <UsageSummary {...sourceData} logger={logger}/>,
             document.getElementById("usage-summary"));
     });
     // react hierarchy would be re-rendered
@@ -83,7 +87,7 @@ $('document').ready(function () {
         var refresh = (datamanager.data.REFRESH | 3000);
         sourceData.refresh = Number(refresh);
         ReactDOM.render(
-                <GroupOverview {...sourceData}/>,
+                <GroupOverview {...sourceData} logger={logger}/>,
             document.getElementById("workloads-container"));
     });
     var getFlavors = function (attempts) {

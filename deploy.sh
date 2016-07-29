@@ -26,6 +26,7 @@ cp js/util/validations.js public/javascripts/library/validations.js
 
 # Relocate css files to build directory
 mkdir -p build/stylesheets
+
 cp css/css_framework/framework.css build/stylesheets
 cp css/d3_components/d3Framework.css build/stylesheets
 
