@@ -254,7 +254,8 @@ var httpResponse = function (next, errCallback) {
             this.json = {};
             if (response.statusCode == 200 || response.statusCode == 202) {
                 try {
-                    console.log(chunk);
+                    if (process.env.NODE_ENV != 'production')
+                        console.log(chunk);
                     this.json = JSON.parse(chunk);
                 }catch(e){
                     // No response body in JSON format
