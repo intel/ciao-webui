@@ -108,6 +108,33 @@ ciaoAdapter.prototype.post = function (path, data,token, next){
     return response;
 };
 
+ciaoAdapter.prototype.put = function (path, data,token, next){
+    var options = getHttpOptions(this.host,
+                                 this.port,
+                                 path,
+                                 "PUT",
+                                 this.protocol,
+                                 token);
+    var dataString = JSON.stringify(data);
+    // get content-length and add to header
+    options.headers["Content-Length"] = dataString.length;
+    var response;
+    if (!next) {
+        response = new httpResponse(this.successCallback, this.errorCallback);
+    } else {
+        response = new httpResponse(next);
+    }
+    var req = this.http.request(options, response.callback);
+    req.on('error', function (err) {
+        if (process.env.NODE_ENV != 'production')
+            console.log("ERROR: %s",err);
+        next();
+    });
+    req.write(dataString);
+    req.end();
+    return response;
+};
+
 // Declarative style methods for CIAO Adapter
 // Note: declarative methods are not "RESTful" use for  testing purposes only
 // DO NOT implement more methods than required, use .get, .post instead
@@ -225,11 +252,13 @@ var httpResponse = function (next, errCallback) {
             this.raw = chunk;
             this.statusCode = response.statusCode;
             this.json = {};
-            if (response.statusCode == 200) {
+            if (response.statusCode == 200 || response.statusCode == 202) {
                 try {
+                    console.log(chunk);
                     this.json = JSON.parse(chunk);
                 }catch(e){
-                    this.json = {error:e};
+                    // No response body in JSON format
+                    this.json = null;
                 }
             } else {
                 this.json = {error:response.statusCode};

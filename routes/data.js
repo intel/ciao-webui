@@ -6,13 +6,13 @@ var querystring = require('querystring');
 var TokenManager = new require('../core/tokenManager');
 var NodeService = require('../core/nodeService');
 var TenantService = require('../core/tenantService');
-
+var BlockService = require('../core/blockService');
 // Set up
 var adapter = new ciaoAdapter();
 var tokenManager = new TokenManager(sessionHandler);
 var nodeService = new NodeService(adapter, tokenManager);
 var tenantService = new TenantService(adapter, tokenManager);
-
+var blockService = new BlockService(adapter, tokenManager);
 // Validate session as an authorized token is required
 router.use(sessionHandler.validateSession);
 
@@ -28,6 +28,20 @@ router.delete('/:tenant/servers/:server', function (req, res, next) {
         .validate(req, res);
 });
 
+/* Enpoints compatible with block storage API */
+// Block service GET Methods
+router.get('/:tenant/volumes', blockService.getVolumes());
+
+// Block service POST Methods
+router.post('/:tenant/volumes', blockService.createVolume());
+
+//Block Service DELETE Methods
+router.delete('/:tenant/volumes/:volume_id', blockService.deleteVolume());
+
+// Block Service PUT Methods
+router.put('/:tenant/volumes/:volume_id', blockService.updateVolume());
+
+/* Endpoints compatible with ciao native API*/
 // Tenant service POST Methods
 router.post('/:tenant/servers', tenantService.createServers());
 router.post('/:tenant/servers/action', tenantService.postServersAction());
