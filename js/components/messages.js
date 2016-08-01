@@ -114,7 +114,7 @@ var messages = React.createClass({
         console.log("count and rows",count,"rows:",rows);
          var render;
         if (count > 1) {
-            console.log("render shouyld get value");
+            console.log("render should get value");
             render = <div>There are {count} unsersolved errors
                 <span onClick={this.toggle}> <u>show details</u></span></div>;
         } else if (count === 1) {

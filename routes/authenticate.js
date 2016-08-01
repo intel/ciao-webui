@@ -134,6 +134,8 @@ router.post('/login', function(req, res, next) {
                               'ECONNREFUSED',
                               'EHOSTUNREACH']
                         .indexOf(err[error].code) >= 0 ? 503 : 401;
+                err.error.title = "Sorry, we could not connect with CIAO."
+                +" Please try again later.";
             }
             if (process.env.NODE_ENV != 'production') {
                 console.log(err);
