@@ -2,6 +2,7 @@ var React = require('react');
 var ReactDOM = require('react-dom');
 var d3LineChartDetail = require("../d3_components/d3LineChartDetail.js");
 var dom = require("react-faux-dom");
+//var $ = require('jquery');
 
 var lineChartDetail = React.createClass({
 
@@ -15,7 +16,6 @@ var lineChartDetail = React.createClass({
         today_00.setMinutes(0);
         today_00.setHours(0);
 
-
         return {
             d3node: null,
             timeFrom:today_00,
@@ -24,13 +24,11 @@ var lineChartDetail = React.createClass({
     },
 
     getDefaultProps: function() {
-
-        // timeframe: measured in days. 1 = 1 day
-
         return {
             width: 300,
             height: 350,
-            timeframe: 1
+            timeframe: 1,
+            refresh: 3500
         };
     },
 
@@ -47,6 +45,9 @@ var lineChartDetail = React.createClass({
 
     componentDidMount: function() {
         //set up Datepicker widget
+
+        // TO DO: Refactor code for create and update chart
+        // Current behaviour is not the expected
         $(".lc-datepicker").datepicker({
             onSelect: this.updateTimeFrame
         });
@@ -61,9 +62,7 @@ var lineChartDetail = React.createClass({
             if (this._dcontainer.offsetHeight > 50)
                 bundle.dimensions.height = this._dcontainer.offsetHeight;
         }
-
         this.lineChart = d3LineChartDetail.create(n, bundle, this.state);
-
         this.setState({d3node: this.lineChart.render()});
     },
 
@@ -72,15 +71,116 @@ var lineChartDetail = React.createClass({
 
         state.timeFrom = new Date(this.datepicker.from.value);
         state.timeTo = new Date(this.datepicker.to.value);
-        //time to goes to the end of the day
-        state.timeTo.setMinutes(1439);
-        //update state only if date is valid
-        if (!isNaN(state.timeFrom.getTime()) &&
-            !isNaN(state.timeTo.getTime())) {
+
+/* Functional code for connect data begin*/
+
+        // TO DO: relocate this function in the proper placeholder
+        // Current behaviour: is working with duplicated code for testing
+        // purposes
+
+        var callSource = function () {
+            if (this.state.updating == true)
+                return;
+            this.setState({updating: true});
+
+            var n = dom.createElement('svg');
+            var bundle = {props: this.props};
+
+            console.log("bundle",bundle);
+
+            if (this._dcontainer) {
+                bundle.dimensions = {};
+                console.log("www", this._dcontainer.offsetWidth);
+                console.log("hhh", this._dcontainer.offsetHeight);
+                if (this._dcontainer.offsetWidth > 50)
+                    bundle.dimensions.width = this._dcontainer.offsetWidth;
+                    bundle.dimensions.height = this.props.height;
+            }
+            this.lineChart.setData(this.props.data);
+            this.lineChart = d3LineChartDetail.create(n, bundle, this.state);
+            this.setState({d3node: this.lineChart.render()});
+
+            var url;
+            var memoryUsageData = [];
+
+            if (!datamanager.data.activeTenant){
+                // admin
+            } else {
+                // tenant
+                url = "/data/"+datamanager.data.activeTenant.id+
+                    this.props.source+"?start_date="+(state.timeFrom).toISOString()+
+                    "&end_date="+(state.timeTo).toISOString();
+            }
+            $.get({
+                url:url})
+                .done(function (data) {
+                    var fmtData;
+                    if (data) {
+                        if (this.props.title === "Memory usage") {
+                            data.usage.forEach((rowData) => {
+                                memoryUsageData.push({
+                                    dateValue : new Date(rowData.timestamp),
+                                    usageValue: rowData.ram_usage
+                                });
+                            });
+                            console.log("MemoryUsageData ",this.props.data);
+                            this.setState({updating: false});
+                            datamanager.setDataSource('memory-usage-summary',{
+                                source: this.props.source,
+                                start_date: state.timeFrom.toISOString(),
+                                end_date: state.timeFrom.toISOString(),
+                                data:memoryUsageData
+                            });
+                        } else {
+                            console.log("no data to show");
+                        }
+                        /*} else {
+                            console.log("no entro");
+                            this.setState({updating: false});
+                            datamanager.setDataSource('memory-usage-summary',{
+                                source: this.props.source,
+                                start_date: this.props.start_date,
+                                end_date: this.props.end_date,
+                                data:data
+                            });
+                        }*/
+                    }
+                }.bind(this))
+                .fail(function (err) {
+                    this.setState({updating: false});
+                    datamanager.setDataSource('memory-usage-summary',{
+                        source: this.props.source,
+                        start_date: this.props.start_date,
+                        end_date: this.props.end_date});
+                }.bind(this));
+
+        }.bind(this);
+        callSource();
+
+        window.setInterval(function () {
+            callSource();
             this.lineChart.setState(state);
             state.d3node = this.lineChart.render();
             this.setState(state);
-        }
+        }.bind(this), Number(this.props.refresh));
+
+
+/* Functional code for connect data ends*/
+
+        //console.log("propiedades", this.props);
+
+
+        //console.log("de",state.timeFrom);
+        //console.log("a ",state.timeTo);
+        //time to goes to the end of the day
+        //state.timeTo.setMinutes(1439);
+        //update state only if date is valid
+        /*if (!isNaN(state.timeFrom.getTime()) &&
+            !isNaN(state.timeTo.getTime())) {*/
+            this.lineChart.setState(state);
+            state.d3node = this.lineChart.render();
+            this.setState(state);
+        //}
     },
 
     getTimeFrameControl: function () {
@@ -130,6 +230,7 @@ var lineChartDetail = React.createClass({
     },
 
     render: function() {
+        console.log("propiedades", this.props);
         if (this.state.d3node != null) {
             var LineChart = this.state.d3node.toReact();
             return (<div>
