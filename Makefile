@@ -44,12 +44,13 @@ uninstall:
 
 install-dev:
 	# Update/download the required dependencies for the project
+	-mkdir node_modules
 	-cp -r vendor/* node_modules/
 	-npm install
 	# installing Babel and Browserify globally
 	-npm install --global babel-cli
 	-npm install --global browserify
-	-npm install --global babel-preset-es2015 babel-preset-react
+	-npm install babel-preset-es2015 babel-preset-react
 	#Build react + jsx code and put in build directory
 	-npm run babel-react
 	# Run build scripts
@@ -61,7 +62,6 @@ install-dev:
 	-npm run build-subnet
 	-npm run build-group
 	-mkdir -p public/javascripts/library
-	-mkdir node_modules
 	-mkdir -p build/stylesheets
 	-cp views/default_template.ejs views/$(file)
 	-cp css/css_framework/framework.css build/stylesheets
