@@ -101,68 +101,54 @@ var catalogue = React.createClass({
             }
         };
     },
-
+    //click on a row
     onSelectRow: function (selected) {
+
         this.hideAlert();
         this.setState({ selectedInstance: selected });
     },
+    //select from dropdown
     selectInstances: function (query) {
+
         var key = Object.keys(query);
 
-        var selectedInstance = this.props.data.filter(function (instance) {
-            return instance[key] == query[key];
-        });
+        if(query[key] == 'all'){
+            var selected = this.props.data.filter(function (instance) {
+                return true;
+            });
 
-        var allInstances = this.props.data.filter(function (instance) {
-            return instance[key] == query[key];
-        });
+            this.setState({ selectedInstance: selected });
+        }else{
+            if(query[key] == 'none'){
+                this.setState({ selectedInstance: [] });
+            }else{
+                var selectedInstance = this.props.data.filter(function (instance) {
+                    return instance[key] == query[key];
+                });
 
-        this.showAlert({
-            selectedPage: {
-                selectInPage: selectedInstance.length,
-                selectInAllPages: allInstances.length,
-                action: query[key],
-                onClick: this.selectInstances.bind(null, query, true)
-            },
-            alertType: "alert frm-alert-information"
-        });
+                var allInstances = this.props.data.filter(function (instance) {
+                    return instance[key] == query[key];
+                });
+               
+                this.showAlert({
+                    selectedPage: {
+                        selectInPage: selectedInstance.length,
+                        selectInAllPages: allInstances.length,
+                        action: query[key],
+                        onClick: this.selectInstances.bind(null, query, true)
+                    },
+                    alertType: "alert frm-alert-information"
+                });
 
-        this.setState({ selectedInstance: selectedInstance });
-    },
-    unselectAllInstances: function () {
-        console.log('acaaa');
-        this.setState({ selectedInstance: [] });
-        this.hideAlert();
-    },
-    selectAllInstances: function () {
-        this.setState({ selectedInstance: this.props.data });
-        this.hideAlert();
+                this.setState({ selectedInstance: selectedInstance });
+            }
+        }
     },
     isChecked: function  (row, selectedRows) {
         var entry = selectedRows.find(function (element) {
             return element[this.props.id] == row[this.props.id];
         });
         return entry;
-    },
-    addDefaultDropDownActions: function (items) {
-
-        if (!items[0] || items[0].name != 'all') {
-            items.unshift({
-                label: 'All',
-                name: 'all',
-                onClick: this.selectAllInstances
-            });
-        }
-
-        if (items[items.length - 1].name != 'none') {
-            items.push({
-                label: 'None',
-                name: 'none',
-                onClick: this.unselectAllInstances
-            });
-        }
-
-        return items;
     },
 
     getToolbarConfiguration: function () {
@@ -180,7 +166,6 @@ var catalogue = React.createClass({
                     .bind(null, query);
             }
         }
-        dropDownActions = this.addDefaultDropDownActions(dropDownActions);
 
         return {
             buttonItems: config.actions ? config.actions : [],
@@ -272,17 +257,13 @@ var catalogue = React.createClass({
     render: function () {
 
         var toolbarconfiguration = this.getToolbarConfiguration();
-
-        console.log('toolbarconfiguration', toolbarconfiguration);
         var tableconfiguration = this.getTableConfiguration();
 
         return React.createElement(
             'div',
             null,
             React.createElement(TableActionToolbar, _extends({
-                selectedInstance: this.state.selectedInstance,
-               // status: this.state.status,
-                //allItems: this.state.allItems
+                selectedInstance: this.state.selectedInstance
             }, toolbarconfiguration)),
             React.createElement(
                 'div',

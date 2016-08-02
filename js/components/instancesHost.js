@@ -28,7 +28,6 @@ var instancesHost = React.createClass({
     },
 
     actionAllInstances: function (status) {
-        console.log("action", status);
         var url = "/data/" + datamanager.data.activeTenant.id +
                 "/servers/action";
         $.ajax({
@@ -39,9 +38,9 @@ var instancesHost = React.createClass({
                   },
             dataType: "application/json"
         }).done(data => {
-            console.log(data);
+            console.log('data - action', data);
         }).fail(err => {
-            console.log(err);
+            console.log('err - action', err);
         });
     },
 
@@ -122,20 +121,20 @@ var instancesHost = React.createClass({
         }
 
         if (status !== "all") {
-            this.refs.catalogue.showModal({
+            /*this.refs.catalogue.showModal({
                 title: 'Remove Instance(s)',
                 body: "You're about to remove an instance, this may result in "
                 + "a loss of data. Are you sure you want to remove?",
                 onAccept: this.deleteInstance,
                 acceptText: 'Remove'
-            });
+            });*/
         } else {
-            this.refs.catalogue.showModal({
+          /*  this.refs.catalogue.showModal({
                 title: modalTitle,
                 body: modalBody,
                 onAccept: this.actionAllInstances,
                 acceptText: modalAceptText
-            });
+            });*/
         }
     },
 
@@ -143,18 +142,19 @@ var instancesHost = React.createClass({
         var disabled = true;
         if (item.length > 0) {
             var firstElement = item[0];
-            if (firstElement.State != 'active' && firstElement.State != 'starting') {
+            if (firstElement.status != 'active' && firstElement.status != 'starting') {
                 disabled = false;
             }
         }
-        return false;
+
+        return disabled;
     },
 
     disabledStopButton: function (item) {
         var disabled = true;
         if (item.length > 0) {
             var firstElement = item[0];
-            if (firstElement.State != 'stopped' && firstElement.State != 'exited') {
+            if (firstElement.status != 'stopped' && firstElement.status != 'exited') {
                 disabled = false;
             }
         }
@@ -189,15 +189,24 @@ var instancesHost = React.createClass({
     },
 
     getDropdownActions: function () {
-        return [{
-            label: 'All Active',
-            name: 'active',
-            query: { 'State': 'active' }
-        }, {
-            label: 'All Stopped',
-            name: 'stopped',
-            query: { 'State': 'exited' }
-        }];
+        return [
+            {
+                label:'All',
+                name:'all',
+                query: {'status':'all'}
+            },{
+                label: 'All Active',
+                name: 'active',
+                query: { 'status': 'active' }
+            }, {
+                label: 'All Stopped',
+                name: 'stopped',
+                query: { 'status': 'exited' }
+            },{
+                label:'None',
+                name:'none',
+                query: {'status':'none'}
+            }];
     },
 
     getSearchfields: function () {
@@ -263,32 +272,6 @@ var instancesHost = React.createClass({
         //componentShouldUpdate
     },
 
-    selectAll: function (status,action) {
-        return function () {
-            actionString = "";
-            switch (action) {
-                case "Start":
-                actionString = "os-start";
-                break;
-                case "Stop":
-                actionString = "os-stop";
-                break;
-                case "Remove":
-                actionString = "os-delete";
-                break;
-            }
-
-            // refactor ... testing
-            this.confirmDelete(status, actionString);
-            var s = this.state;
-            s.selectAll = true;
-            this.setState(s);
-        }.bind(this);
-    },
-
-    componentWillMount: function () {
-    },
-
     render: function () {
         var columns = [];
         if (this.props.data.length > 0) {
@@ -304,7 +287,6 @@ var instancesHost = React.createClass({
             dropDownActions: this.getDropdownActions(),
             searchFields: this.getSearchfields(),
             onChangePage: this.onChangePage,
-            selectAll: this.selectAll,
             id:'instance_id',
             ref: 'catalogue',
             searchTitle: 'Search Instances',

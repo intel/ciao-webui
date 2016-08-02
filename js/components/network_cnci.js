@@ -102,32 +102,23 @@ var networkCnci = React.createClass({
             return false;
         return true;
     },
-
-    selectAll: function (status,action) {
-        return function () {
-            var actionString = "";
-            switch (action) {
-                case "Start":
-                    actionString = "os-start";
-                    break;
-                case "Stop":
-                    actionString = "os-stop";
-                    break;
-                case "Remove":
-                    actionString = "os-delete";
-                    break;
+    getDropdownActions: function(){
+        return [
+            {
+                label:'All',
+                name:'all',
+                query: {'status':'all'}
+            },
+            {
+                label:'None',
+                name:'none',
+                query: {'status':'none'}
             }
-            this.actionAllInstances(status,actionString);
-            var s = this.state;
-            s.selectAll = true;
-            this.setState(s);
-        }.bind(this);
+        ];
     },
     render: function() {
         var columns = [];
         if (this.props.data) {
-            //this.props.count = (this.props.data).length;
-            //console.log("count2", this.props.count);
             columns= Object.keys(this.props.data[0]).map(function(text){
                 return text.replace('_', ' ');
             });
@@ -146,7 +137,7 @@ var networkCnci = React.createClass({
             columns={columns}
             id='cnci_uuid'
             actions={this.getActions()}
-            selectAll= {this.selectAll}
+            dropDownActions= {this.getDropdownActions()}
             searchFields={this.getSearchfields()}
             searchTitle= 'Search Network'
             />
