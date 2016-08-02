@@ -17,12 +17,6 @@ var customAlert = React.createClass({
                             {selectedPage.action}&nbsp;
                             instances selected. &nbsp;
                         </span>
-                        <span className="frm-link"
-                                onClick={selectedPage.onClick}>
-                            Select all&nbsp;
-                            {selectedPage.action}&nbsp;
-                            instances
-                        </span>
                     </div>;
         }else{
             if(this.props.selectedAll){

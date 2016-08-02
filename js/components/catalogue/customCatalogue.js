@@ -102,87 +102,55 @@ var catalogue = React.createClass({
         };
     },
 
-    selectInstance: function (selected) {
-        //merge con selectInstances
+    onSelectRow: function (selected) {
         this.hideAlert();
         this.setState({ selectedInstance: selected });
     },
+    selectInstances: function (query) {
+        var key = Object.keys(query);
 
-    selectInstances: function (query, inAllItems) {
+        var selectedInstance = this.props.data.filter(function (instance) {
+            return instance[key] == query[key];
+        });
 
-        var selectedInstance = [];
-        var allInstances = [];
-        var key = [];
+        var allInstances = this.props.data.filter(function (instance) {
+            return instance[key] == query[key];
+        });
 
-        // inAllItems will trigger action by tenant on all instances matching
-        // the selected state
-        var data = inAllItems ? [] : this.props.data;
-        var newState = {};
-        if (query) {
-            key = Object.keys(query);
-            newState.status = query.state;
-        } else {
-            newState.status = null;
-        }
+        this.showAlert({
+            selectedPage: {
+                selectInPage: selectedInstance.length,
+                selectInAllPages: allInstances.length,
+                action: query[key],
+                onClick: this.selectInstances.bind(null, query, true)
+            },
+            alertType: "alert frm-alert-information"
+        });
 
-        if (key.length > 0 && inAllItems == false) {
-            newState.allItems = false;
-            newState.status = null;
-            selectedInstance = data.filter(function (instance) {
-                return instance[key] == query[key];
-            });
-
-            allInstances = this.props.data.filter(function (instance) {
-                return instance[key] == query[key];
-            });
-            this.showAlert({
-                selectedPage: {
-                    selectInPage: selectedInstance.length,
-                    selectInAllPages: allInstances.length,
-                    action: query[key],
-                    onClick: this.selectInstances.bind(null, query, true)
-                },
-                alertType: "alert frm-alert-information"
-            });
-        } else if(inAllItems == true && query) {
-            newState.allItems = true;
-            newState.status = query[key];
-            this.showAlert({
-                selectedAll: {
-                    selectInAllPages: allInstances.length,
-                    status: query[key],
-                    onClick: this.unselectAllInstances
-                },
-                alertType: "alert frm-alert-information"
-            });
-        }else {
-            //select all
-            newState.allItems = true;
-            newState.status = null;
-            selectedInstance = this.props.data;
-            this.hideAlert();
-        }
-
-        if(inAllItems ==true && query) {
-            if (!query.State)
-                newState.status = "all";
-        }
-        newState.selectedInstance = selectedInstance;
-        newState.selectAll = true;
-        this.setState(newState);
+        this.setState({ selectedInstance: selectedInstance });
     },
     unselectAllInstances: function () {
-        this.setState({ allItems:false, selectedInstance: [], status:"none" });
+        console.log('acaaa');
+        this.setState({ selectedInstance: [] });
         this.hideAlert();
     },
-
+    selectAllInstances: function () {
+        this.setState({ selectedInstance: this.props.data });
+        this.hideAlert();
+    },
+    isChecked: function  (row, selectedRows) {
+        var entry = selectedRows.find(function (element) {
+            return element[this.props.id] == row[this.props.id];
+        });
+        return entry;
+    },
     addDefaultDropDownActions: function (items) {
 
         if (!items[0] || items[0].name != 'all') {
             items.unshift({
                 label: 'All',
                 name: 'all',
-                onClick: this.selectInstances.bind(null, {}, true)
+                onClick: this.selectAllInstances
             });
         }
 
@@ -204,13 +172,16 @@ var catalogue = React.createClass({
 
         if (config.dropDownActions) {
             dropDownActions = config.dropDownActions;
+
             for (var i = 0; i < dropDownActions.length; i++) {
+
                 var query = dropDownActions[i]['query'];
                 dropDownActions[i]['onClick'] = this.selectInstances
-                    .bind(null, query, false);
+                    .bind(null, query);
             }
         }
         dropDownActions = this.addDefaultDropDownActions(dropDownActions);
+
         return {
             buttonItems: config.actions ? config.actions : [],
             searchFields: config.searchFields ? config.searchFields : [],
@@ -257,7 +228,7 @@ var catalogue = React.createClass({
                 case 2:
                     // Use this function when selecting all instances by state
                     f = function (row) {
-                        return (row.State ==  state);
+                        return (row.status ==  state);
                     };
                     break;
                 case 3:
@@ -282,7 +253,7 @@ var catalogue = React.createClass({
             columns: config.columns ? config.columns : [],
             data: config.data ? config.data : [],
             pagination: pagination,
-            onSelectRow: this.selectInstance,
+            onSelectRow: this.onSelectRow,
             selectedRows: this.state.selectedInstance,
             isChecked: isChecked,
             id:config.id,
@@ -301,6 +272,8 @@ var catalogue = React.createClass({
     render: function () {
 
         var toolbarconfiguration = this.getToolbarConfiguration();
+
+        console.log('toolbarconfiguration', toolbarconfiguration);
         var tableconfiguration = this.getTableConfiguration();
 
         return React.createElement(
@@ -308,9 +281,8 @@ var catalogue = React.createClass({
             null,
             React.createElement(TableActionToolbar, _extends({
                 selectedInstance: this.state.selectedInstance,
-                status: this.state.status,
-                allItems: this.state.allItems,
-                selectAll: this.props.selectAll
+               // status: this.state.status,
+                //allItems: this.state.allItems
             }, toolbarconfiguration)),
             React.createElement(
                 'div',
