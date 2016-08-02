@@ -13,21 +13,12 @@ var tableActionToolbar = React.createClass({
     getInitialState: function() {
         return {};
     },
-    isButtonDisabled: function(buttonName){
-
-        return this.props.disabledButtons.find(function(item){
-            return item == buttonName;
-        });
-    },
     render: function() {
         var buttons = this.props.buttonItems.map((item, i) => {
-            var execute = this.props.allItems == true ?
-                this.props.selectAll(this.props.status,item.name) :
-                item.onClick.bind(null, this.props.selectedInstance);
 
-            //disabled={item.onDisabled(this.props.selectedInstance)}
                 return  <Button bsStyle={null} className="btn frm-btn-primary" key={i}
-                            onClick={execute}>
+                            onClick={item.onClick(this.props.selectedInstance)}
+                            disabled={item.onDisabled(this.props.selectedInstance)}>
                             {item.name}
                         </Button>;
             });
