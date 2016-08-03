@@ -667,3 +667,28 @@ ul> li> a{
 .frm-icon-container {
     display: inline-flex;
 }
+
+/*Logger*/
+#logger {
+    width: 100%;
+    text-align: center;
+}
+
+.log-content {
+    display: none;
+    height: 150px;
+}
+
+.alert-btn-close {
+    float: right;
+    background: none;
+    border: none;
+    color: gray;
+    font-weight: bold;
+    font-family: arial;
+}
+
+div .alert-danger {
+    float: left;
+    width: 100%;
+}

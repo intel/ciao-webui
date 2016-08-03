@@ -1,3 +1,5 @@
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var React = require('react');
 var ReactDOM = require('react-dom');
 var $ = require('jquery');
@@ -7,8 +9,12 @@ var NodeSummary = require('../components/nodeSummary.js');
 var Nodes = require('../components/nodes.js');
 var navbar = require('../components/navbar.js');
 var InstancesCounter = require('../components/instancesCounter.js');
+var Logger = require('../util/logger.js');
 
 $('document').ready(function () {
+
+    // Create Logger object
+    window.logger = new Logger('logger-container');
 
     var getUnitString = function (value) {
 
@@ -22,7 +28,7 @@ $('document').ready(function () {
     //Node Summary
     datamanager.onDataSourceSet('node-summary', function (sourceData) {
 
-        ReactDOM.render(React.createElement(NodeSummary, sourceData), document.getElementById("node-summary"));
+        ReactDOM.render(React.createElement(NodeSummary, _extends({}, sourceData, { logger: logger })), document.getElementById("node-summary"));
     });
     // react hierarchy would be re-rendered
     datamanager.setDataSource('node-summary', { sections: [], usageSummary: { elements: [] } });
@@ -30,7 +36,7 @@ $('document').ready(function () {
     //Usage Summary
     datamanager.onDataSourceSet('usage-summary', function (sourceData) {
         sourceData.source = "/nodes";
-        ReactDOM.render(React.createElement(UsageSummary, sourceData), document.getElementById("usage-summary"));
+        ReactDOM.render(React.createElement(UsageSummary, _extends({}, sourceData, { logger: logger })), document.getElementById("usage-summary"));
     });
     datamanager.setDataSource('usage-summary', { data: [] });
 

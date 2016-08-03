@@ -6,10 +6,16 @@ var ButtonInput = reactBootstrap.ButtonInput;
 
 var loginForm = React.createClass({
 
+    getDefaultProps: function() {
+        // Logger defaults to null
+        return {
+            logger: null
+        };
+    },
+
     getInitialState: function() {
         return {
-            showMsgWarning: false,
-            showMsgDanger: false
+            showMsgWarning: false
         };
     },
 
@@ -32,18 +38,7 @@ var loginForm = React.createClass({
                     </div>
                 </div>
             </div>);
-        } else if(this.state.showMsgDanger) {
-            return (<div className="alert frm-alert-information-icon" role="alert">
-                <div className="frm-icon-container">
-                    <span className="glyphicon glyphicon-info-sign frm-icon-extraSize">
-                    </span>
-                    <div className="frm-danger-message">
-                        Sorry, we could not connect with CIAO.
-                        Please try again later.
-                    </div>
-                </div>
-            </div>);
-        }else {
+        } else {
             return null;
         }
     },
@@ -57,6 +52,7 @@ var loginForm = React.createClass({
         // TODO: validate inputs (credentials)
         // ... validate parameters
         var url = "/authenticate/login";
+
         $.post({
                 url:"/authenticate/login",
                 data:credentials
@@ -69,14 +65,16 @@ var loginForm = React.createClass({
                 }
             }.bind(this))
             .fail(function (err) {
-                if (err.status === 500) {
+                if (Number(err.status) >= 500 || Number(err.status) == 408) {
                     this.setState({'showMsgWarning': false});
-                    this.setState({'showMsgDanger': true});
+
+                    if (this.props.logger != null) {
+                        this.props.logger.error(err.responseJSON.error.title,
+                                                err.responseJSON.error.message);
+                    }
                 } else if (err.status === 401) {
                     this.setState({'showMsgWarning': true});
-                    this.setState({'showMsgDanger': false});
                 }
-                console.log('err', err);
             }.bind(this));
     },
 
