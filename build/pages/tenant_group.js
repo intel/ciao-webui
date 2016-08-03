@@ -51,6 +51,7 @@ $('document').ready(function () {
     };
     //default data to use with add-instances and group-overview
 
+
     var workload = [{
         name: "BitCoin",
         title: "BitCoin",

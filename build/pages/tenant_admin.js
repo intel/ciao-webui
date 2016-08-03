@@ -1,3 +1,5 @@
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var React = require('react');
 var ReactDOM = require('react-dom');
 var InstancesHost = require('../components/instancesHost.js');
@@ -5,11 +7,15 @@ var GroupOverview = require('../components/groupOverview.js');
 var UsageSummary = require('../components/usageSummary.js');
 var AddInstances = require('../components/addInstances.js');
 var navbar = require('../components/navbar.js');
+var Logger = require('../util/logger.js');
 var $ = require('jquery');
 
 $('document').ready(function () {
 
-    //create usage summary
+    // Create Logger object
+    window.logger = new Logger('logger-container');
+
+    // create usage summary
     // How to use Usage Summary
     // first use a data source compatible for componenet.
 
@@ -26,7 +32,7 @@ $('document').ready(function () {
 
     // Component to Add instances
     datamanager.onDataSourceSet('add-instances', function (sourceData) {
-        ReactDOM.render(React.createElement(AddInstances, { sourceData: sourceData }), document.getElementById("add-instances"));
+        ReactDOM.render(React.createElement(AddInstances, { sourceData: sourceData, logger: logger }), document.getElementById("add-instances"));
     });
 
     //Usage summary
@@ -34,7 +40,7 @@ $('document').ready(function () {
         sourceData.source = "/quotas";
         var refresh = datamanager.data.REFRESH | 3000;
         sourceData.refresh = Number(refresh);
-        ReactDOM.render(React.createElement(UsageSummary, sourceData), document.getElementById("usage-summary"));
+        ReactDOM.render(React.createElement(UsageSummary, _extends({}, sourceData, { logger: logger })), document.getElementById("usage-summary"));
     });
     // react hierarchy would be re-rendered
     datamanager.setDataSource('usage-summary', { data: [] });
@@ -70,7 +76,7 @@ $('document').ready(function () {
     datamanager.onDataSourceSet('group-overview', function (sourceData) {
         var refresh = datamanager.data.REFRESH | 3000;
         sourceData.refresh = Number(refresh);
-        ReactDOM.render(React.createElement(GroupOverview, sourceData), document.getElementById("workloads-container"));
+        ReactDOM.render(React.createElement(GroupOverview, _extends({}, sourceData, { logger: logger })), document.getElementById("workloads-container"));
     });
     var getFlavors = function (attempts) {
         $.get({
