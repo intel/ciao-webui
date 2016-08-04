@@ -4,8 +4,12 @@
 // If no configuration file is set for ciao, hostname, port and protocol
 // may be set in this function.
 var ciaoAdapter = function (hostname, port, protocol) {
-    if (!hostname || !port || !protocol) {
-        var config = getConfig();
+    this.setup(hostname, port, protocol);
+};
+
+ciaoAdapter.prototype.setup = function (hostname, port, protocol){
+    if (this.node != undefined  && (!hostname || !port || !protocol)) {
+        var config = getConfig(this.node);
         this.host = config.host;
         this.port = config.port;
         this.protocol = config.protocol;
@@ -14,16 +18,18 @@ var ciaoAdapter = function (hostname, port, protocol) {
         this.protocol = protocol;
         this.host = hostname;
         this.port = port;
-        this.http = require(this.protocol);
+        this.http = require(this.protocol?this.protocol:"http");
     }
 };
 
 // Tell Ciao Adapter which node will it use
 // node is found in ciao_config.json, ex. values are 'controller', or 'block'
+// IMPORTANT: within current implementation, useNode MUST be used if params are
+// not being specified (hsotname, port and protocol)
 ciaoAdapter.prototype.useNode = function (node) {
-    var ca = Object.assign(new ciaoAdapter(this.host, this.port, this.protocol),
-                           this);
+    var ca = new ciaoAdapter();
     ca.node = node;
+    ca.setup();
     return ca;
 };
 
@@ -200,7 +206,7 @@ ciaoAdapter.prototype.getServersDetail = function (tenant_id,token, next){
 
 // Helper functions
 // Return json configuration from ciao_config.json file
-var getConfig = function () {
+var getConfig = function (node) {
     var file = global.CONFIG_FILE?
         global.CONFIG_FILE : "./config/ciao_config.json";
     var fs = require('fs');
@@ -208,7 +214,7 @@ var getConfig = function () {
     //GLOBAL overwrite
     var result;
     if (config[process.env.NODE_ENV])
-        result = config[process.env.NODE_ENV][this.node];
+        result = config[process.env.NODE_ENV][node];
     else
         result = {};
     if (global.CONTROLLER_ADDR)

@@ -10,9 +10,13 @@ var BlockService = require('../core/blockService');
 // Set up
 var adapter = new ciaoAdapter();
 var tokenManager = new TokenManager(sessionHandler);
-var nodeService = new NodeService(adapter, tokenManager,'controller');
-var tenantService = new TenantService(adapter, tokenManager,'controller');
-var blockService = new BlockService(adapter, tokenManager,'storage');
+
+var nodeService = new NodeService(adapter.useNode('controller'),
+                                  tokenManager);
+var tenantService = new TenantService(adapter.useNode('controller'),
+                                      tokenManager);
+var blockService = new BlockService(adapter.useNode('storage'),
+                                    tokenManager);
 // Validate session as an authorized token is required
 router.use(sessionHandler.validateSession);
 

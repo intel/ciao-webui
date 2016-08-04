@@ -2,14 +2,13 @@
   This is a client implementation for openstack's block storage api
 */
 
-var blockService = function (adapter, tokenManager,node) {
+var blockService = function (adapter, tokenManager) {
     this.adapter = adapter;
     this.tokenManager = tokenManager;
-    this.node = node;
 };
 
 blockService.prototype.getVolumes = function () {
-    var adapter = this.adapter.useNode(this.node);
+    var adapter = this.adapter;
     var tokenManager = this.tokenManager;
     return function (req, res, next) {
         var uri = "/v2/"+req.params.tenant+"/volumes";
