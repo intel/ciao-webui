@@ -18,6 +18,15 @@ var ciaoAdapter = function (hostname, port, protocol) {
     }
 };
 
+// Tell Ciao Adapter which node will it use
+// node is found in ciao_config.json, ex. values are 'controller', or 'block'
+ciaoAdapter.prototype.useNode = function (node) {
+    var ca = Object.assign(new ciaoAdapter(this.host, this.port, this.protocol),
+                           this);
+    ca.node = node;
+    return ca;
+};
+
 ciaoAdapter.prototype.onSuccess = function (callback) {
     var ca = Object.assign(new ciaoAdapter(this.host, this.port, this.protocol),
                            this);
@@ -199,7 +208,7 @@ var getConfig = function () {
     //GLOBAL overwrite
     var result;
     if (config[process.env.NODE_ENV])
-        result = config[process.env.NODE_ENV].controller;
+        result = config[process.env.NODE_ENV][this.node];
     else
         result = {};
     if (global.CONTROLLER_ADDR)

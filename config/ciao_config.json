@@ -5,6 +5,11 @@
             "port": "port number",
             "protocol": "http or https"
         },
+        "storage":{
+            "host": "hostname",
+            "port": "port number",
+            "protocol": "http or https"
+        },
         "keystone": {
             "host": "hostname",
             "port": "port number",
