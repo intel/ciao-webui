@@ -25,9 +25,9 @@ var lineChart = function (svgEl, bundle, state) {
     var to = state.timeTo;
 
     this.computeData = this.props.data.filter((d) => {
-        return (from.getTime() <= d.dateValue.getTime())
+        return (from.getTime() <= (new Date(d.dateValue)).getTime())
             &&
-            (to.getTime() >= d.dateValue.getTime());
+            (to.getTime() >= (new Date(d.dateValue)).getTime());
     });
 
     // setup multipliers for height and width
@@ -59,9 +59,9 @@ lineChart.prototype.setState = function (state) {
     var from = state.timeFrom;
     var to = state.timeTo;
         this.computeData = this.props.data.filter((d) => {
-        return (from.getTime() <= d.dateValue.getTime())
+        return (from.getTime() <= (new Date(d.dateValue)).getTime())
             &&
-            (to.getTime() >= d.dateValue.getTime());
+            (to.getTime() >= (new Date(d.dateValue)).getTime());
     });
 
     this.updateDomain();
@@ -70,9 +70,13 @@ lineChart.prototype.setState = function (state) {
 lineChart.prototype.updateDomain  = function () {
 
     this.computeX
+        /*.domain([
+            this.state.timeFrom,this.state.timeTo
+        ])
+        .nice(d3.time.week);*/
         .domain([
             this.state.timeFrom,this.state.timeTo
-        ]);
+        ])
 
     this.computeY
         .domain(d3.extent(this.computeData, function(d) {
@@ -81,13 +85,13 @@ lineChart.prototype.updateDomain  = function () {
     //re-compute line, x and y axis functions
     this.line = d3.svg.line()
         .interpolate("monotone")
-        .x((d) => this.computeX(d.dateValue))
+        .x((d) => this.computeX(new Date(d.dateValue)))
         .y((d) => this.computeY(d.usageValue));
 
     this.xAxis = d3.svg.axis()
         .scale(this.computeX)
         .orient("bottom")
-        .ticks(5)
+        .ticks(3)
         .tickFormat(d3.time.format("%d/%m/%Y"));
 
     this.yAxis = d3.svg.axis()
@@ -98,7 +102,7 @@ lineChart.prototype.updateDomain  = function () {
 
     this.area = d3.svg.area()
         .interpolate("monotone")
-        .x((d) => this.computeX(d.dateValue))
+        .x((d) => this.computeX(new Date(d.dateValue)))
         .y0(this.height*this.hmult)
         .y1((d) => this.computeY(d.usageValue));
 };

@@ -36,35 +36,15 @@ jQuery('document').ready(function () {
     var endDate = new Date();
 
     startDate.setHours(0,0,0,0);
-    endDate.setDate(startDate.getDate() +1);
+    startDate.setMonth(startDate.getMonth() -3);
+    endDate.setDate(startDate.getDate());
 
-    console.log("startDate",startDate);
-    console.log("endDate", endDate);
-
-    //sample linechart render
-
-    var d1 = new Date();
-
-    var d2 = new Date();
-    d2.setDate(d1.getDate() -2);
-
-    var d3 = new Date();
-    d3.setDate(d1.getDate() -4);
-
-    var lcdata = {
-        data: [{id: 1, dateValue:d1, usageValue:3},
-               {id: 2, dateValue:d2, usageValue:10},
-               {id: 3, dateValue:d3, usageValue:1}],
-        title: "Memory usage"
+    // default data
+    var usageData = {
+        data: [{}]
     };
-    lcdata.data.forEach((d)=> console.log(d.x));
 
-    /*datamanager.onDataSourceSet('line-chart1', function (sourceData) {
-        ReactDOM.render(<LineChartDetail {...sourceData}/>,
-            document.getElementById("memory-usage-details"));
-    });
-    datamanager.setDataSource('line-chart1', lcdata);*/
-    // LineChart Usage data
+    /* Memory Usage */
     datamanager.onDataSourceSet('memory-usage-summary', function (sourceData) {
         sourceData.source = "/resources";
         sourceData.start_date = startDate.toISOString();
@@ -75,6 +55,32 @@ jQuery('document').ready(function () {
     });
 
     //set data sources
-    datamanager.setDataSource('memory-usage-summary', lcdata);
+    datamanager.setDataSource('memory-usage-summary', usageData);
+
+    /* Processor Usage */
+    datamanager.onDataSourceSet('processor-usage-summary', function (sourceData) {
+        sourceData.source = "/resources";
+        sourceData.start_date = startDate.toISOString();
+        sourceData.end_date = endDate.toISOString();
+        sourceData.title = "Processor usage";
+        ReactDOM.render(<LineChartDetail {...sourceData}/>,
+            document.getElementById('processor-usage-details'));
+    });
+
+    //set data sources
+    datamanager.setDataSource('processor-usage-summary', usageData);
+
+    /* Disk Usage */
+    datamanager.onDataSourceSet('disk-usage-summary', function (sourceData) {
+        sourceData.source = "/resources";
+        sourceData.start_date = startDate.toISOString();
+        sourceData.end_date = endDate.toISOString();
+        sourceData.title = "Disk usage";
+        ReactDOM.render(<LineChartDetail {...sourceData}/>,
+            document.getElementById('disk-usage-details'));
+    });
+
+    //set data sources
+    datamanager.setDataSource('disk-usage-summary', usageData);
 
 });
