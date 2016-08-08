@@ -42,7 +42,6 @@ var lineChartDetail = React.createClass({
     componentDidMount: function() {
         // Call update function
         this.drawingChart();
-
     },
 
     drawingChart: function () {
@@ -55,13 +54,14 @@ var lineChartDetail = React.createClass({
 
             var n = dom.createElement('svg');
             var bundle = {props: this.props};
-
             if (this._dcontainer) {
                 bundle.dimensions = {};
+
                 if (this._dcontainer.offsetWidth > 50)
                     bundle.dimensions.width = this._dcontainer.offsetWidth;
                     bundle.dimensions.height = this.props.height;
             }
+
             this.lineChart = d3LineChartDetail.create(n, bundle, this.state);
             this.setState({d3node: this.lineChart.render()});
 
@@ -84,7 +84,6 @@ var lineChartDetail = React.createClass({
                         state.timeTo = new Date(data.to);
 
                         if (this.props.title === "Memory usage") {
-                            //this.setState({updating: false});
                             datamanager.setDataSource('memory-usage-summary',{
                                 source: this.props.source,
                                 start_date: this.props.start_date,
@@ -111,11 +110,11 @@ var lineChartDetail = React.createClass({
                     }
                 }.bind(this))
                 .fail(function (err) {
-                    //this.setState({updating: false});
                     datamanager.setDataSource('memory-usage-summary',{
                         source: this.props.source,
                         start_date: this.props.start_date,
-                        end_date: this.props.end_date});
+                        end_date: this.props.end_date
+                    });
                 }.bind(this));
 
         }.bind(this);
@@ -127,7 +126,6 @@ var lineChartDetail = React.createClass({
             state.d3node = this.lineChart.render();
             this.setState(state);
         }.bind(this), Number(this.props.refresh));
-
     },
 
     render: function() {

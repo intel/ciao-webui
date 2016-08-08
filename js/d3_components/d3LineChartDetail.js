@@ -70,13 +70,9 @@ lineChart.prototype.setState = function (state) {
 lineChart.prototype.updateDomain  = function () {
 
     this.computeX
-        /*.domain([
-            this.state.timeFrom,this.state.timeTo
-        ])
-        .nice(d3.time.week);*/
         .domain([
             this.state.timeFrom,this.state.timeTo
-        ])
+        ]);
 
     this.computeY
         .domain(d3.extent(this.computeData, function(d) {
