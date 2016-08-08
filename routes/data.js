@@ -38,6 +38,7 @@ router.get('/:tenant/volumes', blockService.getVolumes());
 
 // Block service POST Methods
 router.post('/:tenant/volumes', blockService.createVolume());
+router.post('/:tenant/volumes/:volume_id/action', blockService.attachVolume());
 
 //Block Service DELETE Methods
 router.delete('/:tenant/volumes/:volume_id', blockService.deleteVolume());

@@ -61,4 +61,28 @@ blockService.prototype.updateVolume = function () {
     };
 };
 
+// In order to attach volumes a json object with "os-attach" field is required.
+// os-attach is a json object with following parameters:
+// instance_uid (optional), host_name(optional), mountpoint(optional)
+// NOTE: at least one of 3 optional parameters is required.
+blockService.prototype.attachVolume = function() {
+    var adapter = this.adapter;
+    var tokenManager = this.tokenManager;
+    return function (req, res, next) {
+        var uri = "/v2/"+req.params.tenant + "/volumes/"
+                + req.params.volume_id
+                + "/action";
+        // if req.body is well built, use it as os_attach object
+        // otherwise, attempt to retrieve isntance_uuid value to construct it
+        var os_attach = req.body["os-attach"]?req.body:{
+            "os-attach":{
+                "instance_uuid":req.body.instance_uuid
+            }
+        };
+        return adapter.onSuccess((data) => res.send(data.json))
+            .onError((data) => res.send(data))
+            .post(uri, os_attach, req.session.token);
+    };
+};
+
 module.exports = blockService;
