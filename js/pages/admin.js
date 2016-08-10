@@ -7,6 +7,7 @@ var NodeSummary = require('../components/nodeSummary.js');
 var Nodes = require('../components/nodes.js');
 var navbar = require('../components/navbar.js');
 var InstancesCounter = require('../components/instancesCounter.js');
+var Logger = require('../util/logger.js');
 
 $('document').ready(function () {
 
