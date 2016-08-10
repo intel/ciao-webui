@@ -31,7 +31,7 @@ var tableActionToolbar = React.createClass({
 
         var dropDownActions = this.props.dropDownActions.map((item, i) => {
 
-                return  <MenuItem bsStyle={null} className="btn frm-btn-primary" key={i}
+                return  <MenuItem bsStyle={null}  key={i}
                             onClick={item.onClick}>
                             {item.label}
                         </MenuItem>;
