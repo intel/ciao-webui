@@ -153,11 +153,10 @@ var catalogue = React.createClass({
 
     getToolbarConfiguration: function () {
 
-        var config = this.props;
         var dropDownActions = [];
 
-        if (config.dropDownActions) {
-            dropDownActions = config.dropDownActions;
+        if (this.props.dropDownActions) {
+            dropDownActions = this.props.dropDownActions;
 
             for (var i = 0; i < dropDownActions.length; i++) {
 
@@ -168,10 +167,10 @@ var catalogue = React.createClass({
         }
 
         return {
-            buttonItems: config.actions ? config.actions : [],
-            searchFields: config.searchFields ? config.searchFields : [],
+            buttonItems: this.props.actions ? this.props.actions : [],
+            searchFields: this.props.searchFields ? this.props.searchFields : [],
             dropDownActions: dropDownActions,
-            searchTitle : config.searchTitle
+            searchTitle : this.props.searchTitle
         };
     },
 

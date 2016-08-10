@@ -16,8 +16,12 @@ var tableActionToolbar = React.createClass({
     render: function() {
         var buttons = this.props.buttonItems.map((item, i) => {
 
-                return  <Button bsStyle={null} className="btn frm-btn-primary" key={i}
-                            onClick={item.onClick(this.props.selectedInstance)}
+                var execute = item.onClick.bind(null, this.props.selectedInstance);
+
+                return  <Button bsStyle={null}
+                            className="btn frm-btn-primary"
+                            key={i}
+                            onClick={execute}
                             disabled={item.onDisabled(this.props.selectedInstance)}>
                             {item.name}
                         </Button>;
