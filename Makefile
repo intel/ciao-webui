@@ -61,6 +61,8 @@ install-dev:
 	-npm run build-network
 	-npm run build-subnet
 	-npm run build-group
+	-npm run build-forbidden
+	-npm run build-tenant-detail
 	-mkdir -p public/javascripts/library
 	-mkdir -p build/stylesheets
 	-cp views/default_template.ejs views/$(file)
@@ -77,6 +79,6 @@ install-dev:
 
 clean:
 	-rm -rf node_modules
-	-rm build/javascripts/.*js
+	-rm build/javascripts/*.js
 	-rm -rf public/*
 	-rm views/$(file)
