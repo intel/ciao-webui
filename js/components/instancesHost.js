@@ -129,44 +129,37 @@ var instancesHost = React.createClass({
                 acceptText: 'Remove'
             });*/
         } else {
-          /*  this.refs.catalogue.showModal({
+         /*   this.refs.catalogue.showModal({
                 title: modalTitle,
                 body: modalBody,
-                onAccept: this.actionAllInstances,
+                onAccept: this.masiveAction,
                 acceptText: modalAceptText
             });*/
         }
     },
 
-    disabledStartButton: function (item) {
-        var disabled = true;
-        if (item.length > 0) {
-            var firstElement = item[0];
-            if (firstElement.status != 'active' && firstElement.status != 'starting') {
-                disabled = false;
-            }
-        }
+    disabledStartButton: function (items) {
+        var find = items.filter(function(item){
+            return item.status == 'active'
+        })
 
-        return disabled;
+        return find.length == 0;
     },
 
-    disabledStopButton: function (item) {
-        var disabled = true;
-        if (item.length > 0) {
-            var firstElement = item[0];
-            if (firstElement.status != 'stopped' && firstElement.status != 'exited') {
-                disabled = false;
-            }
-        }
-        return disabled;
+    disabledStopButton: function (items) {
+        var find = items.filter(function(item){
+            return item.status == 'stopped' || item.status == 'exited'
+        })
+
+        return find.length == 0;
     },
 
-    disabledRemoveButton: function (item) {
-        var disabled = true;
-        if (item.length > 0) {
-            disabled = false;
+    disabledRemoveButton: function (items) {
+        var enabled = false;
+        if (items.length > 0) {
+            enabled = true;
         }
-        return disabled;
+        return !enabled;
     },
 
     getActions: function () {
