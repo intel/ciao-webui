@@ -1586,33 +1586,34 @@ var usageSummary = React.createClass({
     render: function () {
         var dynamicWidth = Math.round(12 / this.props.data.length);
         var elements = [];
+        var historyButton;
         var columnGrid, reference;
 
         if (this.props.data) {
             if (this.props.data.length > 3) {
                 // tenant
                 columnGrid = "col-xs-3 col-sm-3";
-                reference = "tenant/underConstruction";
+                reference = "tenant/usage";
             } else {
                 // admin
                 columnGrid = "col-xs-4 col-sm-4";
                 reference = "admin/underConstruction";
             }
 
-            this.props.data.forEach(props => {
-                elements.push(React.createElement(
-                    'div',
-                    { key: props.name, className: columnGrid },
-                    React.createElement(ElementSummary, props)
-                ));
-            });
+            if (this.props.data.length !== undefined) {
+                this.props.data.forEach(props => {
+                    elements.push(React.createElement(
+                        'div',
+                        { key: props.name, className: columnGrid },
+                        React.createElement(ElementSummary, props)
+                    ));
+                });
+            }
         }
 
-        return React.createElement(
-            'div',
-            { className: 'row' },
-            elements,
-            React.createElement(
+        if (this.props.history !== false) {
+            //View usage Histroy button
+            historyButton = React.createElement(
                 'div',
                 { className: 'col-xs-12 frm-body-h6' },
                 React.createElement(
@@ -1622,7 +1623,14 @@ var usageSummary = React.createClass({
                         href: reference },
                     'View Usage History'
                 )
-            )
+            );
+        }
+
+        return React.createElement(
+            'div',
+            { className: 'row' },
+            elements,
+            historyButton
         );
     }
 
@@ -63911,17 +63919,45 @@ var cachedClearTimeout;
 } ())
 function runTimeout(fun) {
     if (cachedSetTimeout === setTimeout) {
+        //normal enviroments in sane situations
         return setTimeout(fun, 0);
-    } else {
-        return cachedSetTimeout.call(null, fun, 0);
     }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedSetTimeout(fun, 0);
+    } catch(e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+            return cachedSetTimeout.call(null, fun, 0);
+        } catch(e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+            return cachedSetTimeout.call(this, fun, 0);
+        }
+    }
+
+
 }
 function runClearTimeout(marker) {
     if (cachedClearTimeout === clearTimeout) {
-        clearTimeout(marker);
-    } else {
-        cachedClearTimeout.call(null, marker);
+        //normal enviroments in sane situations
+        return clearTimeout(marker);
     }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedClearTimeout(marker);
+    } catch (e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+            return cachedClearTimeout.call(null, marker);
+        } catch (e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+            return cachedClearTimeout.call(this, marker);
+        }
+    }
+
+
+
 }
 var queue = [];
 var draining = false;
