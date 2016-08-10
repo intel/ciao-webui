@@ -61,6 +61,7 @@ install-dev:
 	-npm run build-network
 	-npm run build-subnet
 	-npm run build-group
+	-npm run build-forbidden
 	-npm run build-tenant-detail
 	-mkdir -p public/javascripts/library
 	-mkdir -p build/stylesheets
