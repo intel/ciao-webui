@@ -101,121 +101,107 @@ var catalogue = React.createClass({
             }
         };
     },
-
-    selectInstance: function (selected) {
-        //merge con selectInstances
+    //select a row
+    onSelectRow: function (selected) {
         this.hideAlert();
-        this.setState({ selectedInstance: selected });
+        this.setState({
+            selectedInstance: selected,
+            allItems:false,
+            status:null,
+        });
     },
+    selectAllRecords: function(key){
+        this.showAlert({
+            selectedAll: {
+                onClick: this.selectInstances.bind(null, {key:'none'})
+            },
+            alertType: "alert frm-alert-information"
+        });
 
-    selectInstances: function (query, inAllItems) {
-
-        var selectedInstance = [];
-        var allInstances = [];
-        var key = [];
-
-        // inAllItems will trigger action by tenant on all instances matching
-        // the selected state
-        var data = inAllItems ? [] : this.props.data;
-        var newState = {};
-        if (query) {
-            key = Object.keys(query);
-            newState.status = query.state;
-        } else {
-            newState.status = null;
-        }
-
-        if (key.length > 0 && inAllItems == false) {
-            newState.allItems = false;
-            newState.status = null;
-            selectedInstance = data.filter(function (instance) {
-                return instance[key] == query[key];
-            });
-
-            allInstances = this.props.data.filter(function (instance) {
-                return instance[key] == query[key];
-            });
-            this.showAlert({
-                selectedPage: {
-                    selectInPage: selectedInstance.length,
-                    selectInAllPages: allInstances.length,
-                    action: query[key],
-                    onClick: this.selectInstances.bind(null, query, true)
-                },
-                alertType: "alert frm-alert-information"
-            });
-        } else if(inAllItems == true && query) {
-            newState.allItems = true;
-            newState.status = query[key];
-            this.showAlert({
-                selectedAll: {
-                    selectInAllPages: allInstances.length,
-                    status: query[key],
-                    onClick: this.unselectAllInstances
-                },
-                alertType: "alert frm-alert-information"
-            });
-        }else {
-            //select all
-            newState.allItems = true;
-            newState.status = null;
-            selectedInstance = this.props.data;
-            this.hideAlert();
-        }
-
-        if(inAllItems ==true && query) {
-            if (!query.State)
-                newState.status = "all";
-        }
-        newState.selectedInstance = selectedInstance;
-        newState.selectAll = true;
-        this.setState(newState);
+        this.setState({
+            allItems:true,
+            status:'all',
+            selectedInstance: this.props.data
+        });
     },
-    unselectAllInstances: function () {
-        this.setState({ allItems:false, selectedInstance: [], status:"none" });
+    selectNoneRecord: function(){
+        this.setState({
+            allItems:true,
+            status:'none',
+            selectedInstance: []
+        });
+    },
+    //select from dropbox
+    selectInstances: function (query, inAllPages) {
         this.hideAlert();
+        var key = Object.keys(query);
+
+        if(query[key] == 'all'){
+           this.selectAllRecords(key);
+        }else{
+            if(query[key] == 'none'){
+                this.selectNoneRecord();
+            }else{
+
+                var selectedInstance = this.props.data.filter(function (instance) {
+                    return instance[key] == query[key];
+                });
+
+                if(inAllPages == true){
+                    this.showAlert({
+                        selectedAll: {
+                            onClick: this.selectInstances.bind(null, {key:'none'}),
+                            action:query[key],
+
+                        },
+                        alertType: "alert frm-alert-information"
+                    });
+                }else{
+                    this.showAlert({
+                        selectedPage: {
+                            selectInPage: selectedInstance.length,
+                            selectInAllPages: '',
+                            action: query[key],
+                            onClick: this.selectInstances.bind(null, query, true)
+                        },
+                        alertType: "alert frm-alert-information"
+                    });
+                }
+
+                this.setState({
+                    allItems:inAllPages == true,
+                    status:(inAllPages == true)?query[key]:null,
+                    selectedInstance: selectedInstance
+                });
+            }
+        }
     },
-
-    addDefaultDropDownActions: function (items) {
-
-        if (!items[0] || items[0].name != 'all') {
-            items.unshift({
-                label: 'All',
-                name: 'all',
-                onClick: this.selectInstances.bind(null, {}, true)
-            });
-        }
-
-        if (items[items.length - 1].name != 'none') {
-            items.push({
-                label: 'None',
-                name: 'none',
-                onClick: this.unselectAllInstances
-            });
-        }
-
-        return items;
+    isChecked: function  (row, selectedRows) {
+        var entry = selectedRows.find(function (element) {
+            return element[this.props.id] == row[this.props.id];
+        });
+        return entry;
     },
 
     getToolbarConfiguration: function () {
 
-        var config = this.props;
         var dropDownActions = [];
 
-        if (config.dropDownActions) {
-            dropDownActions = config.dropDownActions;
+        if (this.props.dropDownActions) {
+            dropDownActions = this.props.dropDownActions;
+
             for (var i = 0; i < dropDownActions.length; i++) {
-                var query = dropDownActions[i]['query'];
+            var query = dropDownActions[i]['query'];
                 dropDownActions[i]['onClick'] = this.selectInstances
-                    .bind(null, query, false);
+                    .bind(null, query);
             }
         }
-        dropDownActions = this.addDefaultDropDownActions(dropDownActions);
+
         return {
-            buttonItems: config.actions ? config.actions : [],
-            searchFields: config.searchFields ? config.searchFields : [],
+            buttonItems: this.props.actions ? this.props.actions : [],
+            searchFields: this.props.searchFields ? this.props.searchFields : [],
             dropDownActions: dropDownActions,
-            searchTitle : config.searchTitle
+            searchTitle : this.props.searchTitle
         };
     },
 
@@ -226,19 +212,15 @@ var catalogue = React.createClass({
             items: this.props.count,
             itemsPerPage: this.props.limit
         };
-        // TODO: select conditions based on state
-        // isCheked function is passed from customCatalogue and then executed
-        // on customTable component
-        var condition = -1; //default value
-        // of selection
+
+        var condition = -1;
         var state = this.state.status;
+
         if (this.state.allItems == false) {
-            // Calculate conditions when not selecting all items
             condition = 0;
             if (state == "none")
                 condition = 3;
         } else {
-            // Calculate conditions when selecting all items(filtered by state)
             condition = 2;
             if (state == "all")
                 condition = 1;
@@ -250,14 +232,13 @@ var catalogue = React.createClass({
                 case 1:
                     // All elements are checked
                     f = function () {
-                        // When selecting ALL elements always return true
                         return true;
                     };
                     break;
                 case 2:
                     // Use this function when selecting all instances by state
                     f = function (row) {
-                        return (row.State ==  state);
+                        return (row.status ==  state);
                     };
                     break;
                 case 3:
@@ -282,7 +263,7 @@ var catalogue = React.createClass({
             columns: config.columns ? config.columns : [],
             data: config.data ? config.data : [],
             pagination: pagination,
-            onSelectRow: this.selectInstance,
+            onSelectRow: this.onSelectRow,
             selectedRows: this.state.selectedInstance,
             isChecked: isChecked,
             id:config.id,
@@ -291,10 +272,7 @@ var catalogue = React.createClass({
         };
     },
 
-    //here table component will set the actual items
-    //TODO:  Better way?
     setActualItems: function (lastItem) {
-        //this.actualData =  actualData;
         this.props.onChangePage(lastItem);
     },
 
@@ -307,10 +285,7 @@ var catalogue = React.createClass({
             'div',
             null,
             React.createElement(TableActionToolbar, _extends({
-                selectedInstance: this.state.selectedInstance,
-                status: this.state.status,
-                allItems: this.state.allItems,
-                selectAll: this.props.selectAll
+                selectedInstance: this.state.selectedInstance
             }, toolbarconfiguration)),
             React.createElement(
                 'div',

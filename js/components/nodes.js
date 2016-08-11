@@ -11,48 +11,16 @@ var nodes = React.createClass({
         };
     },
 
-    evacuateNode: function() { //this one
-        if(!this.state.startDisabled){
-
-            console.log(this.state.selectedInstance);
-            console.log('Evacuating node: '+ this.state.selectedInstance);
-            //TODO: Change state in server. Changing locally just for testing
-
-        }
+    //not available at the moment
+    evacuateNode: function() {
     },
 
     disabledEvacuate: function(){
         return true;
     },
 
-    onChangePage: function (lastRecord) {
+    onChangePage: function (lastRecord) {//?
         this.setState({ pagination: lastRecord });
-    },
-    selectAll: function (status,action) {
-
-        console.log('status', status);
-        console.log('action', action);
-        return function () {
-            var actionString = "";
-            switch (action) {
-                case "Ready":
-                    actionString = "READY";
-                    break;
-                case "Full":
-                    actionString = "FULL";
-                    break;
-                case "Maintenance":
-                    actionString = "MAINTENANCE";
-                    break;
-                case "Offline":
-                    actionString = "OFFLINE";
-                    break;
-            }
-            this.actionAllInstances(status,actionString);
-            var s = this.state;
-            s.selectAll = true;
-            this.setState(s);
-        }.bind(this);
     },
     getActions: function(){
         return [
@@ -68,24 +36,33 @@ var nodes = React.createClass({
     getDropdownActions: function(){
         return [
             {
+                label:'All',
+                name:'all',
+                query: {'status':'all'}
+            },{
                 label:'All Ready',
                 name:'ready',
-                query: {'state':'ready'}
+                query: {'status':'READY'}
             },
             {
                 label:'All Maintenance',
                 name:'maintenance',
-                query:{'state':'maintenance'}
+                query:{'status':'MAINTENANCE'}
             },
             {
                 label:'All Full',
                 name:'full',
-                query:{'state':'full'}
+                query:{'status':'FULL'}
             },
             {
                 label:'All Offline',
                 name:'offline',
-                query:{'state':'offline'}
+                query:{'status':'OFFLINE'}
+            },
+            {
+                label:'None',
+                name:'none',
+                query: {'status':'none'}
             }
         ];
     },
@@ -114,11 +91,7 @@ var nodes = React.createClass({
                         url: this.props.source + query})
                         .done(function (data) {
                             if (data) {
-                                console.log("nodes");
-                                console.log(data);
                                 var fmtData = data.nodes.map((node) => {
-                                    /* If JSON object for node needs to be altered
-                                       do it here */
                                     delete node.updated;
                                     return node;
                                 });
@@ -160,7 +133,7 @@ var nodes = React.createClass({
             dropDownActions: this.getDropdownActions(),
             searchFields: this.getSearchfields(),
             onChangePage: this.onChangePage,
-            selectAll: this.selectAll,
+           // selectAll: this.selectAll,
             id:'id',
             ref: 'catalogue',
             searchTitle: "Search Nodes"

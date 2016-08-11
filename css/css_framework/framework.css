@@ -572,33 +572,34 @@ ul> li> a{
 /*
 * Nodes, Instance Module
 */
-.state-ready,
+.status-ready,
+.status-active,
 .utilization-low,
 .instance_state-active{
     color: #2BD899;
 }
-.state-maintenance,
+.status-maintenance,
 .utilization-med,
 .instance_state-starting{
     color: #F3D54E;
 }
-.state-full,
+.status-full,
 .utilization-high,
 .instance_state-stopped{
     color: #FF5573;
 }
- td.State-active {
-     color: #2BD899;
- }
- td.State-pending {
-     color: #f3d54e;;
- }
- td.State-stopped {
-     color: #ff5573;
- }
- td.State-exited {
-     color: #969696;;
- }
+td.status-active {
+    color: #2BD899;
+}
+td.status-pending {
+    color: #f3d54e;;
+}
+td.status-stopped {
+    color: #ff5573;
+}
+td.status-exited {
+    color: #969696;;
+}
 
 /*
 * Usage summary Module

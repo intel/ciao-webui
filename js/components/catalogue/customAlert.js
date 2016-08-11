@@ -18,10 +18,8 @@ var customAlert = React.createClass({
                             instances selected. &nbsp;
                         </span>
                         <span className="frm-link"
-                                onClick={selectedPage.onClick}>
-                            Select all&nbsp;
-                            {selectedPage.action}&nbsp;
-                            instances
+                        onClick={selectedPage.onClick}>
+                            Sellect all {selectedPage.action}&nbsp; instances.
                         </span>
                     </div>;
         }else{
@@ -29,8 +27,8 @@ var customAlert = React.createClass({
                 var selectedAll = this.props.selectedAll;
                 return  <div className={this.props.alertType}>
                             <span>
-                                All {this.props.status}
-                                {selectedAll.action}
+                                All {this.props.status}&nbsp;
+                                {selectedAll.action}&nbsp;
                                 instances selected.&nbsp;
                             </span>
                             <span className="frm-link"
