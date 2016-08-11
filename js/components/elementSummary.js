@@ -17,7 +17,7 @@ var elementSummary = React.createClass({
 
     getDefaultProps: function() {
         // put some default data
-        var base = 120;
+        var base = 148;
         return {
             width: base,
             height: base * 1.5,
