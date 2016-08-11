@@ -137,20 +137,22 @@ var instancesHost = React.createClass({
         }
     },
 
+    //If at least one is exites or stopped, enabled the button
     disabledStartButton: function (items) {
+        var find = items.filter(function(item){
+            return item.status == 'exited' || item.status == 'stopped'
+        })
+
+        return find.length == 0;
+    },
+
+    //If at least one is active, enabled the button
+    disabledStopButton: function (items) {
         var find = items.filter(function(item){
             return item.status == 'active'
         })
 
-        return find.length > 0;
-    },
-
-    disabledStopButton: function (items) {
-        var find = items.filter(function(item){
-            return item.status == 'stopped' || item.status == 'exited'
-        })
-
-        return find.length > 0;
+        return find.length == 0;
     },
 
     disabledRemoveButton: function (items) {
