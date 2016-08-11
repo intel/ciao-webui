@@ -3,7 +3,6 @@ var React = require('react');
 var CustomCatalogue = require('./catalogue/customCatalogue.js');
 var $ = require('jquery');
 var actionString = '';
-var status = [];
 
 var instancesHost = React.createClass({
     displayName: 'instancesHost',
@@ -143,7 +142,7 @@ var instancesHost = React.createClass({
             return item.status == 'active'
         })
 
-        return find.length == 0;
+        return find.length > 0;
     },
 
     disabledStopButton: function (items) {
@@ -151,7 +150,7 @@ var instancesHost = React.createClass({
             return item.status == 'stopped' || item.status == 'exited'
         })
 
-        return find.length == 0;
+        return find.length > 0;
     },
 
     disabledRemoveButton: function (items) {
@@ -162,7 +161,7 @@ var instancesHost = React.createClass({
         return !enabled;
     },
 
-    getActions: function () {
+    getButtonsActions: function () {
         return [{
             label: 'Start',
             name: 'Start',
@@ -181,7 +180,7 @@ var instancesHost = React.createClass({
         }];
     },
 
-    getDropdownActions: function () {
+    getSelectActions: function () {
         return [
             {
                 label:'All',
@@ -261,8 +260,6 @@ var instancesHost = React.createClass({
 
     onChangePage: function (lastRecord) {
         this.setState({ pagination: lastRecord });
-        //onStateChange
-        //componentShouldUpdate
     },
 
     render: function () {
@@ -276,8 +273,8 @@ var instancesHost = React.createClass({
             data: this.props.data,
             count: this.props.count,
             columns: columns,
-            actions: this.getActions(),
-            dropDownActions: this.getDropdownActions(),
+            actions: this.getButtonsActions(),
+            dropDownActions: this.getSelectActions(),
             searchFields: this.getSearchfields(),
             onChangePage: this.onChangePage,
             id:'instance_id',
