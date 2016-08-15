@@ -76,9 +76,15 @@ blockService.prototype.attachVolume = function() {
         // otherwise, attempt to retrieve isntance_uuid value to construct it
         var os_attach = req.body["os-attach"]?req.body:{
             "os-attach":{
-                "instance_uuid":req.body.instance_uuid
+                "instance_uuid":req.body.instance_uuid,
+                "mountpoint":req.body.mountpoint
             }
         };
+        // validate mountpoint
+        if (os_attach['os-attach'].mountpoint == undefined ||
+            os_attach['os-attach'].mountpoint == null) {
+            os_attach['os-attach'].mountpoint = "/dev/vdb";
+        }
         return adapter.onSuccess((data) => res.send(data.json))
             .onError((data) => res.send(data))
             .post(uri, os_attach, req.session.token);
