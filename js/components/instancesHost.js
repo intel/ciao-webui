@@ -120,20 +120,20 @@ var instancesHost = React.createClass({
         }
 
         if (status !== "all") {
-            /*this.refs.catalogue.showModal({
+            this.refs.catalogue.showModal({
                 title: 'Remove Instance(s)',
                 body: "You're about to remove an instance, this may result in "
                 + "a loss of data. Are you sure you want to remove?",
                 onAccept: this.deleteInstance,
                 acceptText: 'Remove'
-            });*/
+            });
         } else {
-         /*   this.refs.catalogue.showModal({
+            this.refs.catalogue.showModal({
                 title: modalTitle,
                 body: modalBody,
                 onAccept: this.masiveAction,
                 acceptText: modalAceptText
-            });*/
+            });
         }
     },
 
