@@ -92,7 +92,7 @@ router.get('/:tenant/resources', function(req, res, next) {
         var data = adapter.useNode('controller').get(
             uri,req.session.token,
             () => {
-                if (data.json) {
+                if (data.json.usage) {
                     usageSummary.from = data.json.usage[0].timestamp;
                     usageSummary.to = data.json.usage[data.json.usage.length-1].timestamp;
 
