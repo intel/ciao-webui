@@ -25,7 +25,8 @@ router.delete('/:tenant/servers/:server', function (req, res, next) {
         (t) => {
             var uri = "/v2.1/" + req.params.tenant +
                 "/servers/" + req.params.server;
-            var data = adapter.delete(uri,req.session.token, () => {
+            var data = adapter.useNode("controller")
+                    .delete(uri,req.session.token, () => {
                 res.send(data.raw);
             });
         })
@@ -69,7 +70,7 @@ router.get('/:tenant/flavors/:flavor', tenantService.getFlavor());
 router.get('/flavors/:flavor/servers/detail', function(req, res, next) {
     var uri = "/v2.1/flavors/" +
         req.params.flavor + "/servers/detail";
-    var data = adapter.get(
+    var data = adapter.useNode("controller").get(
         uri,req.session.token,
         () => res.send(data.json));
 });
@@ -88,7 +89,7 @@ router.get('/:tenant/resources', function(req, res, next) {
             "to":""
         };
 
-        var data = adapter.get(
+        var data = adapter.useNode('controller').get(
             uri,req.session.token,
             () => {
                 if (data.json) {
@@ -131,7 +132,8 @@ router.get('/:tenant/quotas', function (req, res, next) {
                 (value / 1000) + "TB";
         };
         var uri = "/v2.1/" + req.params.tenant + "/quotas";
-        var data = adapter.get(uri,req.session.token, () => {
+        var data = adapter.useNode('controller')
+                .get(uri,req.session.token, () => {
             if (data.json) {
                 var validateQuota = (value) => {
                     if (value !== -1){
@@ -189,7 +191,7 @@ router.get('/nodes/:node/servers/detail/count',
 
 router.get('/cncis', function (req, res, next) {
     var uri = "/v2.1/cncis";
-    var data = adapter.get(uri,req.session.token, () => {
+    var data = adapter.useNode('controller').get(uri,req.session.token, () => {
         res.set('Content-Type','application/json');
         res.send(data.json);
     });
@@ -197,7 +199,8 @@ router.get('/cncis', function (req, res, next) {
 
 router.get('/cncis/:cnci/detail', function (req, res, next) {
     var uri = "/v2.1/cncis/" + req.params.cnci + "/detail";
-    var data = adapter.get(uri,req.session.token, () => res.send(data.json));
+    var data = adapter.useNode('controller')
+            .get(uri,req.session.token, () => res.send(data.json));
 });
 
 module.exports = router;
