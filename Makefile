@@ -64,10 +64,10 @@ install-dev:
 	-npm run build-forbidden
 	-npm run build-tenant-detail
 	-mkdir -p public/javascripts/library
-	-mkdir -p build/stylesheets
+	-mkdir -p public/stylesheets
 	-cp views/default_template.ejs views/$(file)
-	-cp css/css_framework/framework.css build/stylesheets
-	-cp css/d3_components/d3Framework.css build/stylesheets
+	-cp css/css_framework/* public/stylesheets/
+	-cp css/d3_components/d3Framework.css public/stylesheets/
 	-cp js/util/*.js public/javascripts/library/
 	sed -i.bak "s~$(subst $\",,$(match))~$(subst $\",,$(match))\\$(bootstrap)\\$(subst $\",,$(framework))\\$(subst $\",,$(d3))\\ $(subst $\",,$(jquery))\\$(subst $\",,$(jqueryui))\\$(subst $\",,$(datamanager))\\$(subst $\",,$(loadDatamanager))\\ $(subst $\",,$(validations))~" views/$(subst $\",,$(file))
 	-mkdir -p $(DESTDIR)/ciao-webui/
