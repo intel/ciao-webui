@@ -10,26 +10,27 @@ var customAlert = React.createClass({
 
         if(this.props.selectedPage){
             var selectedPage = this.props.selectedPage;
-
+            var selectInPage = selectedPage.selectInPage == "0"
+                            ? "No" : "All " + selectedPage.selectInPage;
             return  <div className={this.props.alertType}>
                         <span>
-                            {selectedPage.selectInPage}&nbsp;
-                            {selectedPage.action}&nbsp;
-                            instances selected. &nbsp;
+                            {selectInPage} {selectedPage.action} instances
+                            on this page were selected.&nbsp;
                         </span>
                         <span className="frm-link"
                         onClick={selectedPage.onClick}>
-                            Sellect all {selectedPage.action}&nbsp; instances.
+                            Select all undisplayed&nbsp;
+                            {selectedPage.action} instances.
                         </span>
                     </div>;
         }else{
             if(this.props.selectedAll){
                 var selectedAll = this.props.selectedAll;
+                var action = selectedAll.action == undefined ? " "
+                            : " " + selectedAll.action + " ";
                 return  <div className={this.props.alertType}>
                             <span>
-                                All {this.props.status}&nbsp;
-                                {selectedAll.action}&nbsp;
-                                instances selected.&nbsp;
+                                All{action}instances were selected.&nbsp;
                             </span>
                             <span className="frm-link"
                                 onClick={selectedAll.onClick}>
