@@ -217,12 +217,14 @@ var getConfig = function (node) {
         result = config[process.env.NODE_ENV][node];
     else
         result = {};
-    if (global.CONTROLLER_ADDR)
-        result.host = global.CONTROLLER_ADDR;
-    if (global.CONTROLLER_PORT)
-        result.port = global.CONTROLLER_PORT;
-    if (global.PROTOCOL)
-        result.protocol = global.PROTOCOL;
+    if (node === 'controller') {
+        if (global.CONTROLLER_ADDR)
+            result.host = global.CONTROLLER_ADDR;
+        if (global.CONTROLLER_PORT)
+            result.port = global.CONTROLLER_PORT;
+        if (global.PROTOCOL)
+            result.protocol = global.PROTOCOL;
+    }
     return result;
 };
 
