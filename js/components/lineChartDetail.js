@@ -2,7 +2,9 @@ var React = require('react');
 var ReactDOM = require('react-dom');
 var d3LineChartDetail = require("../d3_components/d3LineChartDetail.js");
 var dom = require("react-faux-dom");
-//var $ = require('jquery');
+var currentDate = "";
+var currentTime = "";
+var currentDateTime = "";
 
 var lineChartDetail = React.createClass({
 
@@ -40,6 +42,8 @@ var lineChartDetail = React.createClass({
     lineChart: null,
 
     componentDidMount: function() {
+        // Call for current date and time
+        //this.getRealTime();
         // Call update function
         this.drawingChart();
     },
@@ -128,7 +132,20 @@ var lineChartDetail = React.createClass({
         }.bind(this), Number(this.props.refresh));
     },
 
+    getRealTime: function () {
+
+        var startTime = function () {
+            var today = new Date();
+            currentDateTime = today.toString();
+            t = setTimeout(function () {
+                startTime()
+            }, 500);
+        }
+        startTime();
+    },
+
     render: function() {
+        this.getRealTime();
         if (this.state.d3node != null) {
             var LineChart = this.state.d3node.toReact();
             return (<div>
@@ -137,6 +154,12 @@ var lineChartDetail = React.createClass({
                           <div className="frm-panel-heading frm-panel-standar">
                           </div>
                           <div className="frm-panel">
+                            <div className="frm-bold-text frm-secondary-text">
+                                <h2 id="currentDate"
+                                    className="pull-right frm-chart-title">
+                                    {currentDateTime}
+                                </h2>
+                            </div>
                             <div
                                ref={(ref) => this._dcontainer = ref }
                               className="d3-container text-center">
