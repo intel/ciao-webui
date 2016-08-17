@@ -48,10 +48,10 @@ var instancesHost = React.createClass({
             var url = "/data/" + datamanager.data.activeTenant.id +
                 //TODO: not having tenant_id may cause bugs
                 // for users with more than one tenant
-                "/servers/" + el.instance_id + "/action";
+                "/servers/" + el.id + "/action";
             $.post({
                 url: url,
-                data: { server: el.instance_id, action: "os-start" },
+                data: { server: el.id, action: "os-start" },
                 dataType: "application/json"
             }).done(data => {
                 console.log(data);
@@ -65,10 +65,10 @@ var instancesHost = React.createClass({
         elements.forEach(el => {
             var url = "/data/" + datamanager.data.activeTenant.id +
                 //el.tenant_id +
-                "/servers/" + el.instance_id + "/action";
+                "/servers/" + el.id + "/action";
             $.post({
                 url: url,
-                data: { server: el.instance_id, action: "os-stop" },
+                data: { server: el.id, action: "os-stop" },
                 dataType: "application/json"
             }).done(data => {
                 console.log(data);
@@ -82,11 +82,11 @@ var instancesHost = React.createClass({
         elements.forEach(el => {
             var url = "/data/" + datamanager.data.activeTenant.id +
                 //el.tenant_id +
-                "/servers/" + el.instance_id;
+                "/servers/" + el.id;
             $.ajax({
                 url: url,
                 type: "DELETE",
-                data: { server: el.instance_id, action: "os-delete" },
+                data: { server: el.id, action: "os-delete" },
                 dataType: "application/json"
             }).done(data => {
                 console.log(data);
@@ -279,7 +279,7 @@ var instancesHost = React.createClass({
             dropDownActions: this.getSelectActions(),
             searchFields: this.getSearchfields(),
             onChangePage: this.onChangePage,
-            id:'instance_id',
+            id: 'id',
             ref: 'catalogue',
             searchTitle: 'Search Instances',
         });else return React.createElement('div', null);
