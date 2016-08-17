@@ -1,8 +1,6 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
 var InstancesHost = require('../components/instancesHost.js');
-var UsageSummary = require('../components/usageSummary.js');
-var InstancesCounter = require('../components/instancesCounter.js');
 var navbar = require('../components/navbar.js');
 var  Overview = require('../components/overview.js');
 var $ = require('jquery');
@@ -61,23 +59,22 @@ $('document').ready(function () {
 
     //Set up table to view instances running on current node
     var key = 'instances-host';
-    var ihSource = "/data/nodes/"
-            + datamanager.data.idMachine
-            + "/servers/detail";;
+
     datamanager.onDataSourceSet(key, function (sourceData) {
+        sourceData.source = "/data/nodes/"
+            + datamanager.data.idMachine
+            + "/servers/detail";
+
         var refresh = (datamanager.data.REFRESH | 3000);
         sourceData.refresh = Number(refresh);
         sourceData.recordsPerPage = 10;
-        sourceData.source = ihSource;
         sourceData.dataKey = key;
+
         ReactDOM.render(
-                <InstancesHost {...sourceData}/>,
-            document.getElementById('instances-host'));
+        <InstancesHost {...sourceData}/>,
+        document.getElementById('instances-host'))
     });
 
-    datamanager.setDataSource(key, {
-        dataKey: key,
-        source: ihSource
-    });
+    datamanager.setDataSource('instances-host',{data:[]});
 
 });
