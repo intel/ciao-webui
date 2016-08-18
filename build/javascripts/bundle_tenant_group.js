@@ -86,7 +86,7 @@ var addInstances = React.createClass({
             'div',
             { className: 'pull-right' },
             React.createElement(
-                'h6',
+                'h4',
                 null,
                 React.createElement(
                     Button,
@@ -301,40 +301,40 @@ var customAlert = React.createClass({
 
         if (this.props.selectedPage) {
             var selectedPage = this.props.selectedPage;
-
+            var selectInPage = selectedPage.selectInPage == "0" ? "No" : "All " + selectedPage.selectInPage;
             return React.createElement(
                 "div",
                 { className: this.props.alertType },
                 React.createElement(
                     "span",
                     null,
-                    selectedPage.selectInPage,
-                    " ",
+                    selectInPage,
+                    " ",
                     selectedPage.action,
-                    "  instances selected.  "
+                    " instances on this page were selected. "
                 ),
                 React.createElement(
                     "span",
                     { className: "frm-link",
                         onClick: selectedPage.onClick },
-                    "Select all ",
+                    "Select all undisplayed ",
                     selectedPage.action,
-                    "  instances"
+                    " instances."
                 )
             );
         } else {
             if (this.props.selectedAll) {
                 var selectedAll = this.props.selectedAll;
+                var action = selectedAll.action == undefined ? " " : " " + selectedAll.action + " ";
                 return React.createElement(
                     "div",
                     { className: this.props.alertType },
                     React.createElement(
                         "span",
                         null,
-                        "All ",
-                        this.props.status,
-                        selectedAll.action,
-                        "instances selected. "
+                        "All",
+                        action,
+                        "instances were selected. "
                     ),
                     React.createElement(
                         "span",
@@ -467,119 +467,106 @@ var catalogue = React.createClass({
             }
         };
     },
-
-    selectInstance: function (selected) {
-        //merge con selectInstances
+    //select a row
+    onSelectRow: function (selected) {
         this.hideAlert();
-        this.setState({ selectedInstance: selected });
+        this.setState({
+            selectedInstance: selected,
+            allItems: false,
+            status: null
+        });
     },
+    selectAllRecords: function (key) {
+        this.showAlert({
+            selectedAll: {
+                onClick: this.selectInstances.bind(null, { key: 'none' })
+            },
+            alertType: "alert frm-alert-information"
+        });
 
-    selectInstances: function (query, inAllItems) {
-
-        var selectedInstance = [];
-        var allInstances = [];
-        var key = [];
-
-        // inAllItems will trigger action by tenant on all instances matching
-        // the selected state
-        var data = inAllItems ? [] : this.props.data;
-        var newState = {};
-        if (query) {
-            key = Object.keys(query);
-            newState.status = query.state;
-        } else {
-            newState.status = null;
-        }
-
-        if (key.length > 0 && inAllItems == false) {
-            newState.allItems = false;
-            newState.status = null;
-            selectedInstance = data.filter(function (instance) {
-                return instance[key] == query[key];
-            });
-
-            allInstances = this.props.data.filter(function (instance) {
-                return instance[key] == query[key];
-            });
-            this.showAlert({
-                selectedPage: {
-                    selectInPage: selectedInstance.length,
-                    selectInAllPages: allInstances.length,
-                    action: query[key],
-                    onClick: this.selectInstances.bind(null, query, true)
-                },
-                alertType: "alert frm-alert-information"
-            });
-        } else if (inAllItems == true && query) {
-            newState.allItems = true;
-            newState.status = query[key];
-            this.showAlert({
-                selectedAll: {
-                    selectInAllPages: allInstances.length,
-                    status: query[key],
-                    onClick: this.unselectAllInstances
-                },
-                alertType: "alert frm-alert-information"
-            });
-        } else {
-            //select all
-            newState.allItems = true;
-            newState.status = null;
-            selectedInstance = this.props.data;
-            this.hideAlert();
-        }
-
-        if (inAllItems == true && query) {
-            if (!query.State) newState.status = "all";
-        }
-        newState.selectedInstance = selectedInstance;
-        newState.selectAll = true;
-        this.setState(newState);
+        this.setState({
+            allItems: true,
+            status: 'all',
+            selectedInstance: this.props.data
+        });
     },
-    unselectAllInstances: function () {
-        this.setState({ allItems: false, selectedInstance: [], status: "none" });
+    selectNoneRecord: function () {
+        this.setState({
+            allItems: true,
+            status: 'none',
+            selectedInstance: []
+        });
+    },
+    //select from dropbox
+    selectInstances: function (query, inAllPages) {
         this.hideAlert();
+        var key = Object.keys(query);
+
+        if (query[key] == 'all') {
+            this.selectAllRecords(key);
+        } else {
+            if (query[key] == 'none') {
+                this.selectNoneRecord();
+            } else {
+
+                var selectedInstance = this.props.data.filter(function (instance) {
+                    return instance[key] == query[key];
+                });
+
+                if (inAllPages == true) {
+                    this.showAlert({
+                        selectedAll: {
+                            onClick: this.selectInstances.bind(null, { key: 'none' }),
+                            action: query[key]
+
+                        },
+                        alertType: "alert frm-alert-information"
+                    });
+                } else {
+                    this.showAlert({
+                        selectedPage: {
+                            selectInPage: selectedInstance.length,
+                            selectInAllPages: '',
+                            action: query[key],
+                            onClick: this.selectInstances.bind(null, query, true)
+                        },
+                        alertType: "alert frm-alert-information"
+                    });
+                }
+
+                this.setState({
+                    allItems: inAllPages == true,
+                    status: inAllPages == true ? query[key] : null,
+                    selectedInstance: selectedInstance
+                });
+            }
+        }
     },
-
-    addDefaultDropDownActions: function (items) {
-
-        if (!items[0] || items[0].name != 'all') {
-            items.unshift({
-                label: 'All',
-                name: 'all',
-                onClick: this.selectInstances.bind(null, {}, true)
-            });
-        }
-
-        if (items[items.length - 1].name != 'none') {
-            items.push({
-                label: 'None',
-                name: 'none',
-                onClick: this.unselectAllInstances
-            });
-        }
-
-        return items;
+    isChecked: function (row, selectedRows) {
+        var entry = selectedRows.find(function (element) {
+            return element[this.props.id] == row[this.props.id];
+        });
+        return entry;
     },
 
     getToolbarConfiguration: function () {
 
-        var config = this.props;
         var dropDownActions = [];
 
-        if (config.dropDownActions) {
-            dropDownActions = config.dropDownActions;
+        if (this.props.dropDownActions) {
+            dropDownActions = this.props.dropDownActions;
+
             for (var i = 0; i < dropDownActions.length; i++) {
                 var query = dropDownActions[i]['query'];
-                dropDownActions[i]['onClick'] = this.selectInstances.bind(null, query, false);
+                dropDownActions[i]['onClick'] = this.selectInstances.bind(null, query);
             }
         }
-        dropDownActions = this.addDefaultDropDownActions(dropDownActions);
+
         return {
-            buttonItems: config.actions ? config.actions : [],
-            searchFields: config.searchFields ? config.searchFields : [],
+            buttonItems: this.props.actions ? this.props.actions : [],
+            searchFields: this.props.searchFields ? this.props.searchFields : [],
             dropDownActions: dropDownActions,
-            searchTitle: config.searchTitle
+            searchTitle: this.props.searchTitle
         };
     },
 
@@ -590,18 +577,14 @@ var catalogue = React.createClass({
             items: this.props.count,
             itemsPerPage: this.props.limit
         };
-        // TODO: select conditions based on state
-        // isCheked function is passed from customCatalogue and then executed
-        // on customTable component
-        var condition = -1; //default value
-        // of selection
+
+        var condition = -1;
         var state = this.state.status;
+
         if (this.state.allItems == false) {
-            // Calculate conditions when not selecting all items
             condition = 0;
             if (state == "none") condition = 3;
         } else {
-            // Calculate conditions when selecting all items(filtered by state)
             condition = 2;
             if (state == "all") condition = 1;
         }
@@ -612,14 +595,13 @@ var catalogue = React.createClass({
                 case 1:
                     // All elements are checked
                     f = function () {
-                        // When selecting ALL elements always return true
                         return true;
                     };
                     break;
                 case 2:
                     // Use this function when selecting all instances by state
                     f = function (row) {
-                        return row.State == state;
+                        return row.status == state;
                     };
                     break;
                 case 3:
@@ -644,7 +626,7 @@ var catalogue = React.createClass({
             columns: config.columns ? config.columns : [],
             data: config.data ? config.data : [],
             pagination: pagination,
-            onSelectRow: this.selectInstance,
+            onSelectRow: this.onSelectRow,
             selectedRows: this.state.selectedInstance,
             isChecked: isChecked,
             id: config.id,
@@ -653,10 +635,7 @@ var catalogue = React.createClass({
         };
     },
 
-    //here table component will set the actual items
-    //TODO:  Better way?
     setActualItems: function (lastItem) {
-        //this.actualData =  actualData;
         this.props.onChangePage(lastItem);
     },
 
@@ -666,10 +645,7 @@ var catalogue = React.createClass({
         var tableconfiguration = this.getTableConfiguration();
 
         return React.createElement('div', null, React.createElement(TableActionToolbar, _extends({
-            selectedInstance: this.state.selectedInstance,
-            status: this.state.status,
-            allItems: this.state.allItems,
-            selectAll: this.props.selectAll
+            selectedInstance: this.state.selectedInstance
         }, toolbarconfiguration)), React.createElement('div', { className: 'row' }, React.createElement('div', { className: 'col-xs-12' }, this.renderAlert())), React.createElement(CustomTable, tableconfiguration), this.renderModal());
     }
 });
@@ -847,30 +823,38 @@ var customTable = React.createClass({
 
     getInitialState: function () {
         return {
-            activePage: 1,
-            actualItems: []
+            activePage: 1
         };
     },
-
-    select: function (row) {
-        var selected = this.props.selectedRows;
+    selectRow: function (selectedRow) {
+        var key = this.props.id;
         var newSelected = [];
 
-        if (Object.keys(selected).length == 1) {
-
-            if (selected[0][this.props.id] == row[this.props.id]) {
-                newSelected = [];
-            } else {
-                newSelected.push(row);
-            }
+        //first element
+        if (this.props.selectedRows.length == 0) {
+            newSelected.push(selectedRow);
         } else {
-            newSelected.push(row);
+            var indexRow = this.props.selectedRows.findIndex(function (row) {
+                return row[key] == selectedRow[key];
+            });
+
+            this.props.selectedRows.forEach(function (element, index) {
+                //If is the same, not add it.
+                if (selectedRow[key] != element[key]) {
+                    newSelected.push(element);
+                }
+            });
+
+            //If not exist, add it.
+            if (indexRow < 0) {
+                newSelected.push(selectedRow);
+            }
         }
+
         this.props.onSelectRow(newSelected);
     },
 
     isChecked: function (row) {
-        // isChecked function comes customCatalogue component
         return this.props.isChecked(row, this.props.selectedRows);
     },
 
@@ -880,31 +864,35 @@ var customTable = React.createClass({
         //var lasItem = this.props.data[this.props.data.length - 1];
         this.props.onChangePage(page);
     },
+    getTableHeader: function () {
+        var table_header = this.props.columns.map((column, i) => {
+            return React.createElement('th', { key: i + 1 }, column);
+        });
+        table_header.unshift(React.createElement('td', { key: 0 }));
 
-    render: function () {
+        return table_header;
+    },
+    getTableBody: function () {
+        var table_body;
 
-        var actualData = this.props.data;
-
-        var body;
         try {
-            body = actualData.map((row, i) => {
+            table_body = this.props.data.map((row, i) => {
                 var columns = [];
 
+                //Add input select for each row
                 columns.push(React.createElement('td', null, React.createElement('input', {
                     type: 'checkbox',
-                    onClick: this.select.bind(null, row),
+                    onClick: this.selectRow.bind(null, row),
                     checked: this.isChecked(row) })));
 
-                //first element is a link
-                if (this.props.link) {
-
-                    columns.push(React.createElement('td', null, React.createElement('a', { className: 'frm-link',
-                        href: this.props.link.url + row[this.props.link.field] }, row[this.props.link.field])));
-                }
-
+                //Add the rest of the information into the body's table
                 for (var key in row) {
 
-                    if (key != this.props.link.field) {
+                    //Add link, if exist
+                    if (this.props.link && this.props.link.field == key) {
+                        columns.push(React.createElement('td', null, React.createElement('a', { className: 'frm-link',
+                            href: this.props.link.url + row[this.props.link.field] }, row[this.props.link.field])));
+                    } else {
                         columns.push(React.createElement('td', { key: key, className: key + '-' + row[key] }, row[key]));
                     }
                 }
@@ -913,31 +901,21 @@ var customTable = React.createClass({
                     key: i }, columns);
             });
         } catch (err) {
-            body = [];
+            table_body = [];
         }
 
-        var header = this.props.columns.map((column, i) => {
-            return React.createElement('th', { key: i + 1 }, column);
-        });
-        header.unshift(React.createElement('td', { key: 0 }));
+        return table_body;
+    },
 
-        return React.createElement('div', { className: 'table-responsive' }, React.createElement(Table, { className: 'table-hover' }, React.createElement('thead', null, React.createElement('tr', null, header)), React.createElement('tbody', null, body)), React.createElement('div', { className: 'frm-pagination' }, React.createElement(CustomPagination, _extends({
+    render: function () {
+
+        return React.createElement('div', { className: 'table-responsive' }, React.createElement(Table, { className: 'table-hover' }, React.createElement('thead', null, React.createElement('tr', null, this.getTableHeader())), React.createElement('tbody', null, this.getTableBody())), React.createElement('div', { className: 'frm-pagination' }, React.createElement(CustomPagination, _extends({
             className: 'pagination',
             items: this.props.pagination.items,
             itemsPerPage: this.props.pagination.limit
         }, this.props.pagination, {
             onSelect: this.changePage }))));
-    },
-    componentWillUnmount: function () {},
-    componentDidMount: function () {
-        // $.get(this.props.source,
-        //       (result) => {
-        //           this.props.data = (result.length == 0)?
-        //               result:this.props.fake_data;
-        //           // TODO: render
-        //       });
-    },
-    componentDidUpdate: function (prevProps, prevState) {}
+    }
 });
 
 module.exports = customTable;
@@ -959,21 +937,18 @@ var tableActionToolbar = React.createClass({
     getInitialState: function () {
         return {};
     },
-    isButtonDisabled: function (buttonName) {
-
-        return this.props.disabledButtons.find(function (item) {
-            return item == buttonName;
-        });
-    },
     render: function () {
         var buttons = this.props.buttonItems.map((item, i) => {
-            var execute = this.props.allItems == true ? this.props.selectAll(this.props.status, item.name) : item.onClick.bind(null, this.props.selectedInstance);
 
-            //disabled={item.onDisabled(this.props.selectedInstance)}
+            var execute = item.onClick.bind(null, this.props.selectedInstance);
+
             return React.createElement(
                 Button,
-                { bsStyle: null, className: 'btn frm-btn-primary', key: i,
-                    onClick: execute },
+                { bsStyle: null,
+                    className: 'btn frm-btn-primary',
+                    key: i,
+                    onClick: execute,
+                    disabled: item.onDisabled(this.props.selectedInstance) },
                 item.name
             );
         });
@@ -982,7 +957,7 @@ var tableActionToolbar = React.createClass({
 
             return React.createElement(
                 MenuItem,
-                { bsStyle: null, className: 'btn frm-btn-primary', key: i,
+                { bsStyle: null, key: i,
                     onClick: item.onClick },
                 item.label
             );
@@ -1036,6 +1011,8 @@ var React = require('react');
 var ReactDOM = require('react-dom');
 var d3Element = require("../d3_components/d3ElementSummary.js");
 var dom = require("react-faux-dom");
+var reactBootstrap = require('react-bootstrap');
+var Button = reactBootstrap.Button;
 
 var elementSummary = React.createClass({
     displayName: 'elementSummary',
@@ -1049,7 +1026,7 @@ var elementSummary = React.createClass({
 
     getDefaultProps: function () {
         // put some default data
-        var base = 120;
+        var base = 148;
         return {
             width: base,
             height: base * 1.5,
@@ -1097,14 +1074,44 @@ var elementSummary = React.createClass({
         }
     },
     renderPanel: function () {
+        // define labels for each concept
+        var reference;
         var body = this.props.value;
         var title = this.props.name;
-        var secondaryBody = title == 'Memory' || title == 'Disk' ? 'MB' : '';
-        var secondaryTitle = title == 'Processor' ? '' : '';
+        var secondaryBody = title == 'Memory Usage' || title == 'Disk Usage' ? ' MB' : '';
+        var secondaryTitle = title == 'Processor Load Average' ? '' : '';
+        var buttonLabel = title.split(" ");
+
+        // switching page jumps
+        if (buttonLabel[0] === "Total") {
+            if (this.props.history !== false) {
+                reference = "#instances-overview";
+            } else {
+                reference = "/" + this.props.reference.substr(0, 6) + "#instances-overview";
+            }
+            buttonLabel = "Instances Overview";
+        } else {
+            if (this.props.history !== false) {
+                reference = this.props.reference + "#" + buttonLabel[0];
+            } else {
+                reference = "#" + buttonLabel[0];
+            }
+            buttonLabel = buttonLabel[0] + " History";
+        }
+
+        // History Button
+        var historyButton = React.createElement(
+            Button,
+            { bsStyle: null,
+                className: 'btn frm-btn-secondary',
+                href: reference },
+            buttonLabel
+        );
+
         return React.createElement(
             'div',
             { className: 'element-summary-panel' },
-            React.createElement('div', { className: 'frm-panel-heading frm-panel-success-full' }),
+            React.createElement('div', { className: 'frm-panel-heading frm-panel-standar' }),
             React.createElement(
                 'div',
                 { className: 'panel frm-panel frm-panel-default frm-panel-remake' },
@@ -1112,33 +1119,21 @@ var elementSummary = React.createClass({
                     'div',
                     { className: 'panel-body' },
                     React.createElement(
-                        'h6',
-                        { className: 'frm-bold-text frm-body-h6' },
-                        body
-                    ),
-                    React.createElement(
-                        'div',
+                        'h2',
                         { className: 'frm-secondary-text frm-bold-text' },
-                        secondaryBody
-                    )
-                )
-            ),
-            React.createElement(
-                'div',
-                { className: 'row' },
-                React.createElement(
-                    'div',
-                    { className: 'col-xs-12 text-center' },
-                    React.createElement(
-                        'div',
-                        { className: 'frm-bold-text' },
                         title
                     ),
                     React.createElement(
-                        'div',
-                        { className: 'frm-secondary-text' },
-                        secondaryTitle
+                        'h6',
+                        { className: 'frm-bold-text frm-body-h6' },
+                        body,
+                        secondaryBody
                     )
+                ),
+                React.createElement(
+                    'div',
+                    { className: 'panel-footer frm-panel-footer-secondary' },
+                    historyButton
                 )
             )
         );
@@ -1154,13 +1149,12 @@ var elementSummary = React.createClass({
 });
 
 module.exports = elementSummary;
-},{"../d3_components/d3ElementSummary.js":13,"react":444,"react-dom":281,"react-faux-dom":284}],10:[function(require,module,exports){
+},{"../d3_components/d3ElementSummary.js":13,"react":444,"react-bootstrap":270,"react-dom":281,"react-faux-dom":284}],10:[function(require,module,exports){
 // React js component
 var React = require('react');
 var CustomCatalogue = require('./catalogue/customCatalogue.js');
 var $ = require('jquery');
 var actionString = '';
-var status = [];
 
 var instancesHost = React.createClass({
     displayName: 'instancesHost',
@@ -1185,7 +1179,6 @@ var instancesHost = React.createClass({
     },
 
     actionAllInstances: function (status) {
-        console.log("action", status);
         var url = "/data/" + datamanager.data.activeTenant.id + "/servers/action";
         $.ajax({
             url: url,
@@ -1195,9 +1188,9 @@ var instancesHost = React.createClass({
             },
             dataType: "application/json"
         }).done(data => {
-            console.log(data);
+            console.log('data - action', data);
         }).fail(err => {
-            console.log(err);
+            console.log('err - action', err);
         });
     },
 
@@ -1206,10 +1199,10 @@ var instancesHost = React.createClass({
             var url = "/data/" + datamanager.data.activeTenant.id +
             //TODO: not having tenant_id may cause bugs
             // for users with more than one tenant
-            "/servers/" + el.instance_id + "/action";
+            "/servers/" + el.id + "/action";
             $.post({
                 url: url,
-                data: { server: el.instance_id, action: "os-start" },
+                data: { server: el.id, action: "os-start" },
                 dataType: "application/json"
             }).done(data => {
                 console.log(data);
@@ -1223,10 +1216,10 @@ var instancesHost = React.createClass({
         elements.forEach(el => {
             var url = "/data/" + datamanager.data.activeTenant.id +
             //el.tenant_id +
-            "/servers/" + el.instance_id + "/action";
+            "/servers/" + el.id + "/action";
             $.post({
                 url: url,
-                data: { server: el.instance_id, action: "os-stop" },
+                data: { server: el.id, action: "os-stop" },
                 dataType: "application/json"
             }).done(data => {
                 console.log(data);
@@ -1240,11 +1233,11 @@ var instancesHost = React.createClass({
         elements.forEach(el => {
             var url = "/data/" + datamanager.data.activeTenant.id +
             //el.tenant_id +
-            "/servers/" + el.instance_id;
+            "/servers/" + el.id;
             $.ajax({
                 url: url,
                 type: "DELETE",
-                data: { server: el.instance_id, action: "os-delete" },
+                data: { server: el.id, action: "os-delete" },
                 dataType: "application/json"
             }).done(data => {
                 console.log(data);
@@ -1285,43 +1278,39 @@ var instancesHost = React.createClass({
             this.refs.catalogue.showModal({
                 title: modalTitle,
                 body: modalBody,
-                onAccept: this.actionAllInstances,
+                onAccept: this.masiveAction,
                 acceptText: modalAceptText
             });
         }
     },
 
-    disabledStartButton: function (item) {
-        var disabled = true;
-        if (item.length > 0) {
-            var firstElement = item[0];
-            if (firstElement.State != 'active' && firstElement.State != 'starting') {
-                disabled = false;
-            }
-        }
-        return false;
+    //If at least one is exites or stopped, enabled the button
+    disabledStartButton: function (items) {
+        var find = items.filter(function (item) {
+            return item.status == 'exited' || item.status == 'stopped';
+        });
+
+        return find.length == 0;
     },
 
-    disabledStopButton: function (item) {
-        var disabled = true;
-        if (item.length > 0) {
-            var firstElement = item[0];
-            if (firstElement.State != 'stopped' && firstElement.State != 'exited') {
-                disabled = false;
-            }
-        }
-        return disabled;
+    //If at least one is active, enabled the button
+    disabledStopButton: function (items) {
+        var find = items.filter(function (item) {
+            return item.status == 'active';
+        });
+
+        return find.length == 0;
     },
 
-    disabledRemoveButton: function (item) {
-        var disabled = true;
-        if (item.length > 0) {
-            disabled = false;
+    disabledRemoveButton: function (items) {
+        var enabled = false;
+        if (items.length > 0) {
+            enabled = true;
         }
-        return disabled;
+        return !enabled;
     },
 
-    getActions: function () {
+    getButtonsActions: function () {
         return [{
             label: 'Start',
             name: 'Start',
@@ -1340,15 +1329,23 @@ var instancesHost = React.createClass({
         }];
     },
 
-    getDropdownActions: function () {
+    getSelectActions: function () {
         return [{
+            label: 'All',
+            name: 'all',
+            query: { 'status': 'all' }
+        }, {
             label: 'All Active',
             name: 'active',
-            query: { 'State': 'active' }
+            query: { 'status': 'active' }
         }, {
             label: 'All Stopped',
             name: 'stopped',
-            query: { 'State': 'exited' }
+            query: { 'status': 'exited' }
+        }, {
+            label: 'None',
+            name: 'none',
+            query: { 'status': 'none' }
         }];
     },
 
@@ -1402,34 +1399,7 @@ var instancesHost = React.createClass({
 
     onChangePage: function (lastRecord) {
         this.setState({ pagination: lastRecord });
-        //onStateChange
-        //componentShouldUpdate
     },
-
-    selectAll: function (status, action) {
-        return function () {
-            actionString = "";
-            switch (action) {
-                case "Start":
-                    actionString = "os-start";
-                    break;
-                case "Stop":
-                    actionString = "os-stop";
-                    break;
-                case "Remove":
-                    actionString = "os-delete";
-                    break;
-            }
-
-            // refactor ... testing
-            this.confirmDelete(status, actionString);
-            var s = this.state;
-            s.selectAll = true;
-            this.setState(s);
-        }.bind(this);
-    },
-
-    componentWillMount: function () {},
 
     render: function () {
         var columns = [];
@@ -1442,12 +1412,11 @@ var instancesHost = React.createClass({
             data: this.props.data,
             count: this.props.count,
             columns: columns,
-            actions: this.getActions(),
-            dropDownActions: this.getDropdownActions(),
+            actions: this.getButtonsActions(),
+            dropDownActions: this.getSelectActions(),
             searchFields: this.getSearchfields(),
             onChangePage: this.onChangePage,
-            selectAll: this.selectAll,
-            id: 'instance_id',
+            id: 'id',
             ref: 'catalogue',
             searchTitle: 'Search Instances'
         });else return React.createElement('div', null);
@@ -1577,12 +1546,12 @@ var navbar = React.createClass({
 
 module.exports = navbar;
 },{"react":444,"react-bootstrap":270}],12:[function(require,module,exports){
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 // usage Summary display current instances,memory,vCPUs and disk vs quota
 var React = require('react');
 var ReactDOM = require('react-dom/server');
 var ElementSummary = require('./elementSummary.js');
-var reactBootstrap = require('react-bootstrap');
-var Button = reactBootstrap.Button;
 
 var usageSummary = React.createClass({
     displayName: 'usageSummary',
@@ -1611,6 +1580,7 @@ var usageSummary = React.createClass({
                 memoryValue = 0,
                 memoryQuota = 0,
                 procesorValue = 0;
+            var reference;
 
             if (!datamanager.data.activeTenant) {
                 // admin
@@ -1618,6 +1588,7 @@ var usageSummary = React.createClass({
             } else {
                 // tenant
                 url = "/data/" + datamanager.data.activeTenant.id + this.props.source;
+                reference = "tenant/usage";
             }
             $.get({
                 url: url }).done(function (data) {
@@ -1682,6 +1653,7 @@ var usageSummary = React.createClass({
     },
 
     render: function () {
+
         var dynamicWidth = Math.round(12 / this.props.data.length);
         var elements = [];
         var historyButton;
@@ -1703,39 +1675,24 @@ var usageSummary = React.createClass({
                     elements.push(React.createElement(
                         'div',
                         { key: props.name, className: columnGrid },
-                        React.createElement(ElementSummary, props)
+                        React.createElement(ElementSummary, _extends({}, props, { reference: reference,
+                            history: this.props.history }))
                     ));
                 });
             }
         }
 
-        if (this.props.history !== false) {
-            //View usage Histroy button
-            historyButton = React.createElement(
-                'div',
-                { className: 'col-xs-12 frm-body-h6' },
-                React.createElement(
-                    Button,
-                    { bsStyle: null,
-                        className: 'btn frm-btn-secondary pull-right',
-                        href: reference },
-                    'View Usage History'
-                )
-            );
-        }
-
         return React.createElement(
             'div',
             { className: 'row' },
-            elements,
-            historyButton
+            elements
         );
     }
 
 });
 
 module.exports = usageSummary;
-},{"./elementSummary.js":9,"react":444,"react-bootstrap":270,"react-dom/server":282}],13:[function(require,module,exports){
+},{"./elementSummary.js":9,"react":444,"react-dom/server":282}],13:[function(require,module,exports){
 // d3 component: Element Summary
 // this element consists of a donut chart ment to display
 // the current usage of a determined resource vs it's quota
