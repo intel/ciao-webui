@@ -53,6 +53,21 @@ lineChart.prototype.x = function (mult) {
     return d3.time.scale()
         .range([0, w - this.margin.left - this.margin.right]);
 };
+/* grid */
+
+lineChart.prototype.make_x_axis = function () {
+    return d3.svg.axis()
+        .scale(this.computeX)
+        .orient("bottom")
+        .ticks(10);
+};
+
+lineChart.prototype.make_y_axis = function () {
+    return d3.svg.axis()
+        .scale(this.computeY)
+        .orient("left")
+        .ticks(5);
+};
 
 lineChart.prototype.setState = function (state) {
     this.state = state;
@@ -87,13 +102,17 @@ lineChart.prototype.updateDomain  = function () {
     this.xAxis = d3.svg.axis()
         .scale(this.computeX)
         .orient("bottom")
-        .ticks(3)
-        .tickFormat(d3.time.format("%d/%m/%Y"));
+        .ticks(12)
+        .tickSubdivide(2)
+        .tickSize(-60, -60, 0);
+        /*.orient("bottom")
+        .ticks(4)
+        .tickFormat(d3.time.format("%H-%p"));*/
 
     this.yAxis = d3.svg.axis()
         .scale(this.computeY)
-        .orient("left");
-        //.ticks(5,"%");
+        .orient("left")
+        .ticks(5);
 
 
     this.area = d3.svg.area()
@@ -122,11 +141,31 @@ lineChart.prototype.render = function () {
               this.margin.left + "," +
               this.margin.top + ")");
 
+    svg.append("rect")
+        .attr("width", this.width - this.margin.left - this.margin.right)
+        .attr("height", this.height*this.hmult)
+        .attr("fill", "#f5f5f5");
+
+    /* Drawing the grid */
+    svg.append("g")
+        .attr("class", "gridBar")
+        .attr("transform", "translate(0," + this.height*this.hmult + ")")
+        .call(this.make_x_axis()
+            .tickSize(-this.height, 0, 0)
+            .tickFormat(""));
+
+    svg.append("g")
+        .attr("class", "grid")
+        .call(this.make_y_axis()
+            .tickSize(-(this.width - this.margin.left - this.margin.right), 0, 0)
+            .tickFormat(""))
+            .style("opacity", 0.2);
+
+    /* Drawing data */
     svg.append("path")
          .datum(this.computeData)
          .attr("class", "area")
          .attr("d", this.area);
-
 
     // Draw line passing data and using the line function
     svg.append("path")
@@ -144,11 +183,13 @@ lineChart.prototype.render = function () {
 
     //select all individual xAxis text
     svg.selectAll(".x-axis text")
-        .attr("transform", "translate(0,15)rotate(-20)");
+        .attr("transform", "translate(0,15)rotate(0)")
+        .style("fill", "#969696");
 
     svg.append("g")
         .attr("class", "y-axis")
-        .call(this.yAxis);
+        .call(this.yAxis)
+        .style("fill", "#969696");
 
     return this.svgEl;
 };

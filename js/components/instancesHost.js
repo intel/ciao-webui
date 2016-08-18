@@ -3,7 +3,6 @@ var React = require('react');
 var CustomCatalogue = require('./catalogue/customCatalogue.js');
 var $ = require('jquery');
 var actionString = '';
-var status = [];
 
 var instancesHost = React.createClass({
     displayName: 'instancesHost',
@@ -28,7 +27,6 @@ var instancesHost = React.createClass({
     },
 
     actionAllInstances: function (status) {
-        console.log("action", status);
         var url = "/data/" + datamanager.data.activeTenant.id +
                 "/servers/action";
         $.ajax({
@@ -39,9 +37,9 @@ var instancesHost = React.createClass({
                   },
             dataType: "application/json"
         }).done(data => {
-            console.log(data);
+            console.log('data - action', data);
         }).fail(err => {
-            console.log(err);
+            console.log('err - action', err);
         });
     },
 
@@ -50,10 +48,10 @@ var instancesHost = React.createClass({
             var url = "/data/" + datamanager.data.activeTenant.id +
                 //TODO: not having tenant_id may cause bugs
                 // for users with more than one tenant
-                "/servers/" + el.instance_id + "/action";
+                "/servers/" + el.id + "/action";
             $.post({
                 url: url,
-                data: { server: el.instance_id, action: "os-start" },
+                data: { server: el.id, action: "os-start" },
                 dataType: "application/json"
             }).done(data => {
                 console.log(data);
@@ -67,10 +65,10 @@ var instancesHost = React.createClass({
         elements.forEach(el => {
             var url = "/data/" + datamanager.data.activeTenant.id +
                 //el.tenant_id +
-                "/servers/" + el.instance_id + "/action";
+                "/servers/" + el.id + "/action";
             $.post({
                 url: url,
-                data: { server: el.instance_id, action: "os-stop" },
+                data: { server: el.id, action: "os-stop" },
                 dataType: "application/json"
             }).done(data => {
                 console.log(data);
@@ -84,11 +82,11 @@ var instancesHost = React.createClass({
         elements.forEach(el => {
             var url = "/data/" + datamanager.data.activeTenant.id +
                 //el.tenant_id +
-                "/servers/" + el.instance_id;
+                "/servers/" + el.id;
             $.ajax({
                 url: url,
                 type: "DELETE",
-                data: { server: el.instance_id, action: "os-delete" },
+                data: { server: el.id, action: "os-delete" },
                 dataType: "application/json"
             }).done(data => {
                 console.log(data);
@@ -133,43 +131,39 @@ var instancesHost = React.createClass({
             this.refs.catalogue.showModal({
                 title: modalTitle,
                 body: modalBody,
-                onAccept: this.actionAllInstances,
+                onAccept: this.masiveAction,
                 acceptText: modalAceptText
             });
         }
     },
 
-    disabledStartButton: function (item) {
-        var disabled = true;
-        if (item.length > 0) {
-            var firstElement = item[0];
-            if (firstElement.State != 'active' && firstElement.State != 'starting') {
-                disabled = false;
-            }
-        }
-        return false;
+    //If at least one is exites or stopped, enabled the button
+    disabledStartButton: function (items) {
+        var find = items.filter(function(item){
+            return item.status == 'exited' || item.status == 'stopped'
+        })
+
+        return find.length == 0;
     },
 
-    disabledStopButton: function (item) {
-        var disabled = true;
-        if (item.length > 0) {
-            var firstElement = item[0];
-            if (firstElement.State != 'stopped' && firstElement.State != 'exited') {
-                disabled = false;
-            }
-        }
-        return disabled;
+    //If at least one is active, enabled the button
+    disabledStopButton: function (items) {
+        var find = items.filter(function(item){
+            return item.status == 'active'
+        })
+
+        return find.length == 0;
     },
 
-    disabledRemoveButton: function (item) {
-        var disabled = true;
-        if (item.length > 0) {
-            disabled = false;
+    disabledRemoveButton: function (items) {
+        var enabled = false;
+        if (items.length > 0) {
+            enabled = true;
         }
-        return disabled;
+        return !enabled;
     },
 
-    getActions: function () {
+    getButtonsActions: function () {
         return [{
             label: 'Start',
             name: 'Start',
@@ -188,16 +182,25 @@ var instancesHost = React.createClass({
         }];
     },
 
-    getDropdownActions: function () {
-        return [{
-            label: 'All Active',
-            name: 'active',
-            query: { 'State': 'active' }
-        }, {
-            label: 'All Stopped',
-            name: 'stopped',
-            query: { 'State': 'exited' }
-        }];
+    getSelectActions: function () {
+        return [
+            {
+                label:'All',
+                name:'all',
+                query: {'status':'all'}
+            },{
+                label: 'All Active',
+                name: 'active',
+                query: { 'status': 'active' }
+            }, {
+                label: 'All Stopped',
+                name: 'stopped',
+                query: { 'status': 'exited' }
+            },{
+                label:'None',
+                name:'none',
+                query: {'status':'none'}
+            }];
     },
 
     getSearchfields: function () {
@@ -259,34 +262,6 @@ var instancesHost = React.createClass({
 
     onChangePage: function (lastRecord) {
         this.setState({ pagination: lastRecord });
-        //onStateChange
-        //componentShouldUpdate
-    },
-
-    selectAll: function (status,action) {
-        return function () {
-            actionString = "";
-            switch (action) {
-                case "Start":
-                actionString = "os-start";
-                break;
-                case "Stop":
-                actionString = "os-stop";
-                break;
-                case "Remove":
-                actionString = "os-delete";
-                break;
-            }
-
-            // refactor ... testing
-            this.confirmDelete(status, actionString);
-            var s = this.state;
-            s.selectAll = true;
-            this.setState(s);
-        }.bind(this);
-    },
-
-    componentWillMount: function () {
     },
 
     render: function () {
@@ -300,12 +275,11 @@ var instancesHost = React.createClass({
             data: this.props.data,
             count: this.props.count,
             columns: columns,
-            actions: this.getActions(),
-            dropDownActions: this.getDropdownActions(),
+            actions: this.getButtonsActions(),
+            dropDownActions: this.getSelectActions(),
             searchFields: this.getSearchfields(),
             onChangePage: this.onChangePage,
-            selectAll: this.selectAll,
-            id:'instance_id',
+            id: 'id',
             ref: 'catalogue',
             searchTitle: 'Search Instances',
         });else return React.createElement('div', null);

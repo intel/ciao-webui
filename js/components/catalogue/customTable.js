@@ -11,30 +11,38 @@ var customTable = React.createClass({
 
     getInitialState: function () {
         return {
-            activePage: 1,
-            actualItems: []
+            activePage: 1
         };
     },
-
-    select: function (row) {
-        var selected = this.props.selectedRows;
+    selectRow: function (selectedRow) {
+        var key = this.props.id;
         var newSelected = [];
 
-        if (Object.keys(selected).length == 1) {
+        //first element
+        if(this.props.selectedRows.length == 0){
+            newSelected.push(selectedRow);
+        }else{
+            var indexRow = this.props.selectedRows.findIndex(function (row) {
+                return row[key] == selectedRow[key]
+            });
 
-            if (selected[0][this.props.id] == row[this.props.id]) {
-                newSelected = [];
-            } else {
-                newSelected.push(row);
+            this.props.selectedRows.forEach(function (element, index) {
+                //If is the same, not add it.
+                if (selectedRow[key] != element[key]) {
+                    newSelected.push(element);
+                }
+            })
+
+            //If not exist, add it.
+            if(indexRow < 0) {
+                newSelected.push(selectedRow);
             }
-        } else {
-            newSelected.push(row);
         }
+
         this.props.onSelectRow(newSelected);
     },
 
     isChecked: function (row) {
-        // isChecked function comes customCatalogue component
         return this.props.isChecked(row,this.props.selectedRows);
     },
 
@@ -44,51 +52,59 @@ var customTable = React.createClass({
         //var lasItem = this.props.data[this.props.data.length - 1];
         this.props.onChangePage(page);
     },
+    getTableHeader: function(){
+        var table_header = this.props.columns.map((column, i) => {
+                return React.createElement(
+                    'th',
+                    { key: i + 1 },
+                    column
+                );
+        });
+        table_header.unshift(React.createElement('td', { key: 0 }));
 
-    render: function () {
+        return table_header;
+    },
+    getTableBody: function(){
+        var table_body;
 
-        var actualData = this.props.data;
-
-        var body;
         try {
-            body = actualData.map((row, i) => {
+            table_body = this.props.data.map((row, i) => {
                     var columns = [];
 
+            //Add input select for each row
             columns.push(React.createElement(
                 'td',
                 null,
                 React.createElement('input', {
                     type: 'checkbox',
-                    onClick: this.select.bind(null, row),
+                    onClick: this.selectRow.bind(null, row),
                     checked: this.isChecked(row) })
             ));
 
-            //first element is a link
-            if (this.props.link) {
-
-                columns.push(React.createElement(
-                    'td',
-                    null,
-                    React.createElement(
-                        'a',
-                        { className: 'frm-link',
-                            href: this.props.link.url +
-                            row[this.props.link.field] },
-                        row[this.props.link.field]
-                    )
-                ));
-
-            }
-
+            //Add the rest of the information into the body's table
             for (var key in row) {
 
-                if(key != this.props.link.field){
+                //Add link, if exist
+                if(this.props.link && this.props.link.field == key){
+                    columns.push(React.createElement(
+                        'td',
+                        null,
+                        React.createElement(
+                            'a',
+                            { className: 'frm-link',
+                                href: this.props.link.url +
+                                row[this.props.link.field] },
+                            row[this.props.link.field]
+                        )
+                    ));
+                }else{
                     columns.push(React.createElement(
                         'td',
                         { key: key, className: key + '-' + row[key] },
                         row[key]
                     ));
                 }
+
             }
 
             return React.createElement(
@@ -99,17 +115,13 @@ var customTable = React.createClass({
             );
         });
         } catch(err) {
-            body = [];
+            table_body = [];
         }
 
-        var header = this.props.columns.map((column, i) => {
-                return React.createElement(
-                    'th',
-                    { key: i + 1 },
-                    column
-                );
-    });
-        header.unshift(React.createElement('td', { key: 0 }));
+        return table_body;
+    },
+
+    render: function () {
 
         return React.createElement(
             'div',
@@ -123,13 +135,13 @@ var customTable = React.createClass({
                     React.createElement(
                         'tr',
                         null,
-                        header
+                        this.getTableHeader()
                     )
                 ),
                 React.createElement(
                     'tbody',
                     null,
-                    body
+                    this.getTableBody()
                 )
             ),
             React.createElement(
@@ -145,17 +157,7 @@ var customTable = React.createClass({
                         onSelect: this.changePage }))
             )
         );
-    },
-    componentWillUnmount: function () {},
-    componentDidMount: function () {
-        // $.get(this.props.source,
-        //       (result) => {
-        //           this.props.data = (result.length == 0)?
-        //               result:this.props.fake_data;
-        //           // TODO: render
-        //       });
-    },
-    componentDidUpdate: function (prevProps, prevState) {}
+    }
 });
 
 module.exports = customTable;

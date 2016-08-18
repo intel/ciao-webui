@@ -15,15 +15,15 @@ process.argv.forEach((value) => {
         password = value.split("=").pop();
 });
 
-var blockHostname = "hostname";
-var blockPort = "port";
-var blockProtocol = "http";
+var blockHostname = "";
+var blockPort = "";
+var blockProtocol = "";
 
 var req = {session:{}};
 
 var bundle = {
-    username: username,
-    password: password
+    username: "",
+    password: ""
 };
 
 var adapter = new ciaoAdapter();
@@ -98,6 +98,21 @@ token = sessionHandler
                             Object.assign({
                                 params:{tenant:replServer.context.project},
                                 body: {name:n,size:s}
+                            },replServer.context.req),
+                            {send:function(d){
+                                console.log(d);
+                            }}
+                            ,null);
+
+                    };
+
+                    replServer.context.block.attach = function (id, instance) {
+                        return blockService.attachVolume()(
+                            Object.assign({
+                                params:{tenant:replServer.context.project,
+                                        volume_id:id},
+                                body: {"os-attach":{
+                                    "instance_uuid":instance}}
                             },replServer.context.req),
                             {send:function(d){
                                 console.log(d);

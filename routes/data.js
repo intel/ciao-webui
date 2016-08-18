@@ -10,9 +10,13 @@ var BlockService = require('../core/blockService');
 // Set up
 var adapter = new ciaoAdapter();
 var tokenManager = new TokenManager(sessionHandler);
-var nodeService = new NodeService(adapter, tokenManager);
-var tenantService = new TenantService(adapter, tokenManager);
-var blockService = new BlockService(adapter, tokenManager);
+
+var nodeService = new NodeService(adapter.useNode('controller'),
+                                  tokenManager);
+var tenantService = new TenantService(adapter.useNode('controller'),
+                                      tokenManager);
+var blockService = new BlockService(adapter.useNode('storage'),
+                                    tokenManager);
 // Validate session as an authorized token is required
 router.use(sessionHandler.validateSession);
 
@@ -21,7 +25,8 @@ router.delete('/:tenant/servers/:server', function (req, res, next) {
         (t) => {
             var uri = "/v2.1/" + req.params.tenant +
                 "/servers/" + req.params.server;
-            var data = adapter.delete(uri,req.session.token, () => {
+            var data = adapter.useNode("controller")
+                    .delete(uri,req.session.token, () => {
                 res.send(data.raw);
             });
         })
@@ -34,6 +39,7 @@ router.get('/:tenant/volumes', blockService.getVolumes());
 
 // Block service POST Methods
 router.post('/:tenant/volumes', blockService.createVolume());
+router.post('/:tenant/volumes/:volume_id/action', blockService.attachVolume());
 
 //Block Service DELETE Methods
 router.delete('/:tenant/volumes/:volume_id', blockService.deleteVolume());
@@ -64,7 +70,7 @@ router.get('/:tenant/flavors/:flavor', tenantService.getFlavor());
 router.get('/flavors/:flavor/servers/detail', function(req, res, next) {
     var uri = "/v2.1/flavors/" +
         req.params.flavor + "/servers/detail";
-    var data = adapter.get(
+    var data = adapter.useNode("controller").get(
         uri,req.session.token,
         () => res.send(data.json));
 });
@@ -83,10 +89,10 @@ router.get('/:tenant/resources', function(req, res, next) {
             "to":""
         };
 
-        var data = adapter.get(
+        var data = adapter.useNode('controller').get(
             uri,req.session.token,
             () => {
-                if (data.json) {
+                if (data.json.usage) {
                     usageSummary.from = data.json.usage[0].timestamp;
                     usageSummary.to = data.json.usage[data.json.usage.length-1].timestamp;
 
@@ -126,7 +132,8 @@ router.get('/:tenant/quotas', function (req, res, next) {
                 (value / 1000) + "TB";
         };
         var uri = "/v2.1/" + req.params.tenant + "/quotas";
-        var data = adapter.get(uri,req.session.token, () => {
+        var data = adapter.useNode('controller')
+                .get(uri,req.session.token, () => {
             if (data.json) {
                 var validateQuota = (value) => {
                     if (value !== -1){
@@ -139,25 +146,25 @@ router.get('/:tenant/quotas', function (req, res, next) {
                     {
                         value: data.json.instances_usage,
                         quota: validateQuota(data.json.instances_limit),
-                        name: "Instances",
+                        name: "Total Instances",
                         unit: ""
                     },
                     {
                         value: data.json.ram_usage,
                         quota: validateQuota(data.json.ram_limit),
-                        name: "Memory",
+                        name: "Memory Usage",
                         unit: ""
                     },
                     {
                         value: data.json.cpus_usage,
-                        name: "Processors",
+                        name: "Processor Load Average",
                         quota: validateQuota(data.json.cpus_limit),
                         unit: ""
                     },
                     {
                         value: data.json.disk_usage,
                         quota: validateQuota(data.json.disk_limit),
-                        name: "Disk",
+                        name: "Disk Usage",
                         unit: ""
                     }
                 ];
@@ -184,7 +191,7 @@ router.get('/nodes/:node/servers/detail/count',
 
 router.get('/cncis', function (req, res, next) {
     var uri = "/v2.1/cncis";
-    var data = adapter.get(uri,req.session.token, () => {
+    var data = adapter.useNode('controller').get(uri,req.session.token, () => {
         res.set('Content-Type','application/json');
         res.send(data.json);
     });
@@ -192,7 +199,8 @@ router.get('/cncis', function (req, res, next) {
 
 router.get('/cncis/:cnci/detail', function (req, res, next) {
     var uri = "/v2.1/cncis/" + req.params.cnci + "/detail";
-    var data = adapter.get(uri,req.session.token, () => res.send(data.json));
+    var data = adapter.useNode('controller')
+            .get(uri,req.session.token, () => res.send(data.json));
 });
 
 module.exports = router;
