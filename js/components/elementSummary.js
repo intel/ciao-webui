@@ -62,6 +62,7 @@ var elementSummary = React.createClass({
         }
     },
     renderPanel: function(){
+        console.log("propd", this.props);
         // define labels for each concept
         var reference;
         var body = this.props.value;

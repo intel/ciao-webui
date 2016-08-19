@@ -20,9 +20,15 @@ d3ElementSummary.create = function (svgEl, props, state) {
 
 // returns color function based on props
 d3ElementSummary.color = function (props) {
-    return d3Complement.scaleQuantize()
-        .domain([props.quota / 2, props.quota / 1.5, props.quota])
-        .range(["#52f3a4","#f3d54e" ,"#ff5573"]);
+    if(props.id) {
+        return d3Complement.scaleQuantize()
+            .domain([props.quota / 2, props.quota / 1.5, props.quota])
+            .range(["#ff5573","#f3d54e","#52f3a4"]);
+    } else {
+        return d3Complement.scaleQuantize()
+            .domain([props.quota / 2, props.quota / 1.5, props.quota])
+            .range(["#52f3a4","#f3d54e" ,"#ff5573"]);
+    }
 };
 
 d3ElementSummary.update = function (svgEl, props, state) {
@@ -31,12 +37,20 @@ d3ElementSummary.update = function (svgEl, props, state) {
     var angle = (Math.PI * 2) * (props.value / props.quota);
     var angleFull = (Math.PI * 2);
     var sizeX;
+    var complementLabel, title;
 
     // getting size for quotas
     if (((Math.round(props.value * 100 / props.quota)).toString()).length > 2) {
         sizeX = 35;
     } else {
         sizeX = 25;
+    }
+
+    // Getting labels for chart
+    if (props.id) {
+        complementLabel = " Running";
+    } else {
+        complementLabel = "";
     }
 
     // create arc for given data
@@ -101,7 +115,7 @@ d3ElementSummary.update = function (svgEl, props, state) {
         .attr("y", 15 + props.width / 1.5)
         .style({"fill":"#969696", "font-size":"12px"})
         .text( (d) => {
-            return props.value + " of " + props.quota;});
+            return props.value + " of " + props.quota + complementLabel;});
 
     return svgEl;
 };
