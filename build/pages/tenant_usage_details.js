@@ -34,9 +34,12 @@ jQuery('document').ready(function () {
     var startDate = new Date();
     var endDate = new Date();
 
-    startDate.setHours(0, 0, 0, 0);
-    startDate.setMonth(startDate.getMonth() - 3);
-    endDate.setDate(startDate.getDate());
+    //startDate.setHours(0,0,0,0);
+
+    /**** Correct Dates ****/
+    //startDate.setDate(startDate.getDate() -2);
+    /*** end ***/
+    startDate.setDate(startDate.getDate() - 2);
 
     // default data
     var usageData = {

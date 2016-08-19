@@ -2,7 +2,7 @@
 .line {
     fill: none;
     stroke: #00aeef;
-    stroke-width: 1.5px;
+    stroke-width: 2px;
 }
 
 .line-chart-time-control {
@@ -20,7 +20,7 @@
 
 .domain {
     fill: none;
-    stroke: #000;
+    stroke: none;
     stroke-width: 1.5px;
 }
 
@@ -37,4 +37,17 @@
     fill: #00aeef;
     opacity: 0.15;
     stroke-width: 0;
+}
+/* Grid lines */
+.grid .tick {
+    all: unset;
+    stroke: #969696;
+    stroke-width: 3;
+}
+.grid path {
+      stroke-width: 0;
+}
+.gridBar .tick {
+    stroke: #fff;
+    stroke-width: 50;
 }

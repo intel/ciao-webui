@@ -578,6 +578,10 @@ ul> li> a{
     color:#fff;
     background-color: #00aeef;
 }
+.frm-chart-title{
+    padding-right: 5%;
+    color:#80abca;
+}
 /*
 * Nodes, Instance Module
 */

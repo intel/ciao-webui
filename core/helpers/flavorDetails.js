@@ -8,7 +8,7 @@ process.on('message', function(m) {
     global.PROTOCOL = m.globals.protocol;
     global.CONTROLLER_ADDR = m.globals.controller_addr;
     global.CONTROLLER_PORT = m.globals.controller_port;
-    var adapter = new ciaoAdapter();
+    var adapter = (new ciaoAdapter()).useNode('controller');
     if (uri && token && sessionWorkloads)
         var data = adapter.onSuccess(function () {
             var workloads;

@@ -67,7 +67,7 @@ tenantService.prototype.serversDetail = function () {
                                      var image = value.image.id;
                                      var address = value.addresses.private[0];
                                      return {
-                                         "instance_id": value.id,
+                                         "id": value.id,
                                          "status": value.status,
                                          "Node ID": value.hostId,
                                          "IP Address": address.addr,
