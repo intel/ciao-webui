@@ -4,23 +4,14 @@ var InstancesHost = require('../components/instancesHost.js');
 var navbar = require('../components/navbar.js');
 var  Overview = require('../components/overview.js');
 var $ = require('jquery');
+var Logger = require('../util/logger.js');
 
 $('document').ready(function () {
 
-
-    // Navigation bar
-    var nprops = { logoutUrl: "/authenticate/logout"};
-
-    nprops.username = document
-        .getElementById("main-top-navbar")
-        .getAttribute("attr-user");
-
-    nprops.back = {
-        label:'< Back to Admin',
-        url: '/admin'
-    };
-     var n = React.createElement(navbar, nprops);
-     ReactDOM.render(n, document.getElementById("main-top-navbar"));
+    // Create Logger object
+    window.logger = new Logger('logger-container');
+    
+   
 
     var keyOverview = 'overview';
 
@@ -57,10 +48,9 @@ $('document').ready(function () {
             }
         });
 
-    //Set up table to view instances running on current node
-    var key = 'instances-host';
 
-    datamanager.onDataSourceSet(key, function (sourceData) {
+    var keyInstanceHost = 'instances-host';
+    datamanager.onDataSourceSet(keyInstanceHost, function (sourceData) {
         sourceData.source = "/data/nodes/"
             + datamanager.data.idMachine
             + "/servers/detail";
@@ -68,13 +58,41 @@ $('document').ready(function () {
         var refresh = (datamanager.data.REFRESH | 3000);
         sourceData.refresh = Number(refresh);
         sourceData.recordsPerPage = 10;
-        sourceData.dataKey = key;
-
+        sourceData.dataKey = keyInstanceHost;
+        if (datamanager.data.flavors) {
+            try {
+                if (datamanager.data.flavors[0].name)
+                    sourceData.data = sourceData.data.map((x)=>{
+                            try {
+                                x.Image = datamanager.data.flavors.filter(
+                                function (y) {
+                                    return y.disk.localeCompare(x.Image) == 0 ;
+                                })
+                                .pop()
+                                .name;}catch(e){}
+                return x;
+            });
+            } catch(e){}
+        }
         ReactDOM.render(
         <InstancesHost {...sourceData}/>,
-        document.getElementById('instances-host'))
+        document.getElementById('instances-host'));
     });
 
     datamanager.setDataSource('instances-host',{data:[]});
+
+    // Navigation bar
+    var nprops = { logoutUrl: "/authenticate/logout"};
+
+    nprops.username = document
+        .getElementById("main-top-navbar")
+        .getAttribute("attr-user");
+
+    nprops.back = {
+        label:'< Back to Admin',
+        url: '/admin'
+    };
+    var n = React.createElement(navbar, nprops);
+    ReactDOM.render(n, document.getElementById("main-top-navbar"));
 
 });
