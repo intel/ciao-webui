@@ -26,7 +26,6 @@ var elementSummary = React.createClass({
     },
 
     componentWillUpdate: function(nextProps,nextState) {
-
     },
     shouldComponentUpdate: function(nextProps, nextState) {
         //return this.props !== nextProps;
@@ -62,7 +61,6 @@ var elementSummary = React.createClass({
         }
     },
     renderPanel: function(){
-        console.log("propd", this.props);
         // define labels for each concept
         var reference;
         var body = this.props.value;

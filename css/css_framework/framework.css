@@ -95,6 +95,9 @@ h6{
     margin-top: 20px;
 }
 .frm-align-v {
+    padding-top: 20px;
+}
+.frm-align-v2 {
     padding-top: 30px;
 }
 /*
@@ -677,6 +680,7 @@ td.status-exited {
 .add-margin-left{margin-left: 20px;}
 .add-margin-right{margin-right: 20px;}
 .add-padding-left{padding-left: 20px}
+.add-padding-bottom{padding-bottom: 85px;} /* temporal value */
 
 .frm-hidden {
     opacity: 0;

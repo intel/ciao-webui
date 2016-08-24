@@ -1,6 +1,6 @@
 var React = require('react');
 var ReactDOM = require('react-dom/server');
-var AddInstances = require('../components/addInstances.js');
+//var AddInstances = require('../components/addInstances.js');
 var ElementSummary = require('./elementSummary.js');
 
 // InstancesGroup is a single group of instances shown inside the Group Overview
@@ -15,12 +15,16 @@ var instancesGroup = React.createClass({
         var panelStyle;
         // Getting panel class
         if (this.props.quota !== 0) {
+            // panel with chart
             panelStyle = "panel frm-panel frm-panel-default";
         } else {
+            // empty panel
             panelStyle = "panel frm-panel frm-panel-secondary-full";
         }
 
         var getBody = function () {
+            var chartWidth = 120;
+            var chartHeight = chartWidth * 1.5;
             if (this.props.quota !== 0) {
                 return (
                     <div className="panel-body">
@@ -44,7 +48,9 @@ var instancesGroup = React.createClass({
                             </div>
                             <div className="col-xs-6 text-center">
                                 <div key={this.props.name}>
-                                    <ElementSummary {...this.props}/>
+                                    <ElementSummary {...this.props}
+                                    width={chartWidth}
+                                    height={chartHeight}/>
                                 </div>
                             </div>
                         </div>
@@ -53,7 +59,7 @@ var instancesGroup = React.createClass({
             } else {
                 return (
                     <div className="panel-body element-summary-panel">
-                        <div className="frm-panel-title">
+                        <div className="frm-panel-title frm-align-v2">
                             <h4 className="frm-bold-text frm-remake">
                                 No {this.props.name}
                             </h4>
@@ -61,10 +67,9 @@ var instancesGroup = React.createClass({
                                 Instances
                             </h4>
                         </div>
-                        <div className="col-xs-12">
+                        <div className="col-xs-12 frm-align-v2 add-padding-bottom">
                             <div  id="add-instances">
-                                <AddInstances sourceData={[]}
-                                logger={logger}/>
+
                             </div>
                         </div>
                     </div>
