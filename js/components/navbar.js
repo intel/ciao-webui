@@ -18,7 +18,7 @@ var navbar = React.createClass({
     chooseTenant: function(event, tenant) {
         this.setState({tenant: tenant });
         datamanager.data.activeTenant = tenant;
-        datamanager.trigger('update-active-tenant')
+        datamanager.trigger('update-active-tenant');
     },
     logout: function (event) {
         $.post(this.props.logoutUrl,
@@ -38,15 +38,16 @@ var navbar = React.createClass({
             </NavDropdown>);
     },
     getTenantMenu: function () {
-
         var title = (this.state.tenant)?this.state.tenant.name:'';
 
         if(this.props.tenants && this.props.tenants.length > 0){
 
+            var reference = "/admin/tenantDetail/";
             var tenants =  this.props.tenants
                     .map((tenant, i) => (
-                        <MenuItem onSelect={this.chooseTenant}
-                    eventKey={tenant} key={i}>
+                        <MenuItem
+                        href={(tenant.name!=='admin'?reference+
+                        tenant.name:"/"+tenant.name)} >
                         {tenant.name}
                 </MenuItem>));
 
@@ -62,6 +63,7 @@ var navbar = React.createClass({
     },
 
     render: function() {
+
         var titleNavBar   = "";
         var titleNavBrand = "";
         var tenantsMenu   = "";

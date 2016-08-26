@@ -85,5 +85,6 @@ npm run build-subnet
 npm run build-group
 npm run build-notice
 npm run build-tenant-detail
+npm run build-detailby-tenant
 
 npm start
