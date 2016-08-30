@@ -83,7 +83,13 @@ d3ElementSummary.update = function (svgEl, props, state) {
         .attr("y", 8)
         .attr("class","frm-bold-text")
         .style({"font-size":"2em"})
-        .text( (d) => Math.round(d.value * 100 / props.quota));
+        .text( function (d) {
+            if(!d.value) {
+                return "0";
+            } else {
+                return Math.round(d.value * 100 / props.quota);
+            }
+        });
 
     g.append("text")
         .attr("y", -2)
