@@ -107,7 +107,7 @@ var usageSummary = React.createClass({
     },
 
     render: function() {
-
+        console.log("props usage summary", this.props);
         var dynamicWidth = Math.round(12 / this.props.data.length);
         var elements = [];
         var historyButton;

@@ -107,7 +107,7 @@ var groupOverview = React.createClass({
     render: function() {
         var groups = this.props.flavors
             .map((props, i) => (
-                <div className="col-md-4" key={i}>
+                <div className="col-md-6" key={i}>
                     <InstancesGroup {...props}/>
                 </div>));
 

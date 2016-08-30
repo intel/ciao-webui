@@ -45,9 +45,6 @@ body{
     padding-right: 2%;
     background-color: #fff;
 }
-.container{
-
-}
 h1{
     font-size: 12px;
 }
@@ -96,6 +93,12 @@ h6{
 }
 .frm-body-h6{
     margin-top: 20px;
+}
+.frm-align-v {
+    padding-top: 20px;
+}
+.frm-align-v2 {
+    padding-top: 30px;
 }
 /*
 * Headers
@@ -212,6 +215,10 @@ h6{
     border-radius: 6px;
     background-color: #52f3a4;
     color: white;
+}
+.frm-panel-secondary-full {
+    border-radius: 0px;
+    background-color: #e1e1e1;
 }
 .frm-panel-information-full{
     border-radius: 6px;
@@ -673,6 +680,7 @@ td.status-exited {
 .add-margin-left{margin-left: 20px;}
 .add-margin-right{margin-right: 20px;}
 .add-padding-left{padding-left: 20px}
+.add-padding-bottom{padding-bottom: 85px;} /* temporal value */
 
 .frm-hidden {
     opacity: 0;
