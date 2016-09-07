@@ -25,6 +25,7 @@ $('document').ready(function () {
         return value < 1500 ? value + "GB" : value / 1000 + "TB";
     };
 
+    console.log("data", datamanager);
     //Node Summary
     datamanager.onDataSourceSet('node-summary', function (sourceData) {
 

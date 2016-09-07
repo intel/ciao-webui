@@ -1245,7 +1245,7 @@ var groupOverview = React.createClass({
     render: function () {
         var groups = this.props.flavors.map((props, i) => React.createElement(
             'div',
-            { className: 'col-md-4', key: i },
+            { className: 'col-md-6', key: i },
             React.createElement(InstancesGroup, props)
         ));
 
@@ -1260,8 +1260,12 @@ var groupOverview = React.createClass({
 
 module.exports = groupOverview;
 },{"./instancesGroup.js":11,"react":449}],11:[function(require,module,exports){
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var React = require('react');
 var ReactDOM = require('react-dom/server');
+//var AddInstances = require('../components/addInstances.js');
+var ElementSummary = require('./elementSummary.js');
 
 // InstancesGroup is a single group of instances shown inside the Group Overview
 
@@ -1272,57 +1276,96 @@ var instancesGroup = React.createClass({
     componentDidMount: function (rootNode) {},
     componentDidUpdate: function (prevProps, prevState, rootNode) {},
     render: function () {
-        //h4  {this.props.instances.length}
-        //h4 { this.props.instances.filter( (i) =>
-        ///                       i.instance_state == "running" ).length}
+        var panelStyle;
+        // Getting panel class
+        if (this.props.quota !== 0) {
+            // panel with chart
+            panelStyle = "panel frm-panel frm-panel-default";
+        } else {
+            // empty panel
+            panelStyle = "panel frm-panel frm-panel-secondary-full";
+        }
+
         var getBody = function () {
-            return React.createElement(
-                'div',
-                { className: 'panel-body' },
-                React.createElement(
+            var chartWidth = 120;
+            var chartHeight = chartWidth * 1.5;
+            if (this.props.quota !== 0) {
+                return React.createElement(
                     'div',
-                    { className: 'frm-panel-title' },
-                    React.createElement(
-                        'h3',
-                        { className: 'frm-bold-text frm-remake' },
-                        this.props.name
-                    )
-                ),
-                React.createElement(
-                    'div',
-                    { className: 'row' },
+                    { className: 'panel-body' },
                     React.createElement(
                         'div',
-                        { className: 'col-xs-6 text-center' },
-                        React.createElement('h4', null),
-                        React.createElement(
-                            'h6',
-                            { className: 'frm-bold-text' },
-                            this.props.totalInstances
-                        ),
+                        { className: 'frm-panel-title' },
                         React.createElement(
                             'h3',
-                            { className: 'frm-secondary-text' },
+                            { className: 'frm-bold-text frm-remake frm-secondary-text' },
+                            this.props.name
+                        )
+                    ),
+                    React.createElement(
+                        'div',
+                        { className: 'row' },
+                        React.createElement(
+                            'div',
+                            { className: 'col-xs-6' },
+                            React.createElement(
+                                'div',
+                                { className: 'col-xs-9 frm-align-v' },
+                                React.createElement(
+                                    'h6',
+                                    { className: 'frm-bold-text frm-panel-pull-left' },
+                                    this.props.quota
+                                )
+                            ),
+                            React.createElement(
+                                'div',
+                                { className: 'col-xs-5' },
+                                React.createElement(
+                                    'h5',
+                                    { className: 'frm-bold-text frm-panel-pull-left' },
+                                    'Instances'
+                                )
+                            )
+                        ),
+                        React.createElement(
+                            'div',
+                            { className: 'col-xs-6 text-center' },
+                            React.createElement(
+                                'div',
+                                { key: this.props.name },
+                                React.createElement(ElementSummary, _extends({}, this.props, {
+                                    width: chartWidth,
+                                    height: chartHeight }))
+                            )
+                        )
+                    )
+                );
+            } else {
+                return React.createElement(
+                    'div',
+                    { className: 'panel-body element-summary-panel' },
+                    React.createElement(
+                        'div',
+                        { className: 'frm-panel-title frm-align-v2' },
+                        React.createElement(
+                            'h4',
+                            { className: 'frm-bold-text frm-remake' },
+                            'No ',
+                            this.props.name
+                        ),
+                        React.createElement(
+                            'h4',
+                            { className: 'frm-bold-text frm-remake' },
                             'Instances'
                         )
                     ),
                     React.createElement(
                         'div',
-                        { className: 'col-xs-6 text-center' },
-                        React.createElement('h4', null),
-                        React.createElement(
-                            'h6',
-                            { className: 'frm-bold-text' },
-                            this.props.totalRunningInstances
-                        ),
-                        React.createElement(
-                            'h3',
-                            { className: 'frm-secondary-text' },
-                            'Running'
-                        )
+                        { className: 'col-xs-12 frm-align-v2 add-padding-bottom' },
+                        React.createElement('div', { id: 'add-instances' })
                     )
-                )
-            );
+                );
+            }
         }.bind(this);
 
         return React.createElement(
@@ -1331,14 +1374,15 @@ var instancesGroup = React.createClass({
             React.createElement('div', { className: 'frm-panel-heading frm-panel-standar' }),
             React.createElement(
                 'div',
-                { className: 'panel frm-panel frm-panel-default' },
+                { className: panelStyle },
                 function () {
                     if (this.props.name) return getBody();else return React.createElement(
                         'h3',
                         { className: 'frm-secondary-text' },
                         'Loading..'
                     );
-                }.bind(this)()
+                }.bind(this)(),
+                React.createElement('div', { className: 'panel-footer frm-panel-footer-secondary' })
             )
         );
     }
@@ -1346,7 +1390,7 @@ var instancesGroup = React.createClass({
 });
 
 module.exports = instancesGroup;
-},{"react":449,"react-dom/server":287}],12:[function(require,module,exports){
+},{"./elementSummary.js":9,"react":449,"react-dom/server":287}],12:[function(require,module,exports){
 // React js component
 var React = require('react');
 var CustomCatalogue = require('./catalogue/customCatalogue.js');
@@ -1817,15 +1861,15 @@ var navbar = React.createClass({
         );
     },
     getTenantMenu: function () {
-
         var title = this.state.tenant ? this.state.tenant.name : '';
 
         if (this.props.tenants && this.props.tenants.length > 0) {
 
+            var reference = "/admin/tenantDetail/";
             var tenants = this.props.tenants.map((tenant, i) => React.createElement(
                 MenuItem,
-                { onSelect: this.chooseTenant,
-                    eventKey: tenant, key: i },
+                {
+                    href: tenant.name !== 'admin' ? reference + tenant.name : "/" + tenant.name },
                 tenant.name
             ));
 
@@ -1841,6 +1885,7 @@ var navbar = React.createClass({
     },
 
     render: function () {
+
         var titleNavBar = "";
         var titleNavBrand = "";
         var tenantsMenu = "";
@@ -2001,7 +2046,7 @@ var usageSummary = React.createClass({
     },
 
     render: function () {
-
+        console.log("props usage summary", this.props);
         var dynamicWidth = Math.round(12 / this.props.data.length);
         var elements = [];
         var historyButton;
@@ -2060,7 +2105,11 @@ d3ElementSummary.create = function (svgEl, props, state) {
 
 // returns color function based on props
 d3ElementSummary.color = function (props) {
-    return d3Complement.scaleQuantize().domain([props.quota / 2, props.quota / 1.5, props.quota]).range(["#52f3a4", "#f3d54e", "#ff5573"]);
+    if (props.id) {
+        return d3Complement.scaleQuantize().domain([props.quota / 2, props.quota / 1.5, props.quota]).range(["#ff5573", "#f3d54e", "#52f3a4"]);
+    } else {
+        return d3Complement.scaleQuantize().domain([props.quota / 2, props.quota / 1.5, props.quota]).range(["#52f3a4", "#f3d54e", "#ff5573"]);
+    }
 };
 
 d3ElementSummary.update = function (svgEl, props, state) {
@@ -2069,12 +2118,20 @@ d3ElementSummary.update = function (svgEl, props, state) {
     var angle = Math.PI * 2 * (props.value / props.quota);
     var angleFull = Math.PI * 2;
     var sizeX;
+    var complementLabel, title;
 
     // getting size for quotas
     if (Math.round(props.value * 100 / props.quota).toString().length > 2) {
         sizeX = 35;
     } else {
         sizeX = 25;
+    }
+
+    // Getting labels for chart
+    if (props.id) {
+        complementLabel = " Running";
+    } else {
+        complementLabel = "";
     }
 
     // create arc for given data
@@ -2094,14 +2151,20 @@ d3ElementSummary.update = function (svgEl, props, state) {
 
     g.append("path").attr("d", arc).style("fill", d => this.color(props)(d.value));
 
-    g.append("text").attr("y", 8).attr("class", "frm-bold-text").style({ "font-size": "2em" }).text(d => Math.round(d.value * 100 / props.quota));
+    g.append("text").attr("y", 8).attr("class", "frm-bold-text").style({ "font-size": "2em" }).text(function (d) {
+        if (!d.value) {
+            return "0";
+        } else {
+            return Math.round(d.value * 100 / props.quota);
+        }
+    });
 
     g.append("text").attr("y", -2).attr("x", sizeX).attr("class", "frm-bold-text").style({ "font-size": "smaller" }).text("%");
 
     g.append("text").attr("y", props.width / 1.5).attr("class", "frm-bold-text").text(d => props.name);
 
     g.append("text").attr("y", 15 + props.width / 1.5).style({ "fill": "#969696", "font-size": "12px" }).text(d => {
-        return props.value + " of " + props.quota;
+        return props.value + " of " + props.quota + complementLabel;
     });
 
     return svgEl;
@@ -2143,7 +2206,7 @@ $('document').ready(function () {
 
     // Component to Add instances
     datamanager.onDataSourceSet('add-instances', function (sourceData) {
-        ReactDOM.render(React.createElement(AddInstances, { sourceData: sourceData, logger: logger }), document.getElementById("add-instances"));
+        ReactDOM.render(React.createElement(AddInstances, { sourceData: sourceData }), document.getElementById("add-instances"));
     });
 
     //Usage summary
@@ -30954,25 +31017,40 @@ var process = module.exports = {};
 var cachedSetTimeout;
 var cachedClearTimeout;
 
+function defaultSetTimout() {
+    throw new Error('setTimeout has not been defined');
+}
+function defaultClearTimeout () {
+    throw new Error('clearTimeout has not been defined');
+}
 (function () {
     try {
-        cachedSetTimeout = setTimeout;
-    } catch (e) {
-        cachedSetTimeout = function () {
-            throw new Error('setTimeout is not defined');
+        if (typeof setTimeout === 'function') {
+            cachedSetTimeout = setTimeout;
+        } else {
+            cachedSetTimeout = defaultSetTimout;
         }
+    } catch (e) {
+        cachedSetTimeout = defaultSetTimout;
     }
     try {
-        cachedClearTimeout = clearTimeout;
-    } catch (e) {
-        cachedClearTimeout = function () {
-            throw new Error('clearTimeout is not defined');
+        if (typeof clearTimeout === 'function') {
+            cachedClearTimeout = clearTimeout;
+        } else {
+            cachedClearTimeout = defaultClearTimeout;
         }
+    } catch (e) {
+        cachedClearTimeout = defaultClearTimeout;
     }
 } ())
 function runTimeout(fun) {
     if (cachedSetTimeout === setTimeout) {
         //normal enviroments in sane situations
+        return setTimeout(fun, 0);
+    }
+    // if setTimeout wasn't available but was latter defined
+    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+        cachedSetTimeout = setTimeout;
         return setTimeout(fun, 0);
     }
     try {
@@ -30993,6 +31071,11 @@ function runTimeout(fun) {
 function runClearTimeout(marker) {
     if (cachedClearTimeout === clearTimeout) {
         //normal enviroments in sane situations
+        return clearTimeout(marker);
+    }
+    // if clearTimeout wasn't available but was latter defined
+    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+        cachedClearTimeout = clearTimeout;
         return clearTimeout(marker);
     }
     try {
