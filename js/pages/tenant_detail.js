@@ -1,14 +1,30 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
+var navbar = require('../components/navbar.js');
 var InstancesHost = require('../components/instancesHost.js');
 var GroupOverview = require('../components/groupOverview.js');
 var UsageSummary = require('../components/usageSummary.js');
 var AddInstances = require('../components/addInstances.js');
-var navbar = require('../components/navbar.js');
 var Logger = require('../util/logger.js');
 var $ = require('jquery');
 
 $('document').ready(function () {
+    var activeTenant = datamanager.data.activeTenant;
+    // Navigation bar
+    var nprops = { logoutUrl: "/authenticate/logout"};
+    // Data manager gets tenants which was passed through  routes:/tenant
+    nprops.tenants = datamanager.data.tenants;
+    nprops.activeTenant = activeTenant;
+    nprops.back = {
+            label:'< Back to [Overview]',
+            url: '/tenant',
+        }
+
+    nprops.username = document
+        .getElementById("main-top-navbar")
+        .getAttribute("attr-user");
+    var n = React.createElement(navbar, nprops);
+    ReactDOM.render(n, document.getElementById("main-top-navbar"));
 
     // Create Logger object
     window.logger = new Logger('logger-container');
@@ -18,11 +34,9 @@ $('document').ready(function () {
     // first use a data source compatible for componenet.
 
     var getUnitString = function (value) {
-
         if (value == null)
             return function (arg) {return arg;};
-
-        return value < 1500 ?
+            return value < 1500 ?
             value + "GB" :
             (value / 1000) + "TB";
     };
@@ -35,8 +49,7 @@ $('document').ready(function () {
             <AddInstances sourceData={sourceData}/>,
             document.getElementById("add-instances"));
     });
-
-    //Usage summary
+        //Usage summary
     datamanager.onDataSourceSet('usage-summary', function (sourceData) {
         sourceData.source = "/quotas";
         var refresh = (datamanager.data.REFRESH | 3000);
@@ -47,40 +60,6 @@ $('document').ready(function () {
     });
     // react hierarchy would be re-rendered
     datamanager.setDataSource('usage-summary', {data:[]});
-
-    //create instances host
-    var keyInstanceHost = 'instances-host';
-    datamanager.onDataSourceSet(keyInstanceHost, function (sourceData) {
-        sourceData.source = "/data/"
-            + datamanager.data.activeTenant.id
-            + "/servers/detail";
-        // pagination shows 10 items per page
-        // milliseconds
-        var refresh = (datamanager.data.REFRESH | 3000);
-        sourceData.refresh = Number(refresh);
-        sourceData.recordsPerPage = 10;
-        sourceData.dataKey = keyInstanceHost;
-        if (datamanager.data.flavors) {
-            try {
-                if (datamanager.data.flavors[0].name)
-                    sourceData.data = sourceData.data.map((x)=>{
-                        try {
-                            x.Image = datamanager.data.flavors.filter(
-                                function (y) {
-                                    return y.disk.localeCompare(x.Image) == 0 ;
-                                })
-                                .pop()
-                                .name;}catch(e){}
-                        return x;
-                    });
-            } catch(e){}
-        }
-        ReactDOM.render(
-            <InstancesHost {...sourceData}/>,
-            document.getElementById('instances-host'));
-    });
-
-    datamanager.setDataSource('instances-host',{data:[]});
 
     // create group overview
     datamanager.onDataSourceSet('group-overview', function (sourceData) {
@@ -116,15 +95,38 @@ $('document').ready(function () {
     };
     getFlavors(0);
 
-    // Navigation bar
-    var nprops = { logoutUrl: "/authenticate/logout"};
-    // Data manager gets tenants which was passed through  routes:/tenant
-    nprops.tenants = datamanager.data.tenants;
-    nprops.activeTenant = activeTenant;
+    //create instances host
+    var keyInstanceHost = 'instances-host';
+    datamanager.onDataSourceSet(keyInstanceHost, function (sourceData) {
+        sourceData.source = "/data/"
+            + datamanager.data.activeTenant.id
+            + "/servers/detail";
+        // pagination shows 10 items per page
+        // milliseconds
+        var refresh = (datamanager.data.REFRESH | 3000);
+        sourceData.refresh = Number(refresh);
+        sourceData.recordsPerPage = 10;
+        sourceData.dataKey = keyInstanceHost;
+        if (datamanager.data.flavors) {
+            try {
+                if (datamanager.data.flavors[0].name)
+                    sourceData.data = sourceData.data.map((x)=>{
+                        try {
+                            x.Image = datamanager.data.flavors.filter(
+                                function (y) {
+                                    return y.disk.localeCompare(x.Image) == 0 ;
+                                })
+                                .pop()
+                                .name;}catch(e){}
+                        return x;
+                    });
+            } catch(e){}
+        }
+        ReactDOM.render(
+            <InstancesHost {...sourceData}/>,
+            document.getElementById('instances-host'));
+    });
 
-    nprops.username = document
-        .getElementById("main-top-navbar")
-        .getAttribute("attr-user");
-    var n = React.createElement(navbar, nprops);
-    ReactDOM.render(n, document.getElementById("main-top-navbar"));
+    datamanager.setDataSource('instances-host',{data:[]});
+
 });

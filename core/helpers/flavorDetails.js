@@ -24,11 +24,15 @@ process.on('message', function(m) {
                         var tri = filteredData.filter((server) => {
                             return server.status == 'active';
                         }).length;
-                        w.totalInstances = ti;
-                        w.totalRunningInstances = tri;
+                        //w.totalInstances = ti;
+                        //w.totalRunningInstances = tri;
+                        w.quota = ti;
+                        w.value = tri;
                     } else {
-                        w.totalInstances = 0;
-                        w.totalRunningInstances = 0;
+                        //w.totalInstances = 0;
+                        //w.totalRunningInstances = 0;
+                        w.quota = 0;
+                        w.value = 0;
                     }
                     return w;
                 });

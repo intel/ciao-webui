@@ -26,7 +26,6 @@ var elementSummary = React.createClass({
     },
 
     componentWillUpdate: function(nextProps,nextState) {
-
     },
     shouldComponentUpdate: function(nextProps, nextState) {
         //return this.props !== nextProps;

@@ -24,6 +24,7 @@ $('document').ready(function () {
         (value / 1000) + "TB";
     };
 
+console.log("data",datamanager);
     //Node Summary
     datamanager.onDataSourceSet('node-summary', function (sourceData) {
 

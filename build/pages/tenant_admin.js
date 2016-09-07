@@ -32,7 +32,7 @@ $('document').ready(function () {
 
     // Component to Add instances
     datamanager.onDataSourceSet('add-instances', function (sourceData) {
-        ReactDOM.render(React.createElement(AddInstances, { sourceData: sourceData, logger: logger }), document.getElementById("add-instances"));
+        ReactDOM.render(React.createElement(AddInstances, { sourceData: sourceData }), document.getElementById("add-instances"));
     });
 
     //Usage summary
