@@ -417,13 +417,21 @@ $('document').ready(function () {
             .done(function (data) {
                 callback();
                 var fmtData = data.volumes.map((x) => {
+                    var attachedTo = "None";
+                    if (x.attachments.length > 0) {
+                        attachedTo = "";
+                        x.attachments.forEach( (a) => {
+                            attachedTo = (a.server_id + " on " + a.device);
+                        });
+                    }
                     return {
                         "volume_id":x.id,
                         "status":x.status,
                         "name":x.name,
                         "Size":new String(x.size," Gb"),
                         "Description":x.description,
-                        "bootable":x.bootable
+                        "bootable":x.bootable,
+                        "Attached to": attachedTo
                     };
                 });
                 datamanager.setDataSource('block-catalogue', {
