@@ -1165,15 +1165,15 @@ var navbar = React.createClass({
         );
     },
     getTenantMenu: function () {
-
         var title = this.state.tenant ? this.state.tenant.name : '';
 
         if (this.props.tenants && this.props.tenants.length > 0) {
 
+            var reference = "/admin/tenantDetail/";
             var tenants = this.props.tenants.map((tenant, i) => React.createElement(
                 MenuItem,
-                { onSelect: this.chooseTenant,
-                    eventKey: tenant, key: i },
+                {
+                    href: tenant.name !== 'admin' ? reference + tenant.name : "/" + tenant.name },
                 tenant.name
             ));
 
@@ -1189,6 +1189,7 @@ var navbar = React.createClass({
     },
 
     render: function () {
+
         var titleNavBar = "";
         var titleNavBrand = "";
         var tenantsMenu = "";
@@ -1865,7 +1866,7 @@ var usageSummary = React.createClass({
     },
 
     render: function () {
-
+        console.log("props usage summary", this.props);
         var dynamicWidth = Math.round(12 / this.props.data.length);
         var elements = [];
         var historyButton;
@@ -1981,7 +1982,11 @@ d3ElementSummary.create = function (svgEl, props, state) {
 
 // returns color function based on props
 d3ElementSummary.color = function (props) {
-    return d3Complement.scaleQuantize().domain([props.quota / 2, props.quota / 1.5, props.quota]).range(["#52f3a4", "#f3d54e", "#ff5573"]);
+    if (props.id) {
+        return d3Complement.scaleQuantize().domain([props.quota / 2, props.quota / 1.5, props.quota]).range(["#ff5573", "#f3d54e", "#52f3a4"]);
+    } else {
+        return d3Complement.scaleQuantize().domain([props.quota / 2, props.quota / 1.5, props.quota]).range(["#52f3a4", "#f3d54e", "#ff5573"]);
+    }
 };
 
 d3ElementSummary.update = function (svgEl, props, state) {
@@ -1990,12 +1995,20 @@ d3ElementSummary.update = function (svgEl, props, state) {
     var angle = Math.PI * 2 * (props.value / props.quota);
     var angleFull = Math.PI * 2;
     var sizeX;
+    var complementLabel, title;
 
     // getting size for quotas
     if (Math.round(props.value * 100 / props.quota).toString().length > 2) {
         sizeX = 35;
     } else {
         sizeX = 25;
+    }
+
+    // Getting labels for chart
+    if (props.id) {
+        complementLabel = " Running";
+    } else {
+        complementLabel = "";
     }
 
     // create arc for given data
@@ -2015,14 +2028,20 @@ d3ElementSummary.update = function (svgEl, props, state) {
 
     g.append("path").attr("d", arc).style("fill", d => this.color(props)(d.value));
 
-    g.append("text").attr("y", 8).attr("class", "frm-bold-text").style({ "font-size": "2em" }).text(d => Math.round(d.value * 100 / props.quota));
+    g.append("text").attr("y", 8).attr("class", "frm-bold-text").style({ "font-size": "2em" }).text(function (d) {
+        if (!d.value) {
+            return "0";
+        } else {
+            return Math.round(d.value * 100 / props.quota);
+        }
+    });
 
     g.append("text").attr("y", -2).attr("x", sizeX).attr("class", "frm-bold-text").style({ "font-size": "smaller" }).text("%");
 
     g.append("text").attr("y", props.width / 1.5).attr("class", "frm-bold-text").text(d => props.name);
 
     g.append("text").attr("y", 15 + props.width / 1.5).style({ "fill": "#969696", "font-size": "12px" }).text(d => {
-        return props.value + " of " + props.quota;
+        return props.value + " of " + props.quota + complementLabel;
     });
 
     return svgEl;
@@ -2057,6 +2076,7 @@ $('document').ready(function () {
         return value < 1500 ? value + "GB" : value / 1000 + "TB";
     };
 
+    console.log("data", datamanager);
     //Node Summary
     datamanager.onDataSourceSet('node-summary', function (sourceData) {
 
@@ -30835,25 +30855,40 @@ var process = module.exports = {};
 var cachedSetTimeout;
 var cachedClearTimeout;
 
+function defaultSetTimout() {
+    throw new Error('setTimeout has not been defined');
+}
+function defaultClearTimeout () {
+    throw new Error('clearTimeout has not been defined');
+}
 (function () {
     try {
-        cachedSetTimeout = setTimeout;
-    } catch (e) {
-        cachedSetTimeout = function () {
-            throw new Error('setTimeout is not defined');
+        if (typeof setTimeout === 'function') {
+            cachedSetTimeout = setTimeout;
+        } else {
+            cachedSetTimeout = defaultSetTimout;
         }
+    } catch (e) {
+        cachedSetTimeout = defaultSetTimout;
     }
     try {
-        cachedClearTimeout = clearTimeout;
-    } catch (e) {
-        cachedClearTimeout = function () {
-            throw new Error('clearTimeout is not defined');
+        if (typeof clearTimeout === 'function') {
+            cachedClearTimeout = clearTimeout;
+        } else {
+            cachedClearTimeout = defaultClearTimeout;
         }
+    } catch (e) {
+        cachedClearTimeout = defaultClearTimeout;
     }
 } ())
 function runTimeout(fun) {
     if (cachedSetTimeout === setTimeout) {
         //normal enviroments in sane situations
+        return setTimeout(fun, 0);
+    }
+    // if setTimeout wasn't available but was latter defined
+    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+        cachedSetTimeout = setTimeout;
         return setTimeout(fun, 0);
     }
     try {
@@ -30874,6 +30909,11 @@ function runTimeout(fun) {
 function runClearTimeout(marker) {
     if (cachedClearTimeout === clearTimeout) {
         //normal enviroments in sane situations
+        return clearTimeout(marker);
+    }
+    // if clearTimeout wasn't available but was latter defined
+    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+        cachedClearTimeout = clearTimeout;
         return clearTimeout(marker);
     }
     try {
