@@ -126,13 +126,14 @@ $('document').ready(function () {
         },
         {
             id: 'volume_size',
-            type:'number',
+            type:'text',
             field:'input',
             name:'size',
-            label:'Size',
+            label:'Size (GB)',
             validate:{
                 required:true,
-                isNumber:true
+                regex:'^[1-9][0-9]*$',
+                message:"Size must be a integer number greater than 0"
             }
         },
         {
