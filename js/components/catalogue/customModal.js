@@ -19,7 +19,8 @@ var Alert = reactBootstrap.Alert;
              options:[array of select values and labels {value"":,label:""}],
              validate:{
                 required:true/false,
-                isNumber:true/false
+                regex:regex expression for complex fields
+                message:error message to show if the regex expression dont pass
              }
          }
     onClose:
@@ -88,11 +89,11 @@ var customModal = React.createClass({
                                     React.createElement(
                                         'textarea',
                                         {
-                                            id: row.id,
-                                            className: 'form-control' ,
-                                            label:label,
-                                            value:this.state.data[row.name],
-                                            onChange: this.onChange.bind(this, row.name)
+                                          id: row.id,
+                                          className: 'form-control' ,
+                                          label:label,
+                                          value:this.state.data[row.name],
+                                          onChange: this.onChange.bind(this, row.name)
                                         },
                                         ''
                                     )
@@ -126,61 +127,78 @@ var customModal = React.createClass({
         }
     },
 
-    validateRequiredFields: function(){
-        return !this.props.fields.find(function(item){
-                if(item.validate.required){
-                    return this.state.data[item.name] == '' ||
-                        this.state.data[item.name] == undefined;
-                }else{
-                    return false;
-                }
-            }.bind(this));
+    //Return true if the field is empty
+    isEmpty: function(field){
+        if (!field){
+            return true;
+        }else{
+            if(field.trim() == ""){
+                return true;
+            }
+        }
+        return false;
     },
 
-    validNumberFields: function(){
-        var valid =  !this.props.fields.find(function(item){
-            if(item.validate.isNumber){
-                return isNaN(this.state.data[item.name]);
-            }else{
-                return false;
-            }
-        }.bind(this));
+    //Return true if is wrong
+    validateFieldWithRegex: function(regex, field){
+        var reg = new RegExp(regex);
+        if (!reg.test(field)) {
+            return true;
+        }
 
-        return valid;
+        return false;
     },
 
     isValid: function () {
-        var valid = false;
+        var valid = true;
 
         if(this.props.type == 'form') {
-            if (this.validateRequiredFields()) {
-                if (this.validNumberFields()) {
-                    valid = true;
-                } else {
-                    this.showAlert(
-                        'Please, fill out with the correct type of field',
-                        'danger'
-                    );
+
+            valid = !this.props.fields.find(function (item) {
+                if (item.validate) {
+                    if(item.validate.required){
+                        if(this.isEmpty(this.state.data[item.name])){
+                            this.showAlert(
+                                item.label + " field can't be empty",
+                                'danger'
+                            );
+                            return true;
+                        }else{
+                            if(item.validate.regex){
+                                var reg = new RegExp(item.validate.regex);
+                                if (!reg.test(this.state.data[item.name])) {
+                                    this.showAlert(
+                                        item.validate.message,
+                                        'danger'
+                                    );
+                                    return true;
+                                } else {
+                                    this.hideAlert();
+                                }
+                            }
+                        }
+                    }
+
                 }
-            } else {
-                this.showAlert(
-                    'Please, fill out all required fields',
-                    'danger'
-                );
-            }
-        }else{
-            valid = true;
+                return false;
+            }.bind(this));
         }
+
         return valid;
     },
 
     showAlert: function(alertText, stateAlert){
-
         this.setState({
             showAlert: {
                 text: alertText,
                 state:stateAlert
             }
+        });
+    },
+
+    hideAlert: function(){
+        this.setState({
+            showAlert: false
         });
     },
 
