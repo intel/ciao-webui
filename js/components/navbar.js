@@ -38,11 +38,18 @@ var navbar = React.createClass({
             </NavDropdown>);
     },
     getTenantMenu: function () {
+        console.log("Propiedades de Tenants", this.props);
+        console.log("estado de Tenants", this.state);
+        console.log("location", (window.location.pathname).substr(0,7));
         var title = (this.state.tenant)?this.state.tenant.name:'';
 
-        if(this.props.tenants && this.props.tenants.length > 0){
-
+        if ((window.location.pathname).substr(0,7) === "/tenant") {
+            var reference = "/tenant/";
+        } else {
             var reference = "/admin/tenantDetail/";
+        }
+
+        if(this.props.tenants && this.props.tenants.length > 0){
             var tenants =  this.props.tenants
                     .map((tenant, i) => (
                         <MenuItem
@@ -59,7 +66,6 @@ var navbar = React.createClass({
         }else{
             <div></div>
         }
-
     },
 
     render: function() {
