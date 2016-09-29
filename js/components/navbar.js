@@ -38,9 +38,6 @@ var navbar = React.createClass({
             </NavDropdown>);
     },
     getTenantMenu: function () {
-        console.log("Propiedades de Tenants", this.props);
-        console.log("estado de Tenants", this.state);
-        console.log("location", (window.location.pathname).substr(0,7));
         var title = (this.state.tenant)?this.state.tenant.name:'';
 
         if ((window.location.pathname).substr(0,7) === "/tenant") {
@@ -82,13 +79,15 @@ var navbar = React.createClass({
             userMenu = this.getUserMenu();
         }
 
-        if(this.props.back){
-                titleNavBrand = this.props.back.label;
-                route = this.props.back.url;
-            }else {
-                titleNavBrand = "CIAO";
-                route = "#";
-            }
+        if(!this.props.back ||
+        ((window.location.pathname).substr(0,7) === "/tenant")){
+            titleNavBrand = "CIAO";
+            route = "#";
+        }else if (this.props.back &&
+        ((window.location.pathname).substr(0,7) !== "/tenant")){
+            titleNavBrand = this.props.back.label;
+            route = this.props.back.url;
+        }
 
         return (
             <Navbar className="frm-navbar navbar-fixed-top" inverse>
