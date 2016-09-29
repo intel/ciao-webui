@@ -155,5 +155,44 @@ router.get('/underConstruction', function (req, res, next) {
     res.render(process.env.NODE_ENV+'_template', underConstruction);
 });
 
+var tenantDetail = {
+    title: 'Tenant Detail',
+    page: 'pages/tenant_detail.ejs',
+    scripts: [
+        '/javascripts/bundle_tenant_detail.js'
+    ],
+    data: {
+        title: 'CIAO',
+        section: ''
+    }
+};
+
+router.get('/:name', function (req, res, next) {
+
+    function findTenant(tenant) {
+        return tenant.name === req.params.name;
+    }
+
+    var activeTenant;
+    // take a look on this and replace for a better code
+    if (req.params.name === 'admin') {
+        activeTenant = req.session.activeTenant;
+
+    } else {
+        activeTenant = req.session.tenants.find(findTenant);
+    }
+
+    tenantDetail.data.section = req.params.name + " overview";
+    tenantDetail.data.username = req.session.username;
+    tenantDetail.data.tenants = req.session.tenants;
+    tenantDetail.data.activeTenant = activeTenant;
+    tenantDetail.data.navbar = {
+        username: req.session.username,
+        tenants: req.session.tenants,
+        logoutUrl: "/authenticate/logout"
+    };
+    res.render(process.env.NODE_ENV+'_template', tenantDetail);
+});
+
 
 module.exports = router;
