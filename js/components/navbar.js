@@ -38,11 +38,11 @@ var navbar = React.createClass({
             </NavDropdown>);
     },
     getTenantMenu: function () {
-        var title = (this.state.tenant)?this.state.tenant.name:'';
-
         if ((window.location.pathname).substr(0,7) === "/tenant") {
+            var title = (this.state.tenant)?this.state.tenant.name:'';
             var reference = "/tenant/";
         } else {
+            var title = (this.state.tenant)?this.state.tenant.name:'admin';
             var reference = "/admin/tenantDetail/";
         }
 
