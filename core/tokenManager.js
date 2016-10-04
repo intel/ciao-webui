@@ -31,13 +31,16 @@ tokenManager.prototype.validate = function (req, res) {
     if (process.env.NODE_ENV != 'production') {
         console.log("validating scope");
         console.log("req.tenant:" +req.params.tenant);
+        console.log("Current token: "+req.session.token);
+        console.log("Get scoped token with tenant-id:"+id);
     }
     // if tenant is available on the parameters, then we need to check
     // if the token is scoped to that tenant
-    if (req.params.tenant) {
+    if (req.params.tenant && req.session.isAdmin === false) {
         var id = req.params.tenant;
-        if (req.session.token_scope == null ||
-            req.session.token_scope != id) {
+        if ((req.session.token_scope == null
+            || req.session.token_scope != id)
+            && id != undefined) {
             // get scoped token
             if (process.env.NODE_ENV != 'production') {
                 console.log("Current token: "+req.session.token);
