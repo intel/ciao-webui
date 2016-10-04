@@ -54,9 +54,17 @@ var customModal = React.createClass({
     },
 
     onChange: function( key, event ) {
-        var data = this.state.data;
-        data[key] = event.target.value;
-        this.setState({data: data});
+
+        if(event){
+            var data = this.state.data;
+            data[key] = (event.target)?event.target.value:event.value;
+            this.setState({data: data});
+        }else{
+            var data = this.state.data;
+            data[key] = null
+            this.setState({data: data});
+        }
+
     },
 
     getBody: function(){
@@ -104,9 +112,11 @@ var customModal = React.createClass({
                 case "select":
                     return <Select
                             id={row.id}
+                            name={row.id}
                             label={label}
-                            value={this.state.value}
-                            placeholder='Select all'
+                            value={this.state.data[row.name]}
+                            placeholder={row.placeholder?row.placeholder:""}
+                            onChange={this.onChange.bind(this, row.name)}
                             options={row.options}
                             />;
 
