@@ -5,6 +5,7 @@ var Modal = reactBootstrap.Modal;
 var Button = reactBootstrap.Button;
 var Input = reactBootstrap.Input;
 var Alert = reactBootstrap.Alert;
+var Select = require('react-select');
 
 /* Custom modal usage
    Properties
@@ -53,9 +54,17 @@ var customModal = React.createClass({
     },
 
     onChange: function( key, event ) {
-        var data = this.state.data;
-        data[key] = event.target.value;
-        this.setState({data: data});
+
+        if(event){
+            var data = this.state.data;
+            data[key] = (event.target)?event.target.value:event.value;
+            this.setState({data: data});
+        }else{
+            var data = this.state.data;
+            data[key] = null
+            this.setState({data: data});
+        }
+
     },
 
     getBody: function(){
@@ -101,18 +110,16 @@ var customModal = React.createClass({
                             );
                     break;
                 case "select":
-                    return <Input
-                        id={row.id}
-                        name={row.id}
-                        type="select"
-                        label={label}
-                        placeholder={row.placeholder?row.placeholder:""}>
-                            {row.options.map((opt, i) => {
-                                return <option value={opt.value} key={i}>
-                                    {opt.label}
-                                </option>;})
-                            }
-                    </Input>;
+                    return <Select
+                            id={row.id}
+                            name={row.id}
+                            label={label}
+                            value={this.state.data[row.name]}
+                            placeholder={row.placeholder?row.placeholder:""}
+                            onChange={this.onChange.bind(this, row.name)}
+                            options={row.options}
+                            />;
+
                     break;
                 default:
                     return React.createElement(
