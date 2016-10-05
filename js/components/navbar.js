@@ -38,11 +38,15 @@ var navbar = React.createClass({
             </NavDropdown>);
     },
     getTenantMenu: function () {
-        var title = (this.state.tenant)?this.state.tenant.name:'';
+        if ((window.location.pathname).substr(0,7) === "/tenant") {
+            var title = (this.state.tenant)?this.state.tenant.name:'';
+            var reference = "/tenant/";
+        } else {
+            var title = (this.state.tenant)?this.state.tenant.name:'admin';
+            var reference = "/admin/tenantDetail/";
+        }
 
         if(this.props.tenants && this.props.tenants.length > 0){
-
-            var reference = "/admin/tenantDetail/";
             var tenants =  this.props.tenants
                     .map((tenant, i) => (
                         <MenuItem
@@ -59,7 +63,6 @@ var navbar = React.createClass({
         }else{
             <div></div>
         }
-
     },
 
     render: function() {
@@ -76,13 +79,15 @@ var navbar = React.createClass({
             userMenu = this.getUserMenu();
         }
 
-        if(this.props.back){
-                titleNavBrand = this.props.back.label;
-                route = this.props.back.url;
-            }else {
-                titleNavBrand = "CIAO";
-                route = "#";
-            }
+        if(!this.props.back ||
+        ((window.location.pathname).substr(0,7) === "/tenant")){
+            titleNavBrand = "CIAO";
+            route = "#";
+        }else if (this.props.back &&
+        ((window.location.pathname).substr(0,7) !== "/tenant")){
+            titleNavBrand = this.props.back.label;
+            route = this.props.back.url;
+        }
 
         return (
             <Navbar className="frm-navbar navbar-fixed-top" inverse>

@@ -11,7 +11,7 @@ var config = {
     ],
     data: {
         title: 'CIAO',
-        section: 'Tenant Overview',
+        //section: 'Tenant Overview',
         username: "no_user"
     }
 };
@@ -67,6 +67,7 @@ router.get('/', validatePermissions, function(req, res, next) {
     config.data.username = req.session.username;
     config.data.tenants = req.session.tenants;
     config.data.activeTenant = req.session.activeTenant;
+    config.data.section = req.session.activeTenant.name + " overview";
     config.data.REFRESH = (Number(process.env.REFRESH) | 3500);
 
     res.render(process.env.NODE_ENV+'_template', config);
@@ -152,6 +153,45 @@ router.get('/underConstruction', function (req, res, next) {
         logoutUrl: "/authenticate/logout"
     };
     res.render(process.env.NODE_ENV+'_template', underConstruction);
+});
+
+var tenantDetail = {
+    title: 'Tenant Detail',
+    page: 'pages/tenant_detail.ejs',
+    scripts: [
+        '/javascripts/bundle_tenant_detail.js'
+    ],
+    data: {
+        title: 'CIAO',
+        section: ''
+    }
+};
+
+router.get('/:name', function (req, res, next) {
+
+    function findTenant(tenant) {
+        return tenant.name === req.params.name;
+    }
+
+    var activeTenant;
+    // take a look on this and replace for a better code
+    if (req.params.name === 'admin') {
+        activeTenant = req.session.activeTenant;
+
+    } else {
+        activeTenant = req.session.tenants.find(findTenant);
+    }
+
+    tenantDetail.data.section = req.params.name + " overview";
+    tenantDetail.data.username = req.session.username;
+    tenantDetail.data.tenants = req.session.tenants;
+    tenantDetail.data.activeTenant = activeTenant;
+    tenantDetail.data.navbar = {
+        username: req.session.username,
+        tenants: req.session.tenants,
+        logoutUrl: "/authenticate/logout"
+    };
+    res.render(process.env.NODE_ENV+'_template', tenantDetail);
 });
 
 
