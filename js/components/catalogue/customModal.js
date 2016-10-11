@@ -5,7 +5,6 @@ var Modal = reactBootstrap.Modal;
 var Button = reactBootstrap.Button;
 var Input = reactBootstrap.Input;
 var Alert = reactBootstrap.Alert;
-var Select = require('react-select');
 
 /* Custom modal usage
    Properties
@@ -133,7 +132,6 @@ var customModal = React.createClass({
             );
         }
     },
-
     //Return true if the field is empty
     isEmpty: function(field){
         if (!field){
@@ -230,7 +228,7 @@ var customModal = React.createClass({
                     </Alert>);
             }
         }.bind(this);
-
+//125
         return  (
             <Modal show={this.state.showModal} onHide={this.handleClose}>
                 <Modal.Header closeButton>
