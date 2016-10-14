@@ -185,6 +185,7 @@ router.get('/underConstruction', function (req, res, next) {
     res.render(process.env.NODE_ENV+'_template', underConstruction);
 });
 
+// Retrieves the main view detail according the selected tenant
 var tenantDetail = {
     title: 'Tenant Detail',
     page: 'pages/tenant_detail.ejs',
@@ -221,7 +222,49 @@ router.get('/tenantDetail/:name', function (req, res, next) {
         tenants: req.session.tenants,
         logoutUrl: "/authenticate/logout"
     };
+    tenantDetail.data.reference = "admin/tenantDetail/"+req.params.name+"/usage";
     res.render(process.env.NODE_ENV+'_template', tenantDetail);
+});
+
+// Retrieves usage details for the default tenant
+var usageConfig = {
+    title: 'Tenant detailed view',
+    page: 'pages/tenant_usage.ejs',
+    scripts: [
+        '/javascripts/bundle_tenant_usage_detail.js'
+    ],
+    data: {
+        title: 'CIAO',
+        section: 'Usage Overview'
+    }
+};
+
+router.get('/tenantDetail/:name/usage', function (req, res, next) {
+
+    function findTenant(tenant) {
+        return tenant.name === req.params.name;
+    }
+
+    var activeTenant;
+    // take a look on this and replace for a better code
+    if (req.params.name === 'admin') {
+        activeTenant = req.session.activeTenant;
+
+    } else {
+        activeTenant = req.session.tenants.find(findTenant);
+    }
+
+    usageConfig.data.section = req.params.name + " overview";
+    usageConfig.data.username = req.session.username;
+    usageConfig.data.tenants = req.session.tenants;
+    usageConfig.data.activeTenant = activeTenant;
+    usageConfig.data.navbar = {
+        username: req.session.username,
+        tenants: req.session.tenants,
+        logoutUrl: "/authenticate/logout"
+    };
+    usageConfig.data.reference = "admin/tenantDetail/"+req.params.name+"/usage";
+    res.render(process.env.NODE_ENV+'_template', usageConfig);
 });
 
 

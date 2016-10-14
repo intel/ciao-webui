@@ -62,8 +62,6 @@ var instancesCounter = React.createClass({
     },
 
     render: function() {
-        console.log(this.props);
-        console.log("total Instances",this.props.data.total_instances);
 
         return (
             <div className="element-summary-panel usageSummary">
