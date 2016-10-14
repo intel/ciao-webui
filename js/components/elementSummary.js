@@ -60,11 +60,6 @@ var elementSummary = React.createClass({
             return (<div>loading..</div>)
         }
     },
-    /*getCurrentUrl: function () {
-        var str =
-        var res = str.replace(/usage#Memory|usage#|car/gi, function myFunction(x){return x.toUpperCase();});
-        document.getElementById("demo").innerHTML = res;
-    },*/
     renderPanel: function(){
         // define labels for each concept
         var reference;
