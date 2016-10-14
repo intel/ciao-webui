@@ -74,12 +74,13 @@ var elementSummary = React.createClass({
             if (this.props.history !== false) {
                 reference = "#instances-overview";
             } else {
-                reference = "/" + ((this.props.reference).substr(0,6)) + "#instances-overview";
+                reference = "/" + this.props.reference.replace(/\/\usage/gi, "") + "#instances-overview";
+                //reference = ((this.props.reference).substr(0,6)) + "#instances-overview";
             }
             buttonLabel = "Instances Overview";
         } else {
             if (this.props.history !== false) {
-                reference = this.props.reference + "#" + buttonLabel[0];
+                reference =  "/" + this.props.reference + "#" + buttonLabel[0];
             } else {
                 reference = "#" + buttonLabel[0];
             }
