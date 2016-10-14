@@ -34,7 +34,7 @@ var usageSummary = React.createClass({
             } else {
                 // tenant
                 url = "/data/"+datamanager.data.activeTenant.id+this.props.source;
-                reference = "tenant/usage";
+                reference = datamanager.data.reference;
             }
             $.get({
                 url:url})
@@ -107,7 +107,6 @@ var usageSummary = React.createClass({
     },
 
     render: function() {
-        console.log("props usage summary", this.props);
         var dynamicWidth = Math.round(12 / this.props.data.length);
         var elements = [];
         var historyButton;
@@ -117,7 +116,7 @@ var usageSummary = React.createClass({
             if(this.props.data.length > 3) {
                 // tenant
                 columnGrid = "col-xs-3 col-sm-3";
-                reference = "tenant/usage";
+                reference = datamanager.data.reference;
             } else {
                 // admin
                 columnGrid = "col-xs-4 col-sm-4";
