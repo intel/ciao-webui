@@ -43,16 +43,22 @@ var catalogue = React.createClass({
         return true;
     },
 
-    componentDidMount: function () {
+    componentWillUnmount: function () {
+        this._mounted = false;
+    },
 
+    componentDidMount: function () {
+        this._mounted = true;
         // trigger 'onMount' listener set in the properties
         // onMount should contain HTTP requests to fill in new data
         // and trigger datamanager when new data is received.
 
         var onmount = this.props.onMount;
         var callSource = function () {
+
             if (this.state.updating == true)
                 return;
+
             this.setState({updating: true});
             var query = '?limit=' + this.props.recordsPerPage;
             query = query +
@@ -63,9 +69,10 @@ var catalogue = React.createClass({
 
         }.bind(this);
         callSource();
-
         window.setInterval(function () {
-            callSource();
+            if (this._mounted) {
+                callSource();
+            }
         }.bind(this), this.props.refresh);
     },
 
@@ -98,7 +105,9 @@ var catalogue = React.createClass({
             ref: 'catalogue'
 
         });else return React.createElement('div', null);
-    }
+    },
+
+    _mounted: false
 });
 
 module.exports = catalogue;
