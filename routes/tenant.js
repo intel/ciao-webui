@@ -7,7 +7,7 @@ var config = {
     title: 'CIAO',
     page: 'pages/tenant.ejs',
     scripts: [
-        '/javascripts/bundle_tenant_admin.js',
+        '/javascripts/bundle_tenant_detail.js',
         '/util/chosen.jquery.js'
     ],
     data: {
@@ -160,7 +160,8 @@ var tenantDetail = {
     title: 'Tenant Detail',
     page: 'pages/tenant_detail.ejs',
     scripts: [
-        '/javascripts/bundle_tenant_detail.js'
+        '/javascripts/bundle_tenant_detail.js',
+        '/util/chosen.jquery.js'
     ],
     data: {
         title: 'CIAO',

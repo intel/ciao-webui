@@ -27,12 +27,18 @@ var elementSummary = React.createClass({
 
     componentWillUpdate: function(nextProps,nextState) {
     },
+
+    componentWillUnmount: function() {
+        this._mounted = false;
+    },
+
     shouldComponentUpdate: function(nextProps, nextState) {
         //return this.props !== nextProps;
         return true;
     },
-    componentDidMount: function() {
 
+    componentDidMount: function() {
+        this._mounted = true;
         var callSource = function () {
             var n = dom.createElement('svg');
             n = d3Element.create(n, this.props, null);
@@ -43,7 +49,9 @@ var elementSummary = React.createClass({
         callSource();
 
         window.setInterval(function () {
-            callSource();
+            if (this._mounted) {
+                callSource();
+            }
         }.bind(this),2000);
     },
     renderDonutChart: function(){
@@ -118,7 +126,9 @@ var elementSummary = React.createClass({
         }else{
             return this.renderPanel();
         }
-    }
+    },
+
+    _mounted: false
 
 });
 
