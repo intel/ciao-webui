@@ -18,6 +18,17 @@ blockService.prototype.getVolumes = function () {
     };
 };
 
+blockService.prototype.getVolumesDetail = function () {
+    var adapter = this.adapter;
+    var tokenManager = this.tokenManager;
+    return function (req, res, next) {
+        var uri = "/v2/"+req.params.tenant+"/volumes/detail";
+        return adapter.onSuccess((data) => res.send(data.json))
+            .onError((data) => res.send(data))
+            .get(uri,req.session.token);
+    };
+};
+
 blockService.prototype.deleteVolume = function () {
     var adapter = this.adapter;
     var tokenManager = this.tokenManager;
@@ -35,13 +46,18 @@ blockService.prototype.createVolume = function () {
     return function (req, res, next) {
         var uri = "/v2/"+req.params.tenant+"/volumes";
 
-        var volume = req.body.volume? req.body :{ volume: {
+        var jsonBody = req.body.volume? req.body :{ volume: {
             size:req.body.size,
             name: req.body.name
         }};
+        // add optional values
+        if (req.body.description) {
+            jsonBody.volume.description = req.body.description;
+        }
+
         return adapter.onSuccess((data) => res.send(data.json))
             .onError((data) => res.send(data))
-            .post(uri,volume,req.session.token);
+            .post(uri, jsonBody, req.session.token);
     };
 };
 
