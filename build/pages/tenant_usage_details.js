@@ -22,6 +22,7 @@ jQuery('document').ready(function () {
     // Usage Summary
     datamanager.onDataSourceSet('usage-summary', function (sourceData) {
         sourceData.source = "/quotas";
+        sourceData.reference = "tenant/" + datamanager.data.tenantName + "/usage";
         sourceData.history = false;
         ReactDOM.render(React.createElement(UsageSummary, sourceData), document.getElementById('usage-summary'));
     });
