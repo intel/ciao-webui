@@ -1,27 +1,27 @@
 {
-    "development": {
+    "production": {
         "controller": {
-            "host": "hostname",
-            "port": "port number",
-            "protocol": "http or https"
+            "host": "10.219.4.32",
+            "port": "8774",
+            "protocol": "https"
         },
         "storage":{
-            "host": "hostname",
-            "port": "port number",
-            "protocol": "http or https"
+            "host": "10.219.4.32",
+            "port": "8774",
+            "protocol": "https"
         },
         "keystone": {
-            "host": "hostname",
-            "port": "port number",
-            "protocol": "http or https",
+            "host": "10.219.4.32",
+            "port": "35357",
+            "protocol": "https",
             "uri": "/v3/auth/tokens"
         },
         "ui": {
-            "protocol": "http or https",
+            "protocol": "https",
             "certificates": {
-                "key": "path to key pem",
-                "cert": "path to cert pem",
-                "passphrase": "",
+                "key": "/Users/anunez9/Documents/Code/certs/key.pem",
+                "cert": "/Users/anunez9/Documents/Code/certs/cert.pem",
+                "passphrase": "dedo123",
                 "trusted": []
             }
         }
