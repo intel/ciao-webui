@@ -3,16 +3,30 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 var React = require('react');
 var ReactDOM = require('react-dom');
 var Catalogue = require('../components/catalogue/catalogue.js');
+var navbar = require('../components/navbar.js');
+var CustomModal = require('../components/catalogue/customModal.js');
 var InstancesHost = require('../components/instancesHost.js');
 var GroupOverview = require('../components/groupOverview.js');
 var UsageSummary = require('../components/usageSummary.js');
 var AddInstances = require('../components/addInstances.js');
-var navbar = require('../components/navbar.js');
 var Logger = require('../util/logger.js');
-var CustomModal = require('../components/catalogue/customModal.js');
 var $ = require('jquery');
 
 $('document').ready(function () {
+    var activeTenant = datamanager.data.activeTenant;
+    // Navigation bar
+    var nprops = { logoutUrl: "/authenticate/logout" };
+    // Data manager gets tenants which was passed through  routes:/tenant
+    nprops.tenants = datamanager.data.tenants;
+    nprops.activeTenant = activeTenant;
+    nprops.back = {
+        label: '< Back to [Overview]',
+        url: '/tenant'
+    };
+
+    nprops.username = document.getElementById("main-top-navbar").getAttribute("attr-user");
+    var n = React.createElement(navbar, nprops);
+    ReactDOM.render(n, document.getElementById("main-top-navbar"));
 
     // Create Logger object
     window.logger = new Logger('logger-container');
@@ -22,11 +36,9 @@ $('document').ready(function () {
     // first use a data source compatible for componenet.
 
     var getUnitString = function (value) {
-
         if (value == null) return function (arg) {
             return arg;
         };
-
         return value < 1500 ? value + "GB" : value / 1000 + "TB";
     };
 
@@ -36,7 +48,6 @@ $('document').ready(function () {
     datamanager.onDataSourceSet('add-instances', function (sourceData) {
         ReactDOM.render(React.createElement(AddInstances, { sourceData: sourceData }), document.getElementById("add-instances"));
     });
-
     //Usage summary
     datamanager.onDataSourceSet('usage-summary', function (sourceData) {
         sourceData.source = "/quotas";
@@ -46,6 +57,33 @@ $('document').ready(function () {
     });
     // react hierarchy would be re-rendered
     datamanager.setDataSource('usage-summary', { data: [] });
+
+    // create group overview
+    datamanager.onDataSourceSet('group-overview', function (sourceData) {
+        var refresh = datamanager.data.REFRESH | 3000;
+        sourceData.refresh = Number(refresh);
+        ReactDOM.render(React.createElement(GroupOverview, _extends({}, sourceData, { logger: logger })), document.getElementById("workloads-container"));
+    });
+    var getFlavors = function (attempts) {
+        $.get({
+            url: "/data/" + datamanager.data.activeTenant.id + "/flavors",
+            timeout: 5000 }).done(function (data) {
+            if (data) {
+                data.dataKey = 'group-overview';
+                data.detailUrl = '/data/' + datamanager.data.activeTenant.id;
+                datamanager.setDataSource('group-overview', data);
+                datamanager.setDataSource('add-instances', { activeTenant, data });
+            }
+        }.bind(this)).fail(function (err) {
+            if (attempts < 3) getFlavors(attempts + 1);else {
+                var data = {};
+                data.dataKey = 'group-overview';
+                data.detailUrl = '/data/' + datamanager.data.activeTenant.id;
+                datamanager.setDataSource('group-overview', data);
+            }
+        });
+    };
+    getFlavors(0);
 
     //create instances host
     var keyInstanceHost = 'instances-host';
@@ -394,42 +432,4 @@ $('document').ready(function () {
     datamanager.setDataSource('block-catalogue', { data: [] });
 
     // Ends block storage volume table
-
-
-    // create group overview
-    datamanager.onDataSourceSet('group-overview', function (sourceData) {
-        var refresh = datamanager.data.REFRESH | 3000;
-        sourceData.refresh = Number(refresh);
-        ReactDOM.render(React.createElement(GroupOverview, _extends({}, sourceData, { logger: logger })), document.getElementById("workloads-container"));
-    });
-    var getFlavors = function (attempts) {
-        $.get({
-            url: "/data/" + datamanager.data.activeTenant.id + "/flavors",
-            timeout: 5000 }).done(function (data) {
-            if (data) {
-                data.dataKey = 'group-overview';
-                data.detailUrl = '/data/' + datamanager.data.activeTenant.id;
-                datamanager.setDataSource('group-overview', data);
-                datamanager.setDataSource('add-instances', { activeTenant, data });
-            }
-        }.bind(this)).fail(function (err) {
-            if (attempts < 3) getFlavors(attempts + 1);else {
-                var data = {};
-                data.dataKey = 'group-overview';
-                data.detailUrl = '/data/' + datamanager.data.activeTenant.id;
-                datamanager.setDataSource('group-overview', data);
-            }
-        });
-    };
-    getFlavors(0);
-
-    // Navigation bar
-    var nprops = { logoutUrl: "/authenticate/logout" };
-    // Data manager gets tenants which was passed through  routes:/tenant
-    nprops.tenants = datamanager.data.tenants;
-    nprops.activeTenant = activeTenant;
-
-    nprops.username = document.getElementById("main-top-navbar").getAttribute("attr-user");
-    var n = React.createElement(navbar, nprops);
-    ReactDOM.render(n, document.getElementById("main-top-navbar"));
 });
