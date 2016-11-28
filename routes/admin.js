@@ -258,6 +258,7 @@ router.get('/tenantDetail/:name/usage', function (req, res, next) {
     usageConfig.data.username = req.session.username;
     usageConfig.data.tenants = req.session.tenants;
     usageConfig.data.activeTenant = activeTenant;
+    usageConfig.data.label = '< Back to [Admin Overview]';
     usageConfig.data.navbar = {
         username: req.session.username,
         tenants: req.session.tenants,

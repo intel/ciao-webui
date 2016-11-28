@@ -18,7 +18,7 @@ $('document').ready(function () {
     nprops.tenants = datamanager.data.tenants;
     nprops.activeTenant = activeTenant;
     nprops.back = {
-            label:'< Back to [Overview]',
+            label:'< Back to [Admin Overview]',
             url: '/tenant'
     };
 
