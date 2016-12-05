@@ -45,6 +45,10 @@ imageService.prototype.createImage = function () {
     };
 };
 
+// Placeholder for upload Image method
+// imageService.prototype.uploadImage = function () {
+// }
+
 imageService.prototype.deleteImage = function () {
     var adapter = this.adapter;
     var tokenManager = this.tokenManager;
