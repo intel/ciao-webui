@@ -41,17 +41,17 @@ router.delete('/:tenant/servers/:server', function (req, res, next) {
 
 /* Endpoints for Image Service */
 // Image service GET Methods
-router.get('/:tenant/images', blockService.getImages());
-router.get('/:tenant/images/:image_id', blockService.getImageDetails());
+router.get('/:tenant/images', imageService.getImages());
+router.get('/:tenant/images/:image_id', imageService.getImageDetails());
 
 // Image service POST Methods
-router.post('/:tenant/images', blockService.createImage());
+router.post('/:tenant/images', imageService.createImage());
 
-// Image service PUT Methods
-router.put('/:tenant/images/:image_id/file', blockService.uploadImage());
+// Placeholder fot Image service PUT Methods
+// router.put('/:tenant/images/:image_id/file', imageService.uploadImage());
 
 // Image service DELETE Methods
-router.delete('/:tenant/images/:image_id', blockService.deleteImage());
+router.delete('/:tenant/images/:image_id', imageService.deleteImage());
 
 /* Enpoints compatible with block storage API */
 // Block service GET Methods
