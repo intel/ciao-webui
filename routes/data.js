@@ -7,6 +7,8 @@ var TokenManager = new require('../core/tokenManager');
 var NodeService = require('../core/nodeService');
 var TenantService = require('../core/tenantService');
 var BlockService = require('../core/blockService');
+var ImageService = require('../core/imageService');
+
 // Set up
 var adapter = new ciaoAdapter();
 var tokenManager = new TokenManager(sessionHandler);
@@ -17,6 +19,10 @@ var tenantService = new TenantService(adapter.useNode('controller'),
                                       tokenManager);
 var blockService = new BlockService(adapter.useNode('storage'),
                                     tokenManager);
+// ToDo: temporally using controller config until image config is added
+var imageService = new ImageService(adapter.useNode('controller'),
+                                    tokenManager);
+
 // Validate session as an authorized token is required
 router.use(sessionHandler.validateSession);
 
@@ -32,6 +38,20 @@ router.delete('/:tenant/servers/:server', function (req, res, next) {
         })
         .validate(req, res);
 });
+
+/* Endpoints for Image Service */
+// Image service GET Methods
+router.get('/:tenant/images', imageService.getImages());
+router.get('/:tenant/images/:image_id', imageService.getImageDetails());
+
+// Image service POST Methods
+router.post('/:tenant/images', imageService.createImage());
+
+// Placeholder fot Image service PUT Methods
+// router.put('/:tenant/images/:image_id/file', imageService.uploadImage());
+
+// Image service DELETE Methods
+router.delete('/:tenant/images/:image_id', imageService.deleteImage());
 
 /* Enpoints compatible with block storage API */
 // Block service GET Methods
