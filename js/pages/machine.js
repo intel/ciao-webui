@@ -10,8 +10,8 @@ $('document').ready(function () {
 
     // Create Logger object
     window.logger = new Logger('logger-container');
-    
-   
+
+
 
     var keyOverview = 'overview';
 
@@ -89,7 +89,7 @@ $('document').ready(function () {
         .getAttribute("attr-user");
 
     nprops.back = {
-        label:'< Back to Admin',
+        label:'< Back to [Admin Overview]',
         url: '/admin'
     };
     var n = React.createElement(navbar, nprops);
