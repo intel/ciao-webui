@@ -466,11 +466,13 @@ $('document').ready(function () {
                 callback();
                 var fmtData = data.volumes.map((x) => {
                     var attachedTo = "None";
-                    if (x.attachments.length > 0) {
-                        attachedTo = "";
-                        x.attachments.forEach( (a) => {
-                            attachedTo = (a.server_id + " on " + a.device);
-                        });
+                    if (x.attachments != null) {
+                        if (x.attachments.length > 0) {
+                            attachedTo = "";
+                            x.attachments.forEach( (a) => {
+                                attachedTo = (a.server_id + " on " + a.device);
+                            });
+                        }
                     }
                     return {
                         "volume_id":x.id,
