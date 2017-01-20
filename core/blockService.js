@@ -54,7 +54,8 @@ blockService.prototype.createVolume = function () {
         if (req.body.description) {
             jsonBody.volume.description = req.body.description;
         }
-
+        // Forces json value int to be treated as string
+        jsonBody.volume.size = parseInt(jsonBody.volume.size);
         return adapter.onSuccess((data) => res.send(data.json))
             .onError((data) => res.send(data))
             .post(uri, jsonBody, req.session.token);
