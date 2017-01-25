@@ -1,6 +1,6 @@
 # Variable declaration
 
-DESTDIR ?= /usr/local
+DESTDIR ?= $(shell npm config get prefix)
 NODE_ENV ?="production"
 OS=$(shell uname)
 NPM_LINK=$(shell npm bin -g)
