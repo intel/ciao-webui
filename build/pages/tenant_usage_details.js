@@ -11,7 +11,7 @@ jQuery('document').ready(function () {
     nprops.tenants = datamanager.data.tenants;
     nprops.activeTenant = datamanager.data.activeTenant;
     nprops.back = {
-        label: '< Back to [Overview]',
+        label: datamanager.data.label,
         url: '/tenant'
     };
 

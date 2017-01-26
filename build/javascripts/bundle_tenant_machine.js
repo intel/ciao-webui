@@ -1623,7 +1623,7 @@ $('document').ready(function () {
     nprops.username = document.getElementById("main-top-navbar").getAttribute("attr-user");
 
     nprops.back = {
-        label: '< Back to Admin',
+        label: '< Back to [Admin Overview]',
         url: '/admin'
     };
     var n = React.createElement(navbar, nprops);

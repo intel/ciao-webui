@@ -860,7 +860,7 @@ jQuery('document').ready(function () {
     nprops.tenants = datamanager.data.tenants;
     nprops.activeTenant = datamanager.data.activeTenant;
     nprops.back = {
-        label: '< Back to [Overview]',
+        label: datamanager.data.label,
         url: '/tenant'
     };
 
@@ -5330,6 +5330,8 @@ $export($export.S, 'Object', {setPrototypeOf: require('./$.set-proto').set});
   (factory((global.d3_time = global.d3_time || {})));
 }(this, function (exports) { 'use strict';
 
+  var version = "0.2.6";
+
   var t0 = new Date;
   var t1 = new Date;
   function newInterval(floori, offseti, count, field) {
@@ -5589,9 +5591,7 @@ $export($export.S, 'Object', {setPrototypeOf: require('./$.set-proto').set});
   var timeMonths = month.range;
   var timeYears = year.range;
 
-  var utcMillisecond = millisecond;
   var utcMilliseconds = timeMilliseconds;
-  var utcSecond = second;
   var utcSeconds = timeSeconds;
   var utcMinutes = utcMinute.range;
   var utcHours = utcHour.range;
@@ -5607,9 +5607,6 @@ $export($export.S, 'Object', {setPrototypeOf: require('./$.set-proto').set});
   var utcMonths = utcMonth.range;
   var utcYears = utcYear.range;
 
-  var version = "0.2.5";
-
-  exports.version = version;
   exports.timeMilliseconds = timeMilliseconds;
   exports.timeSeconds = timeSeconds;
   exports.timeMinutes = timeMinutes;
@@ -5625,9 +5622,7 @@ $export($export.S, 'Object', {setPrototypeOf: require('./$.set-proto').set});
   exports.timeWeeks = timeWeeks;
   exports.timeMonths = timeMonths;
   exports.timeYears = timeYears;
-  exports.utcMillisecond = utcMillisecond;
   exports.utcMilliseconds = utcMilliseconds;
-  exports.utcSecond = utcSecond;
   exports.utcSeconds = utcSeconds;
   exports.utcMinutes = utcMinutes;
   exports.utcHours = utcHours;
@@ -5657,6 +5652,8 @@ $export($export.S, 'Object', {setPrototypeOf: require('./$.set-proto').set});
   exports.timeWeek = sunday;
   exports.timeMonth = month;
   exports.timeYear = year;
+  exports.utcMillisecond = millisecond;
+  exports.utcSecond = second;
   exports.utcMinute = utcMinute;
   exports.utcHour = utcHour;
   exports.utcDay = utcDay;
@@ -5670,7 +5667,10 @@ $export($export.S, 'Object', {setPrototypeOf: require('./$.set-proto').set});
   exports.utcWeek = utcSunday;
   exports.utcMonth = utcMonth;
   exports.utcYear = utcYear;
+  exports.version = version;
   exports.timeInterval = newInterval;
+
+  Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
 },{}],50:[function(require,module,exports){
