@@ -1,5 +1,6 @@
 /*Image service component
   Client implementation for Image service api
+  Functionality not ready, still under development.
 */
 
 var imageService = function (adapter, tokenManager) {
