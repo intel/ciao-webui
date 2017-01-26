@@ -5,6 +5,7 @@ process.on('message', function(m) {
     var uri = m.uri;
     var token = m.token;
     var sessionWorkloads = m.workloads;
+    global.CONFIG_FILE = m.globals.config_file;
     global.PROTOCOL = m.globals.protocol;
     global.CONTROLLER_ADDR = m.globals.controller_addr;
     global.CONTROLLER_PORT = m.globals.controller_port;

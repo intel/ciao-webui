@@ -181,7 +181,8 @@ tenantService.prototype.flavorsDetail = function () {
                 var globals = {
                     controller_addr:global.CONTROLLER_ADDR,
                     controller_port:global.CONTROLLER_PORT,
-                    protocol: global.PROTOCOL
+                    protocol: global.PROTOCOL,
+                    config_file: global.CONFIG_FILE
                 };
                 child.send(JSON.stringify({
                     uri: uri,
