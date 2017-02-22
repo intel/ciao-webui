@@ -192,6 +192,16 @@ $('document').ready(function () {
             validate:{
                 required:false
             }
+        },
+        {
+            id: 'volume_image',
+            type: 'text',
+            field: 'input',
+            name: 'imageRef',
+            label: 'Image UUID(Bootable only)',
+            validate: {
+                required: false
+            }
         }];
 
     // Actions definition - add functionality to buttons within volume table
