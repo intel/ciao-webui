@@ -49,8 +49,10 @@ blockService.prototype.createVolume = function () {
         var jsonBody = req.body.volume? req.body :{ volume: {
             size:req.body.size,
             name: req.body.name,
-            imageRef:req.body.imageRef
-        }};
+                    }};
+        if (req.body.imageRef != "--none--") {
+           jsonBody.volume.imageRef=req.body.imageRef
+        }
         // add optional values
         if (req.body.description) {
             jsonBody.volume.description = req.body.description;

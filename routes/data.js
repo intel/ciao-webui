@@ -13,14 +13,21 @@ var ImageService = require('../core/imageService');
 var adapter = new ciaoAdapter();
 var tokenManager = new TokenManager(sessionHandler);
 
-var nodeService = new NodeService(adapter.useNode('controller'),
+var controllerAdapter = adapter.useNode('controller');
+var nodeService = new NodeService(controllerAdapter,
                                   tokenManager);
 var tenantService = new TenantService(adapter.useNode('controller'),
                                       tokenManager);
 var blockService = new BlockService(adapter.useNode('storage'),
                                     tokenManager);
-// ToDo: temporally using controller config until image config is added
-var imageService = new ImageService(adapter.useNode('controller'),
+
+//Note: using controller's hostname configuration and default port
+//and protocol
+var imageService = new ImageService(adapter.useSetup({
+                                        hostname:controllerAdapter.host,
+                                        port:"9292",
+                                        protocol:"https"
+                                    }),
                                     tokenManager);
 
 // Validate session as an authorized token is required
@@ -41,7 +48,7 @@ router.delete('/:tenant/servers/:server', function (req, res, next) {
 
 /* Endpoints for Image Service */
 // Image service GET Methods
-router.get('/:tenant/images', imageService.getImages());
+router.get('/images', imageService.getImages());
 router.get('/:tenant/images/:image_id', imageService.getImageDetails());
 
 // Image service POST Methods
