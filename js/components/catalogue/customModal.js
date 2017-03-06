@@ -109,15 +109,17 @@ var customModal = React.createClass({
                             );
                     break;
                 case "select":
-                    return <Select
+                    return <Input
                             id={row.id}
+                            type="select"
                             name={row.id}
                             label={label}
                             value={this.state.data[row.name]}
                             placeholder={row.placeholder?row.placeholder:""}
                             onChange={this.onChange.bind(this, row.name)}
-                            options={row.options}
-                            />;
+                            >
+                                {row.options}
+                            </Input>;
 
                     break;
                 default:

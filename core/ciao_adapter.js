@@ -33,6 +33,12 @@ ciaoAdapter.prototype.useNode = function (node) {
     return ca;
 };
 
+ciaoAdapter.prototype.useSetup = function (obj) {
+    var ca = new ciaoAdapter();
+    ca.setup(obj.hostname,obj.port,obj.protocol);
+    return ca;
+}
+
 ciaoAdapter.prototype.onSuccess = function (callback) {
     var ca = Object.assign(new ciaoAdapter(this.host, this.port, this.protocol),
                            this);
