@@ -8,6 +8,7 @@ var NodeService = require('../core/nodeService');
 var TenantService = require('../core/tenantService');
 var BlockService = require('../core/blockService');
 var ImageService = require('../core/imageService');
+var ExternalIPService = require('../core/externalIPService');
 
 // Set up
 var adapter = new ciaoAdapter();
@@ -30,6 +31,13 @@ var imageService = new ImageService(adapter.useSetup({
                                     }),
                                     tokenManager);
 
+var externalIPService = new ExternalIPService(adapter.useSetup({
+                                        hostname:controllerAdapter.host,
+                                        port:"8889",
+                                        protocol:"https"
+                                    }),
+                                    tokenManager);
+
 // Validate session as an authorized token is required
 router.use(sessionHandler.validateSession);
 
@@ -45,6 +53,22 @@ router.delete('/:tenant/servers/:server', function (req, res, next) {
         })
         .validate(req, res);
 });
+
+/* Endpoints for External IPs */
+// External IP Service GET Methods
+router.get('/external-ips', externalIPService.listExternalIPs());
+
+/* Endpoints for Pools Service */
+// Pool Service GET Methods
+router.get('/pools', externalIPService.listPools());
+router.get('/pools/:pool_id', externalIPService.listPoolByID()); //Does not work
+
+// Pool Service POST Methods
+router.post('/pools',externalIPService.createPool());
+router.post('/pools/:pool_id', externalIPService.addExternalIPsTOPool());
+
+// Pool Service DELETE Methods
+router.delete('/pools/:pool_id', externalIPService.deletePool());
 
 /* Endpoints for Image Service */
 // Image service GET Methods
