@@ -26,7 +26,7 @@ externalIPService.prototype.listPools = function () {
 
 // retrieve information about a pool
 // Method GET
-externalIPService.prototype.listPoolByID = function () {git
+externalIPService.prototype.listPoolByID = function () {
     var adapter = this.adapter;
     var tokenManager = this.tokenManager;
     return function (req, res, next) {
