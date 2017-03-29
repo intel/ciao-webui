@@ -30,22 +30,12 @@ externalIPService.prototype.listPoolByID = function () {
     var adapter = this.adapter;
     var tokenManager = this.tokenManager;
     return function (req, res, next) {
-        var uri = "/pools";
+        var uri = "/pools/"+req.params.pool_id;
         return adapter.onSuccess((data) => {
             res.set('Content-Type','application/json');
-            if (data.json.pools) {
-                var pools = data.json.pools.filter(
-                    (pool) => pool.id == req.params.pool_id);
-                if (pools.length > 0) {
-                    res.send(pools.pop());
-                } else {
-                    res.send([]);
-                }
-            } else {
-                res.send([]);
-            }
+            res.send(data.json);
         }).onError((data) => res.send(data))
-            .get(url,req.session.token);
+            .get(uri,req.session.token);
     };
 }
 
