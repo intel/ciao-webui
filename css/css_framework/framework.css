@@ -14,12 +14,6 @@
 */
 
 /*
-* Framework CSS 1.0
-* @CIAO web ui
-* @Author: Intel Corporation
-*/
-
-/*
 * Global font declarations
 */
 
@@ -738,16 +732,25 @@ div .alert-danger {
 }
 
 /*Pools*/
-framework.css
 .frm-panel-heading-dotted {
     border: 2px dotted #404040;
     border-bottom-color: transparent;
     padding-left: 20px;
     padding-top: 10px;
     padding-bottom: 10px;
-    font-weight: bold;
-    font-size: 16px;
+    font-weight: bolder;
+    font-size: 20px;
 }
+
+.button-form{
+  float: right;
+  margin-bottom: 20px;
+}
+
+.notation-slash{
+  font-size: 20px;
+}
+
 .frm-panel-dotted {
     border-left: 2px dotted #404040;
     border-right: 2px dotted #404040;
@@ -802,8 +805,4 @@ framework.css
   padding-bottom: 10px;
   font-size: 13px;
   font-style: italic;
-}
-
-.notation-slash{
-  font-size: 20px;
 }
