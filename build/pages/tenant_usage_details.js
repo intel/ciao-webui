@@ -11,7 +11,7 @@ jQuery('document').ready(function () {
     nprops.tenants = datamanager.data.tenants;
     nprops.activeTenant = datamanager.data.activeTenant;
     nprops.back = {
-        label: '< Back to [Overview]',
+        label: datamanager.data.label,
         url: '/tenant'
     };
 
@@ -22,6 +22,7 @@ jQuery('document').ready(function () {
     // Usage Summary
     datamanager.onDataSourceSet('usage-summary', function (sourceData) {
         sourceData.source = "/quotas";
+        sourceData.reference = "tenant/" + datamanager.data.tenantName + "/usage";
         sourceData.history = false;
         ReactDOM.render(React.createElement(UsageSummary, sourceData), document.getElementById('usage-summary'));
     });

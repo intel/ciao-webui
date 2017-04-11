@@ -1,3 +1,18 @@
+/* Copyright (c) 2017 Intel Corporation
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
 var express = require('express');
 var router = express.Router();
 var sessionHandler = require('../core/session');
@@ -7,7 +22,8 @@ var config = {
     title: 'CIAO',
     page: 'pages/tenant.ejs',
     scripts: [
-        '/javascripts/bundle_tenant_admin.js'
+        '/javascripts/bundle_tenant_detail.js',
+        '/util/chosen.jquery.js'
     ],
     data: {
         title: 'CIAO',
@@ -15,7 +31,6 @@ var config = {
         username: "no_user"
     }
 };
-
 
 function validatePermissions (req, res, next){
     if(req.session.isAdmin){ //if is admin, redirect to /admin
@@ -69,6 +84,7 @@ router.get('/', validatePermissions, function(req, res, next) {
     config.data.activeTenant = req.session.activeTenant;
     config.data.section = req.session.activeTenant.name + " overview";
     config.data.REFRESH = (Number(process.env.REFRESH) | 3500);
+    config.data.reference = "tenant/usage";
 
     res.render(process.env.NODE_ENV+'_template', config);
 });
@@ -78,6 +94,7 @@ router.get('/list', validatePermissions, function (req, res, next) {
     res.send(tenants ? tenants:[]);
 });
 
+// Retrieves usage details for the default tenant
 var usageConfig = {
     title: 'Tenant detailed view',
     page: 'pages/tenant_usage.ejs',
@@ -94,11 +111,13 @@ router.get('/usage', validatePermissions, function (req, res, next) {
     usageConfig.data.username = req.session.username;
     usageConfig.data.tenants = req.session.tenants;
     usageConfig.data.activeTenant = req.session.activeTenant;
+    usageConfig.data.label = '< Back to [Overview]'
     usageConfig.data.navbar = {
         username: req.session.username,
         tenants: req.session.tenants,
         logoutUrl: "/authenticate/logout"
     };
+    usageConfig.data.reference = "tenant/usage";
     res.render(process.env.NODE_ENV+'_template', usageConfig);
 });
 
@@ -128,6 +147,7 @@ router.get('/group/:id', validatePermissions, function (req, res, next) {
     res.render(process.env.NODE_ENV+'_template', groupConfig);
 });
 
+// Retrieves a Under construction view
 var underConstruction = {
     title: 'Coming Soon',
     page: 'pages/under_construction.ejs',
@@ -155,11 +175,13 @@ router.get('/underConstruction', function (req, res, next) {
     res.render(process.env.NODE_ENV+'_template', underConstruction);
 });
 
+// Retrieves main view according selected tenant
 var tenantDetail = {
     title: 'Tenant Detail',
     page: 'pages/tenant_detail.ejs',
     scripts: [
-        '/javascripts/bundle_tenant_detail.js'
+        '/javascripts/bundle_tenant_detail.js',
+        '/util/chosen.jquery.js'
     ],
     data: {
         title: 'CIAO',
@@ -191,7 +213,37 @@ router.get('/:name', function (req, res, next) {
         tenants: req.session.tenants,
         logoutUrl: "/authenticate/logout"
     };
+    tenantDetail.data.reference = "tenant/"+req.params.name+"/usage";
     res.render(process.env.NODE_ENV+'_template', tenantDetail);
+});
+
+// Retrieves usage details according selected tenant
+router.get('/:name/usage', function (req, res, next) {
+
+    function findTenant(tenant) {
+        return tenant.name === req.params.name;
+    }
+
+    var activeTenant;
+    // take a look on this and replace for a better code
+    if (req.params.name === 'admin') {
+        activeTenant = req.session.activeTenant;
+
+    } else {
+        activeTenant = req.session.tenants.find(findTenant);
+    }
+
+    usageConfig.data.section = req.params.name + " overview";
+    usageConfig.data.username = req.session.username;
+    usageConfig.data.tenants = req.session.tenants;
+    usageConfig.data.activeTenant = activeTenant;
+    usageConfig.data.navbar = {
+        username: req.session.username,
+        tenants: req.session.tenants,
+        logoutUrl: "/authenticate/logout"
+    };
+    usageConfig.data.reference = "tenant/"+req.params.name+"/usage";
+    res.render(process.env.NODE_ENV+'_template', usageConfig);
 });
 
 

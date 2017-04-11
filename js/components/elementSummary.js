@@ -27,12 +27,18 @@ var elementSummary = React.createClass({
 
     componentWillUpdate: function(nextProps,nextState) {
     },
+
+    componentWillUnmount: function() {
+        this._mounted = false;
+    },
+
     shouldComponentUpdate: function(nextProps, nextState) {
         //return this.props !== nextProps;
         return true;
     },
-    componentDidMount: function() {
 
+    componentDidMount: function() {
+        this._mounted = true;
         var callSource = function () {
             var n = dom.createElement('svg');
             n = d3Element.create(n, this.props, null);
@@ -43,7 +49,9 @@ var elementSummary = React.createClass({
         callSource();
 
         window.setInterval(function () {
-            callSource();
+            if (this._mounted) {
+                callSource();
+            }
         }.bind(this),2000);
     },
     renderDonutChart: function(){
@@ -74,12 +82,13 @@ var elementSummary = React.createClass({
             if (this.props.history !== false) {
                 reference = "#instances-overview";
             } else {
-                reference = "/" + ((this.props.reference).substr(0,6)) + "#instances-overview";
+                reference = "/" + this.props.reference.replace(/\/\usage/gi, "") + "#instances-overview";
+                //reference = ((this.props.reference).substr(0,6)) + "#instances-overview";
             }
             buttonLabel = "Instances Overview";
         } else {
             if (this.props.history !== false) {
-                reference = this.props.reference + "#" + buttonLabel[0];
+                reference =  "/" + this.props.reference + "#" + buttonLabel[0];
             } else {
                 reference = "#" + buttonLabel[0];
             }
@@ -118,7 +127,9 @@ var elementSummary = React.createClass({
         }else{
             return this.renderPanel();
         }
-    }
+    },
+
+    _mounted: false
 
 });
 

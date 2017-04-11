@@ -1,4 +1,19 @@
+<!--
+/* Copyright (c) 2017 Intel Corporation
 
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+-->
 <div class="admin-page">
   <!-- starts top navigation bar -->
   <div id="main-top-navbar" attr-user="<%= username %>"></div>
@@ -56,7 +71,20 @@
   </div>
   <!-- ends Usage summary -->
 
-  <!-- instances on this host -->
+  <!-- pools on this host -->
+  <div class="pools">
+    <div class="row">
+      <div class="col-md-12">
+        <h2 class="frm-bold-text add-margin-bottom">
+          Pools
+        </h2>
+      </div>
+    </div>
+    <div id="pools" ></div>
+  </div>
+
+
+  <!-- nodes on this host -->
   <div class="nodes">
     <div class="row">
       <div class="col-md-12">

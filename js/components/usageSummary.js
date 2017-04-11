@@ -1,3 +1,18 @@
+/* Copyright (c) 2017 Intel Corporation
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
 // usage Summary display current instances,memory,vCPUs and disk vs quota
 var React = require('react');
 var ReactDOM = require('react-dom/server');
@@ -34,7 +49,7 @@ var usageSummary = React.createClass({
             } else {
                 // tenant
                 url = "/data/"+datamanager.data.activeTenant.id+this.props.source;
-                reference = "tenant/usage";
+                reference = datamanager.data.reference;
             }
             $.get({
                 url:url})
@@ -107,7 +122,6 @@ var usageSummary = React.createClass({
     },
 
     render: function() {
-        console.log("props usage summary", this.props);
         var dynamicWidth = Math.round(12 / this.props.data.length);
         var elements = [];
         var historyButton;
@@ -117,7 +131,7 @@ var usageSummary = React.createClass({
             if(this.props.data.length > 3) {
                 // tenant
                 columnGrid = "col-xs-3 col-sm-3";
-                reference = "tenant/usage";
+                reference = datamanager.data.reference;
             } else {
                 // admin
                 columnGrid = "col-xs-4 col-sm-4";

@@ -1,3 +1,18 @@
+/* Copyright (c) 2017 Intel Corporation
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
 var express = require('express');
 var router = express.Router();
 var sessionHandler = require('../core/session');
@@ -18,7 +33,7 @@ var config = {
 
 function validatePermissions (req, res, next){
     if(!req.session.isAdmin){ //if is admin, redirect to /admin
-        res.redirect('/forbidden');
+      res.redirect('/forbidden');
     }
 
     next();
@@ -185,6 +200,7 @@ router.get('/underConstruction', function (req, res, next) {
     res.render(process.env.NODE_ENV+'_template', underConstruction);
 });
 
+// Retrieves the main view detail according the selected tenant
 var tenantDetail = {
     title: 'Tenant Detail',
     page: 'pages/tenant_detail.ejs',
@@ -221,7 +237,76 @@ router.get('/tenantDetail/:name', function (req, res, next) {
         tenants: req.session.tenants,
         logoutUrl: "/authenticate/logout"
     };
+    tenantDetail.data.reference = "admin/tenantDetail/"+req.params.name+"/usage";
     res.render(process.env.NODE_ENV+'_template', tenantDetail);
+});
+
+// Retrieves usage details for the default tenant
+var usageConfig = {
+    title: 'Tenant detailed view',
+    page: 'pages/tenant_usage.ejs',
+    scripts: [
+        '/javascripts/bundle_tenant_usage_detail.js'
+    ],
+    data: {
+        title: 'CIAO',
+        section: 'Usage Overview'
+    }
+};
+
+router.get('/tenantDetail/:name/usage', function (req, res, next) {
+
+    function findTenant(tenant) {
+        return tenant.name === req.params.name;
+    }
+
+    var activeTenant;
+    // take a look on this and replace for a better code
+    if (req.params.name === 'admin') {
+        activeTenant = req.session.activeTenant;
+
+    } else {
+        activeTenant = req.session.tenants.find(findTenant);
+    }
+
+    usageConfig.data.section = req.params.name + " overview";
+    usageConfig.data.username = req.session.username;
+    usageConfig.data.tenants = req.session.tenants;
+    usageConfig.data.activeTenant = activeTenant;
+    usageConfig.data.navbar = {
+        username: req.session.username,
+        tenants: req.session.tenants,
+        logoutUrl: "/authenticate/logout"
+    };
+    usageConfig.data.reference = "admin/tenantDetail/"+req.params.name+"/usage";
+    res.render(process.env.NODE_ENV+'_template', usageConfig);
+});
+
+
+var createPoolConfig = {
+    title: 'Create New IP Pool',
+    page: 'pages/create_pool.ejs',
+    scripts: [
+        '/javascripts/bundle_create_pool.js'
+    ],
+    data: {
+        title: 'Create New IP Pool',
+        section: 'IP Pool'
+    }
+};
+
+router.get('/create/pool', function (req, res, next) {
+
+    createPoolConfig.data.username = req.session.username;
+    createPoolConfig.data.tenants = req.session.tenants;
+    createPoolConfig.data.activeTenant = req.session.activeTenant;
+    createPoolConfig.data.idNetwork =  req.params.id;
+    createPoolConfig.data.navbar = {
+        username: req.session.username,
+        tenants: req.session.tenants,
+        logoutUrl: "/authenticate/logout"
+    };
+    res.render(process.env.NODE_ENV+'_template', createPoolConfig);
 });
 
 

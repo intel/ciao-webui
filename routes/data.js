@@ -1,3 +1,18 @@
+/* Copyright (c) 2017 Intel Corporation
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
 var express = require('express');
 var router = express.Router();
 var sessionHandler = require('../core/session');
@@ -7,16 +22,37 @@ var TokenManager = new require('../core/tokenManager');
 var NodeService = require('../core/nodeService');
 var TenantService = require('../core/tenantService');
 var BlockService = require('../core/blockService');
+var ImageService = require('../core/imageService');
+var ExternalIPService = require('../core/externalIPService');
+
 // Set up
 var adapter = new ciaoAdapter();
 var tokenManager = new TokenManager(sessionHandler);
 
-var nodeService = new NodeService(adapter.useNode('controller'),
+var controllerAdapter = adapter.useNode('controller');
+var nodeService = new NodeService(controllerAdapter,
                                   tokenManager);
 var tenantService = new TenantService(adapter.useNode('controller'),
                                       tokenManager);
 var blockService = new BlockService(adapter.useNode('storage'),
                                     tokenManager);
+
+//Note: using controller's hostname configuration and default port
+//and protocol
+var imageService = new ImageService(adapter.useSetup({
+                                        hostname:controllerAdapter.host,
+                                        port:"9292",
+                                        protocol:"https"
+                                    }),
+                                    tokenManager);
+
+var externalIPService = new ExternalIPService(adapter.useSetup({
+                                        hostname:controllerAdapter.host,
+                                        port:"8889",
+                                        protocol:"https"
+                                    }),
+                                    tokenManager);
+
 // Validate session as an authorized token is required
 router.use(sessionHandler.validateSession);
 
@@ -33,9 +69,45 @@ router.delete('/:tenant/servers/:server', function (req, res, next) {
         .validate(req, res);
 });
 
+/* Endpoints for External IPs */
+// External IP Service GET Methods
+router.get('/external-ips', externalIPService.listExternalIPs());
+
+/* Endpoints for Pools Service */
+// Pool Service GET Methods
+router.get('/pools', externalIPService.listPools());
+router.get('/pools/:pool_id', externalIPService.listPoolByID()); //Does not work
+
+// Pool Service POST Methods
+router.post('/pools',externalIPService.createPool());
+router.post('/pools/:pool_id', externalIPService.addExternalIPsTOPool());
+
+// Pool Service DELETE Methods
+router.delete('/pools/:pool_id', externalIPService.deletePool());
+router.delete('/pools/:pool_id/subnets/:subnet_id', externalIPService.
+            deleteSubnetById());
+router.delete('/pools/:pool_id/external-ips/:ip_id', externalIPService.
+            deleteIpFromPool());
+router.delete('/external-ips/:mapping_id', externalIPService.deleteMappedIp());
+
+/* Endpoints for Image Service */
+// Image service GET Methods
+router.get('/images', imageService.getImages());
+router.get('/:tenant/images/:image_id', imageService.getImageDetails());
+
+// Image service POST Methods
+router.post('/:tenant/images', imageService.createImage());
+
+// Placeholder fot Image service PUT Methods
+// router.put('/:tenant/images/:image_id/file', imageService.uploadImage());
+
+// Image service DELETE Methods
+router.delete('/:tenant/images/:image_id', imageService.deleteImage());
+
 /* Enpoints compatible with block storage API */
 // Block service GET Methods
 router.get('/:tenant/volumes', blockService.getVolumes());
+router.get('/:tenant/volumes/detail', blockService.getVolumesDetail());
 
 // Block service POST Methods
 router.post('/:tenant/volumes', blockService.createVolume());
@@ -51,8 +123,16 @@ router.put('/:tenant/volumes/:volume_id', blockService.updateVolume());
 // Tenant service POST Methods
 router.post('/:tenant/servers', tenantService.createServers());
 router.post('/:tenant/servers/action', tenantService.postServersAction());
+router.post('/:tenant/servers/:server/os-volume_attachments',
+            tenantService.attachVolume());
 router.post('/:tenant/servers/:server/action',
             tenantService.postServerAction());
+
+// Tenant service DELETE Methods
+router.delete('/:tenant/servers/:server/os-volume_attachments/:attachment_id',
+              tenantService.detachVolume());
+
+// Tenant service GET Methods
 
 router.get('/:tenant/servers/detail/count', tenantService.serversDetailCount());
 router.get('/:tenant/servers/detail', tenantService.serversDetail());

@@ -652,29 +652,217 @@ var catalogue = React.createClass({
 
 module.exports = catalogue;
 },{"./customAlert.js":2,"./customModal.js":4,"./customTable.js":7,"./tableActionToolbar.js":8,"react":444}],4:[function(require,module,exports){
-
 // React js component
 var React = require('react');
 var reactBootstrap = require('react-bootstrap');
 var Modal = reactBootstrap.Modal;
 var Button = reactBootstrap.Button;
+var Input = reactBootstrap.Input;
+var Alert = reactBootstrap.Alert;
+
+/* Custom modal usage
+   Properties
+    title:
+    fields:
+      type: parameter object Array
+      field object definition:
+         {
+             id:"html id",
+             label: "title or label",
+             type:html types (text, number),
+             options:[array of select values and labels {value"":,label:""}],
+             validate:{
+                required:true/false,
+                regex:regex expression for complex fields
+                message:error message to show if the regex expression dont pass
+             }
+         }
+    onClose:
+      type: function
+    onAccept: function (parameters) {}
+              callback function to be executed at 'handleSubmit' event.
+              This function passes on parameters
+    cancelText
+    acceptText
+    type: the type of modal to render, available types: 'form'
+*/
 
 var customModal = React.createClass({
     displayName: 'customModal',
 
+
+    getInitialState: function () {
+        return {
+            showModal: true,
+            showAlert: false,
+            data: []
+        };
+    },
 
     getDefaultProps: function () {
         return {
             acceptText: 'Ok',
             cancelText: 'Cancel',
             title: 'Title of the modal',
-            body: 'Body of the modal'
+            type: null
         };
     },
+
+    onChange: function (key, event) {
+
+        if (event) {
+            var data = this.state.data;
+            data[key] = event.target ? event.target.value : event.value;
+            this.setState({ data: data });
+        } else {
+            var data = this.state.data;
+            data[key] = null;
+            this.setState({ data: data });
+        }
+    },
+
+    getBody: function () {
+        if (this.props.type == 'form') {
+            return this.props.fields.map((row, i) => {
+
+                var label = row.validate.required ? row.label + '*' : row.label;
+                switch (row.field) {
+                    case "input":
+                        return React.createElement(Input, {
+                            id: row.id,
+                            label: label,
+                            value: this.state.data[row.name],
+                            onChange: this.onChange.bind(this, row.name),
+                            type: row.type });
+                        break;
+                    case "textarea":
+                        return React.createElement('div', null, React.createElement('div', { className: 'form-group' }, React.createElement(
+                            'label',
+                            { 'class': 'control-label' },
+                            row.label
+                        )), React.createElement('div', { className: 'form-group' }, React.createElement('textarea', {
+                            id: row.id,
+                            className: 'form-control',
+                            label: label,
+                            value: this.state.data[row.name],
+                            onChange: this.onChange.bind(this, row.name)
+                        }, '')));
+                        break;
+                    case "select":
+                        return React.createElement(Select, {
+                            id: row.id,
+                            name: row.id,
+                            label: label,
+                            value: this.state.data[row.name],
+                            placeholder: row.placeholder ? row.placeholder : "",
+                            onChange: this.onChange.bind(this, row.name),
+                            options: row.options
+                        });
+
+                        break;
+                    default:
+                        return React.createElement('p', {}, 'field not implemented');
+                }
+            });
+        } else {
+            return React.createElement('p', {}, this.props.body);
+        }
+    },
+    //Return true if the field is empty
+    isEmpty: function (field) {
+        if (!field) {
+            return true;
+        } else {
+            if (field.trim() == "") {
+                return true;
+            }
+        }
+        return false;
+    },
+
+    //Return true if is wrong
+    validateFieldWithRegex: function (regex, field) {
+        var reg = new RegExp(regex);
+        if (!reg.test(field)) {
+            return true;
+        }
+
+        return false;
+    },
+
+    isValid: function () {
+        var valid = true;
+
+        if (this.props.type == 'form') {
+
+            valid = !this.props.fields.find(function (item) {
+                if (item.validate) {
+                    if (item.validate.required) {
+                        if (this.isEmpty(this.state.data[item.name])) {
+                            this.showAlert(item.label + " field can't be empty", 'danger');
+                            return true;
+                        } else {
+                            if (item.validate.regex) {
+                                var reg = new RegExp(item.validate.regex);
+                                if (!reg.test(this.state.data[item.name])) {
+                                    this.showAlert(item.validate.message, 'danger');
+                                    return true;
+                                } else {
+                                    this.hideAlert();
+                                }
+                            }
+                        }
+                    }
+                }
+                return false;
+            }.bind(this));
+        }
+
+        return valid;
+    },
+
+    showAlert: function (alertText, stateAlert) {
+        this.setState({
+            showAlert: {
+                text: alertText,
+                state: stateAlert
+            }
+        });
+    },
+
+    hideAlert: function () {
+        this.setState({
+            showAlert: false
+        });
+    },
+
+    handleClose: function () {
+        this.setState({ showModal: false, data: [] });
+        this.props.onClose(this.state.data, this.state);
+    },
+
+    handleSubmit: function () {
+        if (this.isValid()) {
+            this.props.onAccept(this.state.data, this.state);
+            this.setState({ showModal: false, data: [] });
+        }
+    },
+
     render: function () {
+
+        var alert = function () {
+            if (this.state.showAlert) {
+                return React.createElement(
+                    Alert,
+                    { bsStyle: this.state.showAlert.state },
+                    this.state.showAlert.text
+                );
+            }
+        }.bind(this);
+        //125
         return React.createElement(
             Modal,
-            { show: true, onHide: this.props.onClose },
+            { show: this.state.showModal, onHide: this.handleClose },
             React.createElement(
                 Modal.Header,
                 { closeButton: true },
@@ -687,23 +875,20 @@ var customModal = React.createClass({
             React.createElement(
                 Modal.Body,
                 null,
-                React.createElement(
-                    'p',
-                    null,
-                    this.props.body
-                )
+                alert(),
+                this.getBody()
             ),
             React.createElement(
                 Modal.Footer,
                 null,
                 React.createElement(
                     Button,
-                    { onClick: this.props.onClose },
+                    { onClick: this.handleClose },
                     this.props.cancelText
                 ),
                 React.createElement(
                     Button,
-                    { onClick: this.props.onAccept },
+                    { onClick: this.handleSubmit },
                     this.props.acceptText
                 )
             )
@@ -1035,12 +1220,18 @@ var elementSummary = React.createClass({
     },
 
     componentWillUpdate: function (nextProps, nextState) {},
+
+    componentWillUnmount: function () {
+        this._mounted = false;
+    },
+
     shouldComponentUpdate: function (nextProps, nextState) {
         //return this.props !== nextProps;
         return true;
     },
-    componentDidMount: function () {
 
+    componentDidMount: function () {
+        this._mounted = true;
         var callSource = function () {
             var n = dom.createElement('svg');
             n = d3Element.create(n, this.props, null);
@@ -1050,7 +1241,9 @@ var elementSummary = React.createClass({
         callSource();
 
         window.setInterval(function () {
-            callSource();
+            if (this._mounted) {
+                callSource();
+            }
         }.bind(this), 2000);
     },
     renderDonutChart: function () {
@@ -1087,12 +1280,13 @@ var elementSummary = React.createClass({
             if (this.props.history !== false) {
                 reference = "#instances-overview";
             } else {
-                reference = "/" + this.props.reference.substr(0, 6) + "#instances-overview";
+                reference = "/" + this.props.reference.replace(/\/\usage/gi, "") + "#instances-overview";
+                //reference = ((this.props.reference).substr(0,6)) + "#instances-overview";
             }
             buttonLabel = "Instances Overview";
         } else {
             if (this.props.history !== false) {
-                reference = this.props.reference + "#" + buttonLabel[0];
+                reference = "/" + this.props.reference + "#" + buttonLabel[0];
             } else {
                 reference = "#" + buttonLabel[0];
             }
@@ -1144,7 +1338,9 @@ var elementSummary = React.createClass({
         } else {
             return this.renderPanel();
         }
-    }
+    },
+
+    _mounted: false
 
 });
 
@@ -1593,7 +1789,7 @@ var usageSummary = React.createClass({
             } else {
                 // tenant
                 url = "/data/" + datamanager.data.activeTenant.id + this.props.source;
-                reference = "tenant/usage";
+                reference = datamanager.data.reference;
             }
             $.get({
                 url: url }).done(function (data) {
@@ -1658,7 +1854,6 @@ var usageSummary = React.createClass({
     },
 
     render: function () {
-        console.log("props usage summary", this.props);
         var dynamicWidth = Math.round(12 / this.props.data.length);
         var elements = [];
         var historyButton;
@@ -1668,7 +1863,7 @@ var usageSummary = React.createClass({
             if (this.props.data.length > 3) {
                 // tenant
                 columnGrid = "col-xs-3 col-sm-3";
-                reference = "tenant/usage";
+                reference = datamanager.data.reference;
             } else {
                 // admin
                 columnGrid = "col-xs-4 col-sm-4";
@@ -6320,6 +6515,8 @@ $export($export.S, 'Object', {setPrototypeOf: require('./$.set-proto').set});
   (factory((global.d3_time = global.d3_time || {})));
 }(this, function (exports) { 'use strict';
 
+  var version = "0.2.6";
+
   var t0 = new Date;
   var t1 = new Date;
   function newInterval(floori, offseti, count, field) {
@@ -6579,9 +6776,7 @@ $export($export.S, 'Object', {setPrototypeOf: require('./$.set-proto').set});
   var timeMonths = month.range;
   var timeYears = year.range;
 
-  var utcMillisecond = millisecond;
   var utcMilliseconds = timeMilliseconds;
-  var utcSecond = second;
   var utcSeconds = timeSeconds;
   var utcMinutes = utcMinute.range;
   var utcHours = utcHour.range;
@@ -6597,9 +6792,6 @@ $export($export.S, 'Object', {setPrototypeOf: require('./$.set-proto').set});
   var utcMonths = utcMonth.range;
   var utcYears = utcYear.range;
 
-  var version = "0.2.5";
-
-  exports.version = version;
   exports.timeMilliseconds = timeMilliseconds;
   exports.timeSeconds = timeSeconds;
   exports.timeMinutes = timeMinutes;
@@ -6615,9 +6807,7 @@ $export($export.S, 'Object', {setPrototypeOf: require('./$.set-proto').set});
   exports.timeWeeks = timeWeeks;
   exports.timeMonths = timeMonths;
   exports.timeYears = timeYears;
-  exports.utcMillisecond = utcMillisecond;
   exports.utcMilliseconds = utcMilliseconds;
-  exports.utcSecond = utcSecond;
   exports.utcSeconds = utcSeconds;
   exports.utcMinutes = utcMinutes;
   exports.utcHours = utcHours;
@@ -6647,6 +6837,8 @@ $export($export.S, 'Object', {setPrototypeOf: require('./$.set-proto').set});
   exports.timeWeek = sunday;
   exports.timeMonth = month;
   exports.timeYear = year;
+  exports.utcMillisecond = millisecond;
+  exports.utcSecond = second;
   exports.utcMinute = utcMinute;
   exports.utcHour = utcHour;
   exports.utcDay = utcDay;
@@ -6660,7 +6852,10 @@ $export($export.S, 'Object', {setPrototypeOf: require('./$.set-proto').set});
   exports.utcWeek = utcSunday;
   exports.utcMonth = utcMonth;
   exports.utcYear = utcYear;
+  exports.version = version;
   exports.timeInterval = newInterval;
+
+  Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
 },{}],57:[function(require,module,exports){

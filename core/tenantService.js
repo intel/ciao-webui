@@ -1,3 +1,18 @@
+/* Copyright (c) 2017 Intel Corporation
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
 var spawn = require('child_process').fork;
 var querystring = require('querystring');
 
@@ -65,10 +80,26 @@ tenantService.prototype.serversDetail = function () {
                         res.send(servers
                                  .map((value) => {
                                      var image = value.image.id;
-                                     var address = value.addresses.private[0];
+                                     var mapStatus = (x) => {
+                                         var m = x;
+                                         switch (x) {
+                                         case 'ACTIVE':
+                                             m = 'active';
+                                             break;
+                                         case 'SHUTOFF':
+                                             m = 'stopped';
+                                             break;
+                                         };
+                                         return m;
+                                     };
+                                     var address = value.addresses.private ?
+                                             value.addresses.private[0]
+                                             :value.addresses.public ?
+                                             value.addresses.public[0]
+                                         :'none';
                                      return {
                                          "id": value.id,
-                                         "status": value.status,
+                                         "status": mapStatus(value.status),
                                          "Node ID": value.hostId,
                                          "IP Address": address.addr,
                                          "MAC address":address[
@@ -165,7 +196,8 @@ tenantService.prototype.flavorsDetail = function () {
                 var globals = {
                     controller_addr:global.CONTROLLER_ADDR,
                     controller_port:global.CONTROLLER_PORT,
-                    protocol: global.PROTOCOL
+                    protocol: global.PROTOCOL,
+                    config_file: global.CONFIG_FILE
                 };
                 child.send(JSON.stringify({
                     uri: uri,
@@ -272,10 +304,11 @@ tenantService.prototype.postServersAction = function () {
             var d = {};
             d["action"] = req.body.action;
             d["status"] = req.body.status;
-            var data = adapter.post(uri,
-                                    d,
-                                    token,
-                                    () => res.send(data.raw));
+            var data = adapter.onSuccess(() => res.send(data.raw))
+                    .onError((err) => res.send(err))
+                    .post(uri,
+                          d,
+                          token);
         }
                               )
             .validate(req, res);
@@ -294,16 +327,81 @@ tenantService.prototype.postServerAction = function () {
             // "-os-start":
             // "-os-stop"
             var d = {};
-            d["server"] = req.body.server;
-            d[req.body.action] = req.body.action;
-            var data = adapter.post(uri,
-                                    d,
-                                    token,
-                                    () => res.send(data.json));
+            d[req.body.action] = null;
+//            d["server"] = req.body.server;
+//            d[req.body.action] = req.body.action;
+            console.log(d);
+            var data = adapter.onSuccess(() => res.send(data.raw))
+                    .onError((err) => res.send(err))
+                    .post(uri,
+                          d,
+                          token);
+        })
+            .validate(req, res);
+    };
+};
+
+// attach volume to a server
+tenantService.prototype.attachVolume = function () {
+    var adapter = this.adapter;
+    var tokenManager = this.tokenManager;
+    return function (req, res, next) {
+        tokenManager.onSuccess((t) => {
+            var token = (t)?t:req.session.token;
+            var uri = "/v2.1/" + req.params.tenant +
+                    "/servers/"+req.params.server + "/os-volume_attachments";
+            var body = JSON.parse(req.body.json);
+            console.log(uri);
+            console.log("Vol attachment", body);
+            var data = adapter.onSuccess(() => {
+                console.log(data);
+                res.send(data.json);
+            })
+                    .onError(() => {
+                        console.log('ERROR:',data);
+                        res.send(data);
+                    })
+                    .post(uri,
+                          body,
+                          // {
+                          //     "volumeAttachment":{
+                          //         "volumeId":body.volumeAttachment.id,
+                          //         "device":"/dev/vdd"
+                          //     }
+                          // },
+                          token);
         }
                               )
             .validate(req, res);
     };
 };
+
+// detach volume from instance
+tenantService.prototype.detachVolume = function () {
+    var adapter = this.adapter;
+    var tokenManager = this.tokenManager;
+    return function (req, res, next) {
+        tokenManager.onSuccess((t) => {
+            var token = (t)?t:req.session.token;
+            var uri = "/v2.1/" + req.params.tenant +
+                    "/servers/"+req.params.server + "/os-volume_attachments"
+                    + '/' +req.params.attachment_id;
+            var data = adapter.onSuccess(() => {
+                console.log(data);
+                res.send(data.json);
+            })
+                    .onError(() => {
+                        console.log('ERROR:',data);
+                        res.send(data);
+                    })
+                    .delete(uri,
+                          token);
+        }
+                              )
+            .validate(req, res);
+    };
+
+};
+
 
 module.exports = tenantService;

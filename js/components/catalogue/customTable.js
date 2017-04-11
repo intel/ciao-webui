@@ -1,3 +1,18 @@
+/* Copyright (c) 2017 Intel Corporation
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 // React js component
@@ -23,7 +38,7 @@ var customTable = React.createClass({
             newSelected.push(selectedRow);
         }else{
             var indexRow = this.props.selectedRows.findIndex(function (row) {
-                return row[key] == selectedRow[key]
+                return row[key] == selectedRow[key];
             });
 
             this.props.selectedRows.forEach(function (element, index) {
@@ -31,7 +46,7 @@ var customTable = React.createClass({
                 if (selectedRow[key] != element[key]) {
                     newSelected.push(element);
                 }
-            })
+            });
 
             //If not exist, add it.
             if(indexRow < 0) {

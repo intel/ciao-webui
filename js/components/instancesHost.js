@@ -1,3 +1,18 @@
+/* Copyright (c) 2017 Intel Corporation
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
 // React js component
 var React = require('react');
 var CustomCatalogue = require('./catalogue/customCatalogue.js');
@@ -140,8 +155,8 @@ var instancesHost = React.createClass({
     //If at least one is exites or stopped, enabled the button
     disabledStartButton: function (items) {
         var find = items.filter(function(item){
-            return item.status == 'exited' || item.status == 'stopped'
-        })
+            return item.status == 'exited' || item.status == 'stopped';
+        });
 
         return find.length == 0;
     },
@@ -149,8 +164,8 @@ var instancesHost = React.createClass({
     //If at least one is active, enabled the button
     disabledStopButton: function (items) {
         var find = items.filter(function(item){
-            return item.status == 'active'
-        })
+            return item.status == 'active';
+        });
 
         return find.length == 0;
     },
@@ -281,7 +296,7 @@ var instancesHost = React.createClass({
             onChangePage: this.onChangePage,
             id: 'id',
             ref: 'catalogue',
-            searchTitle: 'Search Instances',
+            searchTitle: 'Search Instances'
         });else return React.createElement('div', null);
     }
 });
