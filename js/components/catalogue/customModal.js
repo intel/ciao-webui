@@ -83,7 +83,7 @@ var customModal = React.createClass({
 
     getBody: function(){
         if(this.props.type == 'form'){
-            return this.props.fields.map((row, i) => {
+            var elems = this.props.fields.map((row, i) => {
 
                 var label = (row.validate.required)?row.label + '*':row.label;
                 switch(row.field) {
@@ -125,6 +125,7 @@ var customModal = React.createClass({
                     break;
                 case "select":
                     return <Input
+                            key={row.id}
                             id={row.id}
                             type="select"
                             name={row.id}
@@ -133,7 +134,7 @@ var customModal = React.createClass({
                             placeholder={row.placeholder?row.placeholder:""}
                             onChange={this.onChange.bind(this, row.name)}
                             >
-                                {row.options}
+				{row.options.map(function (opt) {return opt.type == "option"?opt:(<option value={opt.value}>{opt.label}</option>);})}
                             </Input>;
 
                     break;
@@ -143,6 +144,7 @@ var customModal = React.createClass({
                     );
                 }
             });
+        return (<div>{elems}</div>);
         }else{
             return React.createElement(
                 'p', {},this.props.body
