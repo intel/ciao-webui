@@ -492,16 +492,15 @@ $('document').ready(function () {
                         // TODO: this detach system only works if volume
                         // is attached to a single instance. as it detaches only
                         // the first attachment. Look for better implementation
-                        var server_id = volumeList
-                                .filter((i) => vol_id === i.id)[0]
-                                .attachments[0]['server_id'];
+                        //var server_id = volumeList
+                        //        .filter((i) => vol_id === i.id)[0]
+                        //        .attachments[0]['server_id'];
                         $.ajax({
                             type: 'DELETE',
                             url: '/data/' +
                                 datamanager.data.activeTenant.id
-                                + '/servers/' + server_id
-                                + '/os-volume_attachments'
-                                + '/' + vol_id
+                                + '/volumes/' + vol_id
+                                + '/action'
                         })
                             .done((data) => console.log(data))
                             .fail((data) => console.log(data));

@@ -126,4 +126,22 @@ blockService.prototype.attachVolume = function() {
     };
 };
 
+blockService.prototype.detachVolume = function() {
+    var adapter = this.adapter;
+    var tokenManager = this.tokenManager;
+    return function (req, res, next) {
+        var uri = "/v2/"+req.params.tenant + "/volumes/"
+                + req.params.volume_id
+                + "/action";
+        // if req.body is well built, use it as os_attach object
+        // otherwise, attempt to retrieve isntance_uuid value to construct it
+        var os_detach = req.body["os-detach"]?req.body:{
+            "os-detach":{
+            }
+        };
+        return adapter.onSuccess((data) => res.send(data.json))
+            .onError((data) => res.send(data))
+            .post(uri, os_detach, req.session.token);
+    };
+};
 module.exports = blockService;
