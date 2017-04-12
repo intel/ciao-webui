@@ -419,16 +419,16 @@ $('document').ready(function () {
                                 .getElementById("attach_volume_id").value;
                         var server_id = document
                                 .getElementById("attach_instance").value;
-                        var volumeAttachment = {"volumeAttachment":{
-                            "volumeId":vol_id,
-                            "device": null
-                        }};
+                        var volumeAttachment = {
+                            "instance_uuid":server_id,
+                            "mountpoint": "/dev/vdb"
+                        };
                         $.post({
                             url: '/data/' +
                                 datamanager.data.activeTenant.id
-                                + '/servers/' + server_id
-                                + '/os-volume_attachments',
-                            data:{"json": JSON.stringify(volumeAttachment)}
+                                + '/volumes/' + vol_id
+                                + '/action',
+                            data: volumeAttachment
                         })
                             .done((data) => console.log(data))
                             .fail((data) => console.log(data));
