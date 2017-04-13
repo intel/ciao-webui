@@ -1,5 +1,20 @@
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
+/* Copyright (c) 2017 Intel Corporation
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
 var React = require('react');
 var ReactDOM = require('react-dom');
 var Catalogue = require('../components/catalogue/catalogue.js');
@@ -348,13 +363,13 @@ $('document').ready(function () {
 
                     var vol_id = document.getElementById("attach_volume_id").value;
                     var server_id = document.getElementById("attach_instance").value;
-                    var volumeAttachment = { "volumeAttachment": {
-                            "volumeId": vol_id,
-                            "device": null
-                        } };
+                    var volumeAttachment = {
+                        "instance_uuid": server_id,
+                        "mountpoint": "/dev/vdb"
+                    };
                     $.post({
-                        url: '/data/' + datamanager.data.activeTenant.id + '/servers/' + server_id + '/os-volume_attachments',
-                        data: { "json": JSON.stringify(volumeAttachment) }
+                        url: '/data/' + datamanager.data.activeTenant.id + '/volumes/' + vol_id + '/action',
+                        data: volumeAttachment
                     }).done(data => console.log(data)).fail(data => console.log(data));
                     document.getElementById(node.id).remove();
                 },
@@ -405,10 +420,12 @@ $('document').ready(function () {
                     // TODO: this detach system only works if volume
                     // is attached to a single instance. as it detaches only
                     // the first attachment. Look for better implementation
-                    var server_id = volumeList.filter(i => vol_id === i.id)[0].attachments[0]['server_id'];
+                    //var server_id = volumeList
+                    //        .filter((i) => vol_id === i.id)[0]
+                    //        .attachments[0]['server_id'];
                     $.ajax({
                         type: 'DELETE',
-                        url: '/data/' + datamanager.data.activeTenant.id + '/servers/' + server_id + '/os-volume_attachments' + '/' + vol_id
+                        url: '/data/' + datamanager.data.activeTenant.id + '/volumes/' + vol_id + '/action'
                     }).done(data => console.log(data)).fail(data => console.log(data));
                     document.getElementById(node.id).remove();
                 },
