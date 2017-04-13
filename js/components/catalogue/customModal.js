@@ -1,3 +1,18 @@
+/* Copyright (c) 2017 Intel Corporation
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
 // React js component
 var React = require('react');
 var reactBootstrap = require('react-bootstrap');
@@ -68,7 +83,7 @@ var customModal = React.createClass({
 
     getBody: function(){
         if(this.props.type == 'form'){
-            return this.props.fields.map((row, i) => {
+            var elems = this.props.fields.map((row, i) => {
 
                 var label = (row.validate.required)?row.label + '*':row.label;
                 switch(row.field) {
@@ -109,15 +124,18 @@ var customModal = React.createClass({
                             );
                     break;
                 case "select":
-                    return <Select
+                    return <Input
+                            key={row.id}
                             id={row.id}
+                            type="select"
                             name={row.id}
                             label={label}
                             value={this.state.data[row.name]}
                             placeholder={row.placeholder?row.placeholder:""}
                             onChange={this.onChange.bind(this, row.name)}
-                            options={row.options}
-                            />;
+                            >
+				{row.options.map(function (opt) {return opt.type == "option"?opt:(<option value={opt.value}>{opt.label}</option>);})}
+                            </Input>;
 
                     break;
                 default:
@@ -126,6 +144,7 @@ var customModal = React.createClass({
                     );
                 }
             });
+        return (<div>{elems}</div>);
         }else{
             return React.createElement(
                 'p', {},this.props.body

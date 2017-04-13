@@ -1,3 +1,18 @@
+/* Copyright (c) 2017 Intel Corporation
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
 var spawn = require('child_process').fork;
 var querystring = require('querystring');
 
@@ -313,9 +328,6 @@ tenantService.prototype.postServerAction = function () {
             // "-os-stop"
             var d = {};
             d[req.body.action] = null;
-//            d["server"] = req.body.server;
-//            d[req.body.action] = req.body.action;
-            console.log(d);
             var data = adapter.onSuccess(() => res.send(data.raw))
                     .onError((err) => res.send(err))
                     .post(uri,
@@ -336,10 +348,7 @@ tenantService.prototype.attachVolume = function () {
             var uri = "/v2.1/" + req.params.tenant +
                     "/servers/"+req.params.server + "/os-volume_attachments";
             var body = JSON.parse(req.body.json);
-            console.log(uri);
-            console.log("Vol attachment", body);
             var data = adapter.onSuccess(() => {
-                console.log(data);
                 res.send(data.json);
             })
                     .onError(() => {
@@ -372,7 +381,6 @@ tenantService.prototype.detachVolume = function () {
                     "/servers/"+req.params.server + "/os-volume_attachments"
                     + '/' +req.params.attachment_id;
             var data = adapter.onSuccess(() => {
-                console.log(data);
                 res.send(data.json);
             })
                     .onError(() => {

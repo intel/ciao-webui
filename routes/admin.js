@@ -1,3 +1,18 @@
+/* Copyright (c) 2017 Intel Corporation
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
 var express = require('express');
 var router = express.Router();
 var sessionHandler = require('../core/session');
@@ -18,7 +33,7 @@ var config = {
 
 function validatePermissions (req, res, next){
     if(!req.session.isAdmin){ //if is admin, redirect to /admin
-        res.redirect('/forbidden');
+      res.redirect('/forbidden');
     }
 
     next();
@@ -265,6 +280,33 @@ router.get('/tenantDetail/:name/usage', function (req, res, next) {
     };
     usageConfig.data.reference = "admin/tenantDetail/"+req.params.name+"/usage";
     res.render(process.env.NODE_ENV+'_template', usageConfig);
+});
+
+
+var createPoolConfig = {
+    title: 'Create New IP Pool',
+    page: 'pages/create_pool.ejs',
+    scripts: [
+        '/javascripts/bundle_create_pool.js'
+    ],
+    data: {
+        title: 'Create New IP Pool',
+        section: 'IP Pool'
+    }
+};
+
+router.get('/create/pool', function (req, res, next) {
+
+    createPoolConfig.data.username = req.session.username;
+    createPoolConfig.data.tenants = req.session.tenants;
+    createPoolConfig.data.activeTenant = req.session.activeTenant;
+    createPoolConfig.data.idNetwork =  req.params.id;
+    createPoolConfig.data.navbar = {
+        username: req.session.username,
+        tenants: req.session.tenants,
+        logoutUrl: "/authenticate/logout"
+    };
+    res.render(process.env.NODE_ENV+'_template', createPoolConfig);
 });
 
 
