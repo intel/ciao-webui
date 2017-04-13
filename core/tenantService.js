@@ -328,9 +328,6 @@ tenantService.prototype.postServerAction = function () {
             // "-os-stop"
             var d = {};
             d[req.body.action] = null;
-//            d["server"] = req.body.server;
-//            d[req.body.action] = req.body.action;
-            console.log(d);
             var data = adapter.onSuccess(() => res.send(data.raw))
                     .onError((err) => res.send(err))
                     .post(uri,
@@ -351,10 +348,7 @@ tenantService.prototype.attachVolume = function () {
             var uri = "/v2.1/" + req.params.tenant +
                     "/servers/"+req.params.server + "/os-volume_attachments";
             var body = JSON.parse(req.body.json);
-            console.log(uri);
-            console.log("Vol attachment", body);
             var data = adapter.onSuccess(() => {
-                console.log(data);
                 res.send(data.json);
             })
                     .onError(() => {
@@ -387,7 +381,6 @@ tenantService.prototype.detachVolume = function () {
                     "/servers/"+req.params.server + "/os-volume_attachments"
                     + '/' +req.params.attachment_id;
             var data = adapter.onSuccess(() => {
-                console.log(data);
                 res.send(data.json);
             })
                     .onError(() => {
