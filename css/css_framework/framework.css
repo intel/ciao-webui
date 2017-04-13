@@ -1,7 +1,16 @@
-/*
-* Framework CSS 1.0
-* @CIAO web ui
-* @Author: Cloud UI & UX
+/* Copyright (c) 2017 Intel Corporation
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
 */
 
 /*
@@ -723,16 +732,25 @@ div .alert-danger {
 }
 
 /*Pools*/
-framework.css
 .frm-panel-heading-dotted {
     border: 2px dotted #404040;
     border-bottom-color: transparent;
     padding-left: 20px;
     padding-top: 10px;
     padding-bottom: 10px;
-    font-weight: bold;
-    font-size: 16px;
+    font-weight: bolder;
+    font-size: 20px;
 }
+
+.button-form{
+  float: right;
+  margin-bottom: 20px;
+}
+
+.notation-slash{
+  font-size: 20px;
+}
+
 .frm-panel-dotted {
     border-left: 2px dotted #404040;
     border-right: 2px dotted #404040;
@@ -787,8 +805,4 @@ framework.css
   padding-bottom: 10px;
   font-size: 13px;
   font-style: italic;
-}
-
-.notation-slash{
-  font-size: 20px;
 }
